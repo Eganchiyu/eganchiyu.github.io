@@ -361,3 +361,7 @@ defaults:
       comments: # true
       share: true
       related: true
+      sidebar: false
+      header:
+        overlay: false
+        show_overlay_excerpt: false
