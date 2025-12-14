@@ -1,5 +1,6 @@
 ---
 title: "为什么我要搭一个博客"
+excerpt: "我为什么要开始写博客"
 date: 2025-12-14
 categories:
   - 随想
