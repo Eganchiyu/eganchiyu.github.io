@@ -1,0 +1,12 @@
+/* 文章列表页 & 页面标题：去掉链接蓝色和下划线 */
+.archive__item-title a,
+.page__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 悬停时给一点提示（可选） */
+.archive__item-title a:hover,
+.page__title a:hover {
+  text-decoration: underline;
+}
