@@ -33,9 +33,7 @@ tags:
 
 这个博客基于 **GitHub Pages + Jekyll + Minimal Mistakes** 搭建。
 
-可以在我的github仓库看到这个项目。
-
-https://github.com/Eganchiyu/eganchiyu.github.io
+可以在[我的github仓库](https://github.com/Eganchiyu/eganchiyu.github.io)看到这个项目。
 
 来试一下示例代码块：
 
