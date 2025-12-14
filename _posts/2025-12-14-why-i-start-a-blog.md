@@ -46,7 +46,7 @@ def write_blog():
 
 尝试一下图片块:
 
-![](assets/images/2025-12-14-11-19-27.png)
+![](/assets/images/2025-12-14-11-36-41.png)
 
 ## 结语
 
