@@ -44,6 +44,10 @@ def write_blog():
     print("Keep writing.")
 ```
 
+尝试一下图片块:
+
+![](assets/images/2025-12-14-11-19-27.png)
+
 ## 结语
 
 总体来说大概就是这样，那么以后也请多多关照。
