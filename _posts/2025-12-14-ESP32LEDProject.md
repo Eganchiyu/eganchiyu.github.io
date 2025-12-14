@@ -9,6 +9,8 @@ tags:
   - 记录
   - 编程
 
+entries_layout: grid
+
 header:
   teaser: /assets/images/2025-12-14-21-02-11.png
 ---
