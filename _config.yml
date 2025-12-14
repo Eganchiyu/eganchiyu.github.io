@@ -16,10 +16,10 @@ minimal_mistakes_skin    : "contrast" # "air", "aqua", "contrast", "dark", "dirt
 
 # Site Settings
 locale                   : "zh-CN"
-rtl                      : "学习 · 记录 · 随想" # true, false (default) # turns direction of the page into right to left for RTL languages
+rtl                      : false # true, false (default) # turns direction of the page into right to left for RTL languages
 title                    : "Eganchiyu的Github Pages"
 title_separator          : "-"
-subtitle                 : # site tagline that appears below site title in masthead
+subtitle                 : "学习 · 记录 · 随想" # site tagline that appears below site title in masthead
 name                     : "Eganchiyu"
 description              : "开始搭建一个基于Github Pages的静态个人网站，可能用于记录想法和学习心得，或者跟进项目动态，或者单纯用来发电。"
 url                      : https://eganchiyu.github.io/  # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
