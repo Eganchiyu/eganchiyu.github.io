@@ -22,13 +22,21 @@
 }
 
 .author__bio.p-note-spoil {
-  background-color: #222;
-  color: transparent;
-  border-radius: 4px;
-  padding: 0em 0em;
-  transition: color 0.25s ease;
+  color: #252525;
+  background-color: #252525;
+  transition: color 0.15s ease;
 }
 
 .author__bio.p-note-spoil:hover {
-  color: #eee;
+  color: #ffffff;
+}
+
+.heimu {
+  color: #222;
+  background-color: #222;
+  transition: color 0.15s ease;
+}
+
+.heimu:hover {
+  color: #fff;
 }
