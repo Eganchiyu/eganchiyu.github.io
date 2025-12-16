@@ -19,6 +19,10 @@
       <div class="author__bio p-note" itemprop="description">
         {{ author.bio | markdownify }}
       </div>
+
+      <div class="author__bio p-note-spoil" itemprop="description">
+        {{ author.bio_fun | markdownify }}
+      </div>
     {% endif %}
   </div>
 

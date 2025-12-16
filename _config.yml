@@ -122,6 +122,7 @@ author:
   name             : "Eganchiyu"
   avatar           : "/assets/images/avatar.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : 正在学习机器学习的大一学生 #"沉迷网络的废柴大学生"
+  bio_fun          : 沉迷网络的废柴大学生
   location         : "西安"
   email            : eganchiyu@163.com
   links:
