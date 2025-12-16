@@ -20,3 +20,15 @@
     "STSong",
     serif;
 }
+
+.author__bio.p-note-spoil {
+  background-color: #222;
+  color: transparent;
+  border-radius: 4px;
+  padding: 0em 0em;
+  transition: color 0.25s ease;
+}
+
+.author__bio.p-note-spoil:hover {
+  color: #eee;
+}
