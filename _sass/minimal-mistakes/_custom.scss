@@ -31,38 +31,53 @@
 //   color: #ffffff;
 // }
 
-body.layout--home {
-  background-image: linear-gradient(rgba(255, 255, 255, .13)),
-  url("https://free.picui.cn/free/2025/09/09/68c0398b3c11c.png") !important;
-  /*在这里修改图片*/
+.layout--home {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.107)), url(https://free.picui.cn/free/2025/09/09/68c0398b3c11c.png) !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;
-  -webkit-backdrop-filter: blur(3px) !important;
-  backdrop-filter: blur(3px) !important; /*在这里修改模糊程度*/
+  z-index: -2;
 }
 
-.archive{
-  background: rgba(255, 255, 255, .3);
-  background-size: cover;
-  position: relative;
-  cursor: pointer;
-  -webkit-backdrop-filter: blur(5px) !important;
-  backdrop-filter: blur(5px) !important;
-  /*在这里修改模糊程度*/
+// body.layout--home::before {
+//   content: "";
+//   position: fixed;
+//   inset: 0;
+//   background: rgba(255, 255, 255, 0);
+//   -webkit-backdrop-filter: blur(8px);
+//   backdrop-filter: blur(8px);
+//   z-index: 0;
+// }
+
+.layoutCover--home{
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.658);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  z-index: 0;
 }
+
+.initial-content.main.archive{
+
+  background: rgba(255, 255, 255, 0);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  z-index: 0;
+}
+
 
 .greedy-nav {
-  position: relative;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-height: 2em;
-  -webkit-backdrop-filter: blur(5px) !important;
-  backdrop-filter: blur(5px) !important;
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    min-height: 2em;
+    background: #ffffff00;
 }
 
 .heimu {
