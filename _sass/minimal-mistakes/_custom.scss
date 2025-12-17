@@ -38,6 +38,18 @@ body.layout--home {
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  backdrop-filter: blur(3px) !important; /*在这里修改模糊程度*/
+}
+
+.archive{
+  background: rgba(255, 255, 255, .3);
+  background-size: cover;
+  position: relative;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(5px) !important;
+  backdrop-filter: blur(5px) !important;
+  /*在这里修改模糊程度*/
 }
 
 .heimu {
