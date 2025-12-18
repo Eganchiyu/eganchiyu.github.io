@@ -89,3 +89,92 @@
 .heimu:hover {
   color: #fff;
 }
+
+.highlight,
+pre.highlight {
+  background: #f8f9fa;
+  color: #24292e;
+  padding: 1em;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+/* 行内代码 */
+code {
+  color: #0f1113;
+}
+
+/* 注释 */
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cp {
+  color: #6a737d;
+  font-style: italic;
+}
+
+/* 关键字 */
+.highlight .k,
+.highlight .kd,
+.highlight .kt,
+.highlight .kr,
+.highlight .kp {
+  color: #005cc5;
+}
+
+/* 类型 / 类名 */
+.highlight .nc,
+.highlight .nn {
+  color: #6f42c1;
+}
+
+/* 函数名 */
+.highlight .nf {
+  color: #6f42c1;
+}
+
+/* 字符串 */
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd {
+  color: #d73a49;
+}
+
+/* 数字 */
+.highlight .mi,
+.highlight .mf,
+.highlight .mh,
+.highlight .il {
+  color: #005cc5;
+}
+
+/* 运算符 */
+.highlight .o {
+  color: #d73a49;
+}
+
+/* 变量名 */
+.highlight .nv,
+.highlight .nb {
+  color: #24292e;
+}
+
+.highlight .n{
+  color:#0f1113
+}
+
+/* 高亮行 */
+.highlight .hll {
+  background-color: #fff5b1;
+}
+
+/* 行号（如果你开了） */
+.highlight table td.gutter {
+  color: #999;
+  padding-right: 0.8em;
+  -webkit-user-select: none;
+  user-select: none;
+}
