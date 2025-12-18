@@ -263,7 +263,7 @@ g(x,y) = exp(-(x²+y²)/2σ²) · cos(2πfx)
 
 ## 示例代码
 
-```Python
+```python
 def smooth_filter(self):
     img = cv2.imread(self.imagePath)
     kernel = np.ones((3,3), np.float32) / 9
@@ -337,7 +337,7 @@ $$
     这是一个：
 
     $$
-    T : ℝ²⁵ → ℝ²⁵
+    T : ℝ^{25} → ℝ^{25}
     $$
 
     所以根据**线性代数的语境**，卷积核生成了一个**卷积矩阵** $A$ ，使得
