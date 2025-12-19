@@ -33,9 +33,9 @@
 
 .layout--home {
   background-image: linear-gradient(rgba(255, 255, 255, 0.107)), url(https://free.picui.cn/free/2025/09/09/68c0398b3c11c.png) !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-attachment: fixed !important;
+  background-size: cover ;
+  background-position: center ;
+  background-attachment: fixed ;
   z-index: -2;
 }
 
@@ -181,9 +181,9 @@ code {
 
 .layout--single{
   background-image: linear-gradient(rgba(255, 255, 255, 0.107)), url(https://free.picui.cn/free/2025/09/09/68c0398b3c11c.png) !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-attachment: fixed !important;
+  background-size: cover ;
+  background-position: center ;
+  background-attachment: fixed ;
   z-index: -2;
 }
 
@@ -196,3 +196,22 @@ code {
   backdrop-filter: blur(5px);
   z-index: 0;
 }
+
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll !important;
+    background-position: center;
+    background-size: cover;
+  }
+}
+
+// 下一步解决问题：
+/*
+
+1. 字体显示不正确
+2. 跨平台latex显示大小不正确
+3. 跨平台latex显示超出屏幕范围
+4. 强行使用浅色背景，并设计一份深色背景来按照情况选用
+5. 跨平台背景图片不显示问题
+
+*/
