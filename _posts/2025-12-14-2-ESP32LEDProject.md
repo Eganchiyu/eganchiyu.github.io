@@ -1,6 +1,6 @@
 ---
 title: "ESP32 双灯氛围灯项目实践记录"
-excerpt: "我这个基于ESP32的LED彩灯项目记录"
+excerpt: "基于ESP32的LED彩灯项目记录"
 date: 2025-12-14
 categories:
   - 编程
