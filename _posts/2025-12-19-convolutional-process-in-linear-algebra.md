@@ -13,8 +13,8 @@ mathjax: true
 
 entries_layout: grid
 
-# header:
-#   teaser: /assets/images/2025-12-17-20-39-48.png
+header:
+  teaser: /assets/images/2025-12-31-13-42-01.png
 ---
 
 # 前言
