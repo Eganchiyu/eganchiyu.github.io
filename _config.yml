@@ -75,7 +75,7 @@ comments:
     input_position    : top
     emit_metadata     : 0
     lang              : zh-CN
-    lazy              : true
+    lazy              : false
   staticman:
     branch               : # "master"
     endpoint             : # "https://{your Staticman v3 API}/v3/entry/github/"
