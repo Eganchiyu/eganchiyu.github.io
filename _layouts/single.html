@@ -58,6 +58,9 @@ layout: default
         {% endif %}
         {% include page__taxonomy.html %}
         {% include page__date.html %}
+          <span id="busuanzi_container_page_pv">
+            · 阅读量 <span id="busuanzi_value_page_pv"></span>
+          </span>
       </footer>
 
       {% if page.share %}{% include social-share.html %}{% endif %}
@@ -85,3 +88,5 @@ layout: default
     {% include page__related.html posts=site.posts %}
   {% endif %}
 </div>
+
+
