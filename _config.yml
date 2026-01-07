@@ -65,17 +65,17 @@ comments:
     # emit_metadata        : # 1 for enabled, 0 for disabled (default) # https://github.com/giscus/giscus/blob/main/ADVANCED-USAGE.md#imetadatamessage
     # lang                 : # "en" (default)
     # lazy                 : # true, false # Loading of the comments will be deferred until the user scrolls near the comments container.
-    repo_id           : R_kgDOQoT8Zg
-    category_name     : Comments
-    category_id       : DIC_kwDOQoT8Zs4C0q92
-    discussion_term   : pathname
-    reactions_enabled : 1
-    theme             : preferred_color_scheme
-    strict            : 0
-    input_position    : top
-    emit_metadata     : 0
-    lang              : zh-CN
-    lazy              : false
+    # repo_id           : R_kgDOQoT8Zg
+    # category_name     : Comments
+    # category_id       : DIC_kwDOQoT8Zs4C0q92
+    # discussion_term   : pathname
+    # reactions_enabled : 1
+    # theme             : preferred_color_scheme
+    # strict            : 0
+    # input_position    : top
+    # emit_metadata     : 0
+    # lang              : zh-CN
+    # lazy              : false
   staticman:
     branch               : # "master"
     endpoint             : # "https://{your Staticman v3 API}/v3/entry/github/"
