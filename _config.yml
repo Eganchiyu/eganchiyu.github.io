@@ -68,7 +68,7 @@ comments:
     repo_id           : R_kgDOQoT8Zg
     category_name     : Comments
     category_id       : DIC_kwDOQoT8Zs4C0q92
-    discussion_term   : title
+    discussion_term   : pathname
     reactions_enabled : 1
     theme             : preferred_color_scheme
     strict            : 0
@@ -378,7 +378,7 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
-      comments: # true
+      comments: true # true
       share: true
       related: true
       sidebar: false
