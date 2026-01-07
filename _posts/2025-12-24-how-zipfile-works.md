@@ -8,7 +8,7 @@ tags:
   - 博客
   - 软件
   - 哲学
-
+comments: true
 entries_layout: grid
 
 # header:

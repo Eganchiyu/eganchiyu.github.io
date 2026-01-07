@@ -12,7 +12,7 @@ tags:
 mathjax: true
 
 entries_layout: grid
-
+comments: true
 header:
   teaser: /assets/images/2025-12-31-13-42-01.png
 ---

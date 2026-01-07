@@ -8,7 +8,7 @@ tags:
   - 博客
   - 记录
   - 编程
-
+comments: true
 entries_layout: grid
 
 # header:

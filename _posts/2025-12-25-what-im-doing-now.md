@@ -7,7 +7,7 @@ categories:
 tags:
   - 博客
   - 软件
-
+comments: true
 entries_layout: grid
 
 # header:

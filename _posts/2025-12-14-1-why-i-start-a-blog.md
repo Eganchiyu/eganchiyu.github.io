@@ -7,6 +7,8 @@ categories:
 tags:
   - 博客
   - 记录
+
+comments: true
 ---
 
 ## 写在前面
