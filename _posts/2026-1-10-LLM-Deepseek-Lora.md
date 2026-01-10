@@ -1,5 +1,5 @@
 ---
-title: Deepseek LLM本地部署和LoRA微调
+title: Deepseek LLM本地部署和LoRA微调（未完成）
 excerpt: 记录一次部署记录
 
 categories: 
@@ -18,6 +18,8 @@ entries_layout: grid
 
 ---
 
+# 请注意！这篇文章尚未完工！
+
 # Deepseek LLM 本地部署与 LoRA 微调：完整记录与踩坑
 
 
@@ -25,7 +27,7 @@ entries_layout: grid
 
 这个过程非常漫长，我会尝试尽量全面记录自己踩过的坑，希望能帮助到同样初学的小伙伴。
 
-# 1.系统搭建和环境准备
+# 1.系统搭建和环境准备<---目前到这里（一点都没写）
 
 ### 1.1 系统与工具
 
