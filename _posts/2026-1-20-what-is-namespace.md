@@ -192,6 +192,7 @@ namespace MyApp.UI {
 
 ```csharp
 namespace LibraryA {
+namespace LibraryA {
     public class PublicClass { }     // 可以被外部访问
     internal class InternalClass { } // 只能在同一命名空间内访问
 }
