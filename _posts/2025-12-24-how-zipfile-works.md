@@ -3,7 +3,7 @@ title: "为什么有些压缩文件解压那么慢"
 excerpt: "不同level压缩格式和哲学浅谈"
 date: 2025-12-14
 categories:
-  - 软件
+  - 随想
 tags:
   - 博客
   - 软件

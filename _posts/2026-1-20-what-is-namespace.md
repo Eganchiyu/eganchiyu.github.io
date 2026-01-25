@@ -3,10 +3,10 @@ title: 什么是namespace？
 excerpt: Csharp学习记录
 
 categories: 
-  -  编程
+  -  学习记录
 
 tags:
-  -  博
+  -  博客
   -  编程
   -  记录
 comments: true

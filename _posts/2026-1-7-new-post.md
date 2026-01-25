@@ -3,7 +3,7 @@ title: 2026年1月7日 日志
 excerpt: 近期规划和一点思考
 
 categories: 
-  -  日志
+  -  小结
 
 tags:
   -  博客
