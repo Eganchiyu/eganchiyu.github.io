@@ -15,13 +15,17 @@
 
 .page__content {
   font-family:
-    "HarmonyOS Sans SC", /* 这里的名字要和 CDN 定义的一致 */
+    "HarmonyOS Sans SC",
     "LXGW WenKai",
     "Noto Serif SC",
     "Source Han Serif SC",
     "Songti SC",
     "STSong",
     serif;
+}
+
+body {
+  font-family: "HarmonyOS Sans SC", "LXGW WenKai", sans-serif !important;
 }
 
 // .author__bio.p-note-spoil {
