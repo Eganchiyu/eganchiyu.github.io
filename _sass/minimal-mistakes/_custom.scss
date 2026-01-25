@@ -14,13 +14,13 @@
 }
 
 .page__content {
-  font-family:
-    "HarmonyOS Sans SC",
-    "Noto Serif SC",
-    "Source Han Serif SC",
-    "Songti SC",
-    "STSong",
-    serif;
+  font-family: 
+    "HarmonyOS Sans SC",   /* 鸿蒙简体（确保 CDN 名称一致） */
+    "HarmonyOS Sans",      /* 鸿蒙通用名称 */
+    -apple-system,         /* 苹果系统备选 */
+    BlinkMacSystemFont,    /* Chrome 备选 */
+    "Segoe UI",            /* Windows 备选 */
+    sans-serif !important; /* 万能保底 */
 }
 
 
