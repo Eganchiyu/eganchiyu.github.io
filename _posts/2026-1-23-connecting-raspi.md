@@ -161,4 +161,6 @@ asumi@raspberrypi:~ $ source /home/asumi/python/venv/bin/activate
 (venv) asumi@raspberrypi:~ $
 ```
 
+这样就成功创建虚拟环境了
 
+# python工程开发环境
