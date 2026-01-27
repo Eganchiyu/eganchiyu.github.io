@@ -1,5 +1,5 @@
 ---
-title: Deepseek LLM本地部署和LoRA微调（未完成）
+title: Deepseek LLM本地部署和LoRA微调（未完工）
 excerpt: 记录一次部署记录
 
 categories: 
