@@ -427,7 +427,7 @@ libQt5WaylandCompositor.so.5.15.
 libqlinuxfb.so  libqminimal.so  libqoffscreen.so  libqvnc.so  libqwayland-egl.so  libqwayland-generic.so
 ```
 
-## 接下来尝试自编译程序运行
+## 尝试使用树莓派4B8G来原生编译（失败）
 
 我之前花了很久很久搞交叉编译链，真的是头都秃了也没搞好
 
@@ -438,4 +438,121 @@ libqlinuxfb.so  libqminimal.so  libqoffscreen.so  libqvnc.so  libqwayland-egl.so
 ```bash 
 sudo apt update
 sudo apt install qtbase5-dev qtwayland5
+```
+
+---
+
+然而，然而啊，用树莓派是不行滴
+
+编译运行以后发现它的glibc的版本太高了，运行程序会报错。具体情况请看VCR：
+
+1. 无法逾越的 GLIBC 鸿沟
+
+* 词典笔环境：运行在极其保守的 glibc 2.27（2018 年版本）。
+
+* 树莓派环境：现代的 Raspberry Pi OS 基于较新的 Debian，其自带的 glibc 通常在 2.31 甚至 2.34+。
+
+* 核心矛盾：根据 Linux 的符号版本机制，高版本 glibc 编译出的 ELF 文件，无法在低版本 glibc 系统上运行。即便架构一致，执行时也会报出： /lib/libc.so.6: version 'GLIBC_2.34' not found。
+
+2. 动态库污染风险 如果尝试在树莓派上 apt install qtbase5-dev，安装的库会带有树莓派特有的配置和依赖。即便绕过了 glibc，这些动态库在链接时也会将特定的符号绑定到 ELF 中，导致拷贝到词典笔后出现海量的 Symbol not found。
+
+3. 结论：必须进行“版本可控”的交叉编译 要解决这个问题，唯有两条路：
+
+* Sysroot 隔离：在树莓派上构建一个完全隔离的词典笔根文件系统镜像，但这极其沉重。
+
+* 更现代的工具链（Zig + xmake）：Zig 编译器内置了对不同版本 libc 的支持。通过指定 -target aarch64-linux-gnu.2.27，我们可以直接在 Windows 上生成“穿越回 2018 年”的二进制文件。
+
+> 因此，我决定停止在树莓派上的尝试，全力转战 Zig + xmake.lua 方案
+
+真是精彩，不愧是gemini，写的真好（划去）
+
+不过大概来说就是这样，所以接下来我要在Windows上配置Zig编程方案
+
+## 尝试使用Windows+Zig指定版本交叉编译
+
+在电脑上安装xmake和zig，并配置环境变量
+
+创建工程
+
+```c
+#include <stdio.h>
+int main() {
+    printf("Hello From Zig and glibc 2.27\n");
+    return 0;
+}
+```
+
+先使用zig进行编译
+
+```powershell
+zig build-exe test.c -target aarch64-linux-gnu.2.27 -lc
+```
+
+将生成的test文件传输到词典笔上
+
+```powershell
+scp test root@192.168.2.25:/userdata
+```
+
+在词典笔上运行
+
+```bash
+chmod +x /userdata/test
+/userdata/test
+```
+输出：
+
+```
+Hello From Zig and glibc 2.27
+```
+
+成功运行！这说明zig交叉编译成功，且生成的二进制文件可以在词典笔上运行
+
+接下来尝试构造xmake.lua，来尝试用xmake来进行交叉编译
+
+```powershell
+xmake create -l c test_project
+```
+
+```lua
+-- 定义工具链，避免 xmake 瞎猜
+toolchain("zig-cross")
+    set_kind("standalone")
+    -- 强制指定不检查，因为 zig 本身就是全能的
+    set_toolset("cc", "zig cc")
+    set_toolset("cxx", "zig c++")
+    set_toolset("ld", "zig cc")
+    set_toolset("ar", "zig ar")
+    
+    -- 这一行很关键：告诉 xmake 即使找不到标准 SDK 结构也继续
+    on_check(function (toolchain)
+        return true
+    end)
+toolchain_end()
+
+target("test_project")
+    set_kind("binary")
+    set_toolchains("zig-cross")
+    add_files("src/*.c")
+    add_cflags("-target aarch64-linux-gnu.2.27")
+    add_ldflags("-target aarch64-linux-gnu.2.27")
+```
+
+> 工程化转折点
+
+我们现在终于成功配置好了稳定的工具链来交叉编译文件到指定版本的glibc上了！
+
+接下来我们要从词典笔上“借用”Qt5的动态库和头文件，来进行完整的Qt5应用交叉编译，也就是构建一个迷你的Sysroot
+
+## 构建迷你Sysroot，借用词典笔Qt5库进行交叉编译
+
+在词典笔上创建一个临时目录
+
+先尝试进行文件的侦查工作
+
+```bash
+# 确认 Qt 头文件所在位置，通常在 /usr/include/qt 或 /usr/include/qt5
+ls -d /usr/include/qt*
+# 确认 Qt 库所在位置
+ls /usr/lib/libQt5Core.so*
 ```
