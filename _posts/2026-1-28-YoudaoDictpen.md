@@ -569,6 +569,27 @@ target("hello_pen_qt")
 xmake
 ```
 
+```bash
+PS D:\dictpen\codes\Qt> xmake -v
+checking for zig cc ... ok
+checking for the c compiler (cc) ... zig cc
+checking for zig cc ... ok
+checking for flags (-fPIC) ... ok
+checking for zig c++ ... ok
+checking for the c++ compiler (cxx) ... zig c++
+[ 23%]: cache compiling.release src\main.c
+"zig cc" -c -Qunused-arguments -std=c11 -Isysroot\include -target aarch64-linux-gnu.2.27 -o build\.objs\hello_pen_qt\linux\arm64\release\src\main.c.o src\main.c
+checking for flags (-MMD -MF) ... ok
+checking for flags (-fdiagnostics-color=always) ... ok
+checking for zig cc ... ok
+checking for the linker (ld) ... zig cc
+checking for flags (-fPIC) ... ok
+checking for flags (-static-libstdc++) ... ok
+[ 47%]: linking.release hello_pen_qt
+"zig cc" -o build\linux\arm64\release\hello_pen_qt build\.objs\hello_pen_qt\linux\arm64\release\src\main.c.o -Lsysroot\lib -lQt5Widgets -lQt5Gui -lQt5Core -target aarch64-linux-gnu.2.27 -static-libstdc++
+[100%]: build ok, spent 2.734s
+```
+
 > 工程化转折点
 
 我们现在终于成功配置好了稳定的工具链来交叉编译文件到指定版本的glibc上了！
