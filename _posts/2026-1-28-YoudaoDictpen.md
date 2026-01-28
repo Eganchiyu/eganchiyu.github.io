@@ -514,28 +514,59 @@ Hello From Zig and glibc 2.27
 xmake create -l c test_project
 ```
 
+注意，在每次重新构建之前，最好先执行
+
+```powershell
+xmake clean -a
+xmake f -p linux -a arm64 -c
+```
+
 ```lua
--- 定义工具链，避免 xmake 瞎猜
+-- 1. 定义 Zig 工具链 (这是 PenMods 建议的方案)
 toolchain("zig-cross")
     set_kind("standalone")
-    -- 强制指定不检查，因为 zig 本身就是全能的
     set_toolset("cc", "zig cc")
     set_toolset("cxx", "zig c++")
     set_toolset("ld", "zig cc")
     set_toolset("ar", "zig ar")
-    
-    -- 这一行很关键：告诉 xmake 即使找不到标准 SDK 结构也继续
-    on_check(function (toolchain)
-        return true
-    end)
 toolchain_end()
 
-target("test_project")
+-- 2. 项目基础设定
+set_project("DictPenProject")
+set_version("1.0.0")
+-- 强制指定 C++23 (模仿 PenMods) 和 C11
+set_languages("cxx23", "c11")
+
+target("hello_pen_qt")
     set_kind("binary")
     set_toolchains("zig-cross")
+    
+    -- 3. 核心：指定 Target Triple
+    -- 这解决了你之前的 unknown file type 报错，确保生成的是 ELF 而不是 OBJ
+    add_cxflags("-target aarch64-linux-gnu.2.27", {force = true})
+    add_asflags("-target aarch64-linux-gnu.2.27", {force = true})
+    add_ldflags("-target aarch64-linux-gnu.2.27", {force = true})
+
+    -- 4. 路径配置 (把我们之前准备的 sysroot 缝合进来)
+    add_includedirs("sysroot/include")
+    add_linkdirs("sysroot/lib")
+    
+    -- 5. 链接 Qt 库 (先只连核心的，保证能过链接关)
+    add_links("Qt5Widgets", "Qt5Gui", "Qt5Core")
+    
+    -- 模仿 PenMods 的静态链接策略，防止 GLIBCXX 版本过低报错
+    add_ldflags("-static-libstdc++")
+
+    -- 6. 添加你的源代码
     add_files("src/*.c")
-    add_cflags("-target aarch64-linux-gnu.2.27")
-    add_ldflags("-target aarch64-linux-gnu.2.27")
+    -- add_files("src/*.cpp")
+
+```
+
+运行xmake进行编译
+
+```powershell
+xmake
 ```
 
 > 工程化转折点
