@@ -1,5 +1,5 @@
 ---
-title: 本地计算机、树莓派配置ssh（未完工）
+title: 本地计算机、树莓派配置ssh
 excerpt: 通过ssh优化远程访问
 
 categories: 
