@@ -147,7 +147,7 @@ ssh root@192.168.2.25 <--这个是ip地址
 ssh -T git@github.com
 ```
 
-看到 Hi xxx! You've successfully authenticated 即正常
+看到 `Hi xxx! You've successfully authenticated, but GitHub does not provide shell access.` 即正常
 
 ---
 
