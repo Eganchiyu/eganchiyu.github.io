@@ -549,6 +549,11 @@ target("hello_pen_qt")
 
     -- 4. 路径配置 (把我们之前准备的 sysroot 缝合进来)
     add_includedirs("sysroot/include")
+    -- 核心：不仅要加 include 根目录，还要加具体的模块目录
+    add_cxflags("-Isysroot/include", {force = true})
+    add_cxflags("-Isysroot/include/QtCore", {force = true})
+    add_cxflags("-Isysroot/include/QtGui", {force = true})
+    add_cxflags("-Isysroot/include/QtWidgets", {force = true})
     add_linkdirs("sysroot/lib")
     
     -- 5. 链接 Qt 库 (先只连核心的，保证能过链接关)
