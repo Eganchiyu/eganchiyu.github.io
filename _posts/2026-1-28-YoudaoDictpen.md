@@ -18,7 +18,7 @@ entries_layout: grid
 
 ---
 
-## 部署ssh公钥
+# 部署ssh公钥
 
 在PC上确认公钥：（id_xxx.pub 常见为id_ed25519.pub、id_rsa.pub）
 
@@ -106,7 +106,9 @@ clientalivecountmax 3
 
 说明这是一个没有被裁剪的，完整的OpenSSH服务，可以放心大胆地使用
 
-## 确认init系统
+# 确认init系统
+
+## 从终端抓取信息
 
 ```bash
 [root@YoudaoDictionaryPen-880:~]# ps -p 1 -o comm=
@@ -299,7 +301,7 @@ total 55
 > 因此，可以确认这台词典笔使用的是：BusyBox + BusyBox init + SysV 风格启动脚本（rcS + /etc/init.d）
 > 全链条启动是embedded Linux + busybox init + inittab + Wayland UI
 
-### 修改init脚本，注入启动时程序
+## 修改init脚本，注入启动时程序
 
 先创建一个最小脚本
 
@@ -359,7 +361,7 @@ if mount | grep ' on / ' | grep -q 'ro,'; then
 fi
 ```
 
-## 确认显示协议和显示系统
+# 确认显示协议和显示系统
 
 这个系统是：
 
@@ -427,7 +429,7 @@ libQt5WaylandCompositor.so.5.15.
 libqlinuxfb.so  libqminimal.so  libqoffscreen.so  libqvnc.so  libqwayland-egl.so  libqwayland-generic.so
 ```
 
-## 尝试使用树莓派4B8G来原生编译（失败）
+# 尝试使用树莓派4B8G来原生编译（失败）
 
 我之前花了很久很久搞交叉编译链，真的是头都秃了也没搞好
 
@@ -468,7 +470,9 @@ sudo apt install qtbase5-dev qtwayland5
 
 不过大概来说就是这样，所以接下来我要在Windows上配置Zig编程方案
 
-## 尝试使用Windows+Zig指定版本交叉编译
+# 尝试使用Windows+Zig指定版本交叉编译
+
+## zig编译
 
 在电脑上安装xmake和zig，并配置环境变量
 
@@ -508,13 +512,15 @@ Hello From Zig and glibc 2.27
 
 成功运行！这说明zig交叉编译成功，且生成的二进制文件可以在词典笔上运行
 
+## xmake编译
+
 接下来尝试构造xmake.lua，来尝试用xmake来进行交叉编译
 
 ```powershell
 xmake create -l c test_project
 ```
 
-注意，在每次重新构建之前，最好先执行
+！注意，**在每次重新构建之前，最好先执行**
 
 ```powershell
 xmake clean -a
@@ -549,11 +555,6 @@ target("hello_pen_qt")
 
     -- 4. 路径配置 (把我们之前准备的 sysroot 缝合进来)
     add_includedirs("sysroot/include")
-    -- 核心：不仅要加 include 根目录，还要加具体的模块目录
-    add_cxflags("-Isysroot/include", {force = true})
-    add_cxflags("-Isysroot/include/QtCore", {force = true})
-    add_cxflags("-Isysroot/include/QtGui", {force = true})
-    add_cxflags("-Isysroot/include/QtWidgets", {force = true})
     add_linkdirs("sysroot/lib")
     
     -- 5. 链接 Qt 库 (先只连核心的，保证能过链接关)
@@ -564,7 +565,7 @@ target("hello_pen_qt")
 
     -- 6. 添加你的源代码
     add_files("src/*.c")
-    -- add_files("src/*.cpp")
+    add_files("src/*.cpp")
 
 ```
 
