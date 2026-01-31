@@ -1,24 +1,5 @@
----
-title: 有道词典笔Linux系统研究（未完工）
-excerpt: 使用shell对系统进行剖析，以期望破解和外挂程序
 
-categories: 
-  -  词典笔
-
-tags:
-  -  博客
-  -  记录
-  -  Linux
-
-comments: true
-entries_layout: grid
-
-# header:
-#     teaser: 
-
----
-
-# 部署ssh公钥
+## 部署ssh公钥
 
 在PC上确认公钥：（id_xxx.pub 常见为id_ed25519.pub、id_rsa.pub）
 
@@ -106,9 +87,7 @@ clientalivecountmax 3
 
 说明这是一个没有被裁剪的，完整的OpenSSH服务，可以放心大胆地使用
 
-# 确认init系统
-
-## 从终端抓取信息
+## 确认init系统
 
 ```bash
 [root@YoudaoDictionaryPen-880:~]# ps -p 1 -o comm=
@@ -301,7 +280,7 @@ total 55
 > 因此，可以确认这台词典笔使用的是：BusyBox + BusyBox init + SysV 风格启动脚本（rcS + /etc/init.d）
 > 全链条启动是embedded Linux + busybox init + inittab + Wayland UI
 
-## 修改init脚本，注入启动时程序
+### 修改init脚本，注入启动时程序
 
 先创建一个最小脚本
 
@@ -361,7 +340,7 @@ if mount | grep ' on / ' | grep -q 'ro,'; then
 fi
 ```
 
-# 确认显示协议和显示系统
+## 确认显示协议和显示系统
 
 这个系统是：
 
@@ -429,7 +408,8 @@ libQt5WaylandCompositor.so.5.15.
 libqlinuxfb.so  libqminimal.so  libqoffscreen.so  libqvnc.so  libqwayland-egl.so  libqwayland-generic.so
 ```
 
-# 尝试使用树莓派4B8G来原生编译（失败）
+## 交叉编译
+### 尝试使用树莓派4B8G来原生编译（失败）
 
 我之前花了很久很久搞交叉编译链，真的是头都秃了也没搞好
 
@@ -444,7 +424,7 @@ sudo apt install qtbase5-dev qtwayland5
 
 ---
 
-然而，然而啊，用树莓派是不行滴
+然而用树莓派是不行滴
 
 编译运行以后发现它的glibc的版本太高了，运行程序会报错。具体情况请看VCR：
 
@@ -464,15 +444,12 @@ sudo apt install qtbase5-dev qtwayland5
 
 * 更现代的工具链（Zig + xmake）：Zig 编译器内置了对不同版本 libc 的支持。通过指定 -target aarch64-linux-gnu.2.27，我们可以直接在 Windows 上生成“穿越回 2018 年”的二进制文件。
 
-> 因此，我决定停止在树莓派上的尝试，全力转战 Zig + xmake.lua 方案
 
 真是精彩，不愧是gemini，写的真好（划去）
 
 不过大概来说就是这样，所以接下来我要在Windows上配置Zig编程方案
 
-# 尝试使用Windows+Zig指定版本交叉编译
-
-## zig编译
+### 尝试使用Windows+Zig指定版本交叉编译（失败）
 
 在电脑上安装xmake和zig，并配置环境变量
 
@@ -510,9 +487,7 @@ chmod +x /userdata/test
 Hello From Zig and glibc 2.27
 ```
 
-成功运行！这说明zig交叉编译成功，且生成的二进制文件可以在词典笔上运行
-
-## xmake编译
+成功运行，这说明zig交叉编译成功，且生成的二进制文件可以在词典笔上运行
 
 接下来尝试构造xmake.lua，来尝试用xmake来进行交叉编译
 
@@ -520,89 +495,35 @@ Hello From Zig and glibc 2.27
 xmake create -l c test_project
 ```
 
-！注意，**在每次重新构建之前，最好先执行**
-
-```powershell
-xmake clean -a
-xmake f -p linux -a arm64 -c
-```
-
 ```lua
--- 1. 定义 Zig 工具链 (这是 PenMods 建议的方案)
+-- 定义工具链，避免 xmake 瞎猜
 toolchain("zig-cross")
     set_kind("standalone")
+    -- 强制指定不检查，因为 zig 本身就是全能的
     set_toolset("cc", "zig cc")
     set_toolset("cxx", "zig c++")
     set_toolset("ld", "zig cc")
     set_toolset("ar", "zig ar")
+    
+    -- 这一行很关键：告诉 xmake 即使找不到标准 SDK 结构也继续
+    on_check(function (toolchain)
+        return true
+    end)
 toolchain_end()
 
--- 2. 项目基础设定
-set_project("DictPenProject")
-set_version("1.0.0")
--- 强制指定 C++23 (模仿 PenMods) 和 C11
-set_languages("cxx23", "c11")
-
-target("hello_pen_qt")
+target("test_project")
     set_kind("binary")
     set_toolchains("zig-cross")
-    
-    -- 3. 核心：指定 Target Triple
-    -- 这解决了你之前的 unknown file type 报错，确保生成的是 ELF 而不是 OBJ
-    add_cxflags("-target aarch64-linux-gnu.2.27", {force = true})
-    add_asflags("-target aarch64-linux-gnu.2.27", {force = true})
-    add_ldflags("-target aarch64-linux-gnu.2.27", {force = true})
-
-    -- 4. 路径配置 (把我们之前准备的 sysroot 缝合进来)
-    add_includedirs("sysroot/include")
-    add_linkdirs("sysroot/lib")
-    
-    -- 5. 链接 Qt 库 (先只连核心的，保证能过链接关)
-    add_links("Qt5Widgets", "Qt5Gui", "Qt5Core")
-    
-    -- 模仿 PenMods 的静态链接策略，防止 GLIBCXX 版本过低报错
-    add_ldflags("-static-libstdc++")
-
-    -- 6. 添加你的源代码
     add_files("src/*.c")
-    add_files("src/*.cpp")
-
+    add_cflags("-target aarch64-linux-gnu.2.27")
+    add_ldflags("-target aarch64-linux-gnu.2.27")
 ```
-
-运行xmake进行编译
-
-```powershell
-xmake
-```
-
-```bash
-PS D:\dictpen\codes\Qt> xmake -v
-checking for zig cc ... ok
-checking for the c compiler (cc) ... zig cc
-checking for zig cc ... ok
-checking for flags (-fPIC) ... ok
-checking for zig c++ ... ok
-checking for the c++ compiler (cxx) ... zig c++
-[ 23%]: cache compiling.release src\main.c
-"zig cc" -c -Qunused-arguments -std=c11 -Isysroot\include -target aarch64-linux-gnu.2.27 -o build\.objs\hello_pen_qt\linux\arm64\release\src\main.c.o src\main.c
-checking for flags (-MMD -MF) ... ok
-checking for flags (-fdiagnostics-color=always) ... ok
-checking for zig cc ... ok
-checking for the linker (ld) ... zig cc
-checking for flags (-fPIC) ... ok
-checking for flags (-static-libstdc++) ... ok
-[ 47%]: linking.release hello_pen_qt
-"zig cc" -o build\linux\arm64\release\hello_pen_qt build\.objs\hello_pen_qt\linux\arm64\release\src\main.c.o -Lsysroot\lib -lQt5Widgets -lQt5Gui -lQt5Core -target aarch64-linux-gnu.2.27 -static-libstdc++
-[100%]: build ok, spent 2.734s
-```
-
-> 工程化转折点
 
 我们现在终于成功配置好了稳定的工具链来交叉编译文件到指定版本的glibc上了！
 
 接下来我们要从词典笔上“借用”Qt5的动态库和头文件，来进行完整的Qt5应用交叉编译，也就是构建一个迷你的Sysroot
 
-## 构建迷你Sysroot，借用词典笔Qt5库进行交叉编译
+### 构建迷你Sysroot，借用词典笔Qt5库进行交叉编译
 
 在词典笔上创建一个临时目录
 
@@ -614,3 +535,15 @@ ls -d /usr/include/qt*
 # 确认 Qt 库所在位置
 ls /usr/lib/libQt5Core.so*
 ```
+
+然后就陷入了构建各种config的困境。然后我又不是佬搞不定
+
+因此我就尝试回到社区去看一看过去的历史记录能不能找到有用的信息
+
+# 世界上还是好人多
+
+https://t.me/PenUniverse/7004/12132
+
+真想请[Lyrecoul](https://github.com/Lyrecoul)吃顿疯狂星期四（
+
+红豆也要
