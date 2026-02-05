@@ -1,4 +1,20 @@
+---
+title: linux有道词典笔系统探索
+excerpt: 交叉编译好难啊...
 
+categories: 
+  -  学习记录
+tags:
+  -  博客
+  -  记录
+
+comments: true
+entries_layout: grid
+
+# header:
+#     teaser: 
+
+---
 ## 部署ssh公钥
 
 在PC上确认公钥：（id_xxx.pub 常见为id_ed25519.pub、id_rsa.pub）
@@ -547,3 +563,7 @@ https://t.me/PenUniverse/7004/12132
 真想请[Lyrecoul](https://github.com/Lyrecoul)吃顿疯狂星期四（
 
 红豆也要
+
+# 构建sysroot
+
+将
