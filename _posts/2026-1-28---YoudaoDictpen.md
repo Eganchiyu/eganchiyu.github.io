@@ -1,6 +1,6 @@
 ---
-title: linux有道词典笔系统探索
-excerpt: 交叉编译好难啊...
+title: 解剖一支词典笔：从 SSH 接管到交叉编译的系统逆向记录
+excerpt: 一次嵌入式 Linux 设备的完整摸底过程：启动链路、init 机制、显示系统与 glibc 约束下的编译尝试
 
 categories: 
   -  学习记录

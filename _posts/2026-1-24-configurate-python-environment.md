@@ -1,6 +1,6 @@
 ---
-title: 为树莓派配置Python环境
-excerpt: 树莓派配置记录
+title: 为树莓派搭建 Python 开发环境：从系统自带解释器到 VSCode 远程开发
+excerpt: 一份面向工程使用的树莓派 Python 环境配置记录，涵盖虚拟环境、SSH 远程与 VSCode 工作流
 
 categories: 
   -  树莓派

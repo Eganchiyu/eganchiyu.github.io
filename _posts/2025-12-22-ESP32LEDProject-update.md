@@ -1,6 +1,6 @@
 ---
-title: "ESP32 双灯氛围灯-更新星光模式（夜间）"
-excerpt: "基于ESP32的LED彩灯项目记录"
+title: ESP32 双灯氛围灯开发记录：夜间星光模式更新
+excerpt: 一次面向夜间使用场景的星光光效设计与参数化实现记录
 date: 2025-12-14
 categories:
   - ESP32

@@ -1,6 +1,6 @@
 ---
-title: 什么是namespace？
-excerpt: Csharp学习记录
+title: 什么是 Namespace：代码中的“地址系统”
+excerpt: 从命名冲突出发，理解 C# / C++ 命名空间如何组织代码、划分作用域并支撑大型工程结构
 
 categories: 
   -  学习记录

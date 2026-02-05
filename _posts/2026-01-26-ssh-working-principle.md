@@ -1,6 +1,6 @@
 ---
-title: SSH的工作原理
-excerpt: SSH是如何运作的？
+title: SSH 的工作原理：从密钥交换到身份认证的完整通信机制
+excerpt: 一次从密码学与工程视角出发的 SSH 全流程拆解，理解它为何安全、为何稳定，以及为何适合 Git 与远程运维
 
 categories: 
   -  学习记录

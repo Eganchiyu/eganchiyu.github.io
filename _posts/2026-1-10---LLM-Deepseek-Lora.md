@@ -1,6 +1,6 @@
 ---
-title: Deepseek LLM本地部署和LoRA微调（一段时间内都会是未完工）
-excerpt: 记录一次部署记录
+title: DeepSeek LLM 本地部署与 LoRA 微调实录：从环境搭建到模型训练
+excerpt: 一次基于 RTX 5070 的 DeepSeek-7B 本地部署与 LoRA 微调的完整过程记录与踩坑笔记（未完工）
 
 categories: 
   -  LLM

@@ -1,6 +1,6 @@
 ---
-title: "为什么有些压缩文件解压那么慢"
-excerpt: "不同level压缩格式和哲学浅谈"
+title: 为什么有些压缩文件解压得那么慢？
+excerpt: 从 zip 到 tar.xz：压缩算法的层级、性能取舍与工程时代的选择哲学
 date: 2025-12-14
 categories:
   - 随想

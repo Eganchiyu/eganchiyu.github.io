@@ -1,6 +1,6 @@
 ---
-title: "ESP32 双灯氛围灯项目实践记录"
-excerpt: "基于ESP32的LED彩灯项目记录"
+title: 从点灯到系统：ESP32 双灯环智能氛围灯完整工程实践
+excerpt: 集成 Web 控制、人体感应与状态机设计的 ESP32 + WS2812B 项目记录
 date: 2025-12-14
 categories:
   - ESP32

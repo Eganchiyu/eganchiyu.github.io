@@ -1,6 +1,6 @@
 ---
-title: 安装树莓派OS
-excerpt: 树莓派配置记录
+title: 树莓派 4B 从零起步：Raspberry Pi OS 安装与远程环境初配置
+excerpt: 一次完整的树莓派 4B 裸机上手记录，从 TF 卡选择、系统刷写到 VNC 远程桌面的最小可用配置
 
 categories: 
   -  树莓派
@@ -10,7 +10,7 @@ tags:
   -  记录
 comments: true
 entries_layout: grid
-
+ 
 # header:
 #     teaser: 
 

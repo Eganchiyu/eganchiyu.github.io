@@ -1,6 +1,6 @@
 ---
-title: 什么是hook？
-excerpt: Csharp学习记录
+title: Windows 中的 Hook 机制：从消息拦截到功能注入
+excerpt: 以 WPF / Win32 为例，理解 Hook 如何介入系统消息流，并在实际工程中实现热键与信息劫持
 
 categories: 
   -  学习记录
@@ -88,3 +88,5 @@ protected override void OnSourceInitialized(EventArgs e)
 本文探讨了C语言编程中hook的作用，即**劫持信息流**，**处理后选择性放行**，来将信息先通过自己的程序，达到**自定义功能**的效果
 
 在我的Pause_Everywhere项目中，就是**热键劫持**；在MisakaHookFinder中，就是**文本劫持**
+
+所以后面（小可能）会讲到的“**词典笔中使用Hook注入进程来外挂功能和自定义**”就是这个意思
