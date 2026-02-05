@@ -1,6 +1,6 @@
 ---
-title: 本地计算机、树莓派配置ssh
-excerpt: 通过ssh优化远程访问
+title: 从零配置 SSH 公钥：树莓派、嵌入式设备与 GitHub 的免密登录
+excerpt: 一篇覆盖 Windows → Linux / 嵌入式设备 → GitHub 的 SSH 公钥部署完整工作流记录
 
 categories: 
   -  树莓派
@@ -28,7 +28,7 @@ entries_layout: grid
 
 ---
 
-首先，前提是你的设备支持使用ssh进行登录，也就是可以：
+首先，前提是你的设备**支持使用ssh进行登录**，也就是可以：
 
 ```powershell
 ssh asumi@192.168.2.212
@@ -138,6 +138,20 @@ ssh root@192.168.2.25 <--这个是ip地址
 # 为github配置ssh
 
 还是照样**拿到你的密钥文件内容**（一整行）
+
+这次我们生成**椭圆曲线密钥**
+
+```powershell
+ssh-keygen -t ed25519 -C "you@example.com"
+```
+
+后面的参数可以**写自己想要写的名字**
+
+```powershell
+type $env:USERPROFILE\.ssh\id_ed25519.pub
+```
+
+将**一整行**复制到剪切板
 
 打开github，在上面添加公钥：GitHub → Settings → SSH and GPG keys → New SSH key → 粘贴并保存
 
