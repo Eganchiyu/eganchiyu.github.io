@@ -9,6 +9,7 @@ tags:
   - 软件
   - 哲学
 comments: true
+reading_time: 10
 entries_layout: grid
 
 # header:

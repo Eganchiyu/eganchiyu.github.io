@@ -10,7 +10,7 @@ tags:
   - 线性代数
 
 mathjax: true
-
+reading_time: 15
 entries_layout: grid
 comments: true
 header:
