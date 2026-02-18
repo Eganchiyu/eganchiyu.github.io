@@ -13,7 +13,7 @@ entries_layout: grid
  
 # header:
 #     teaser: 
-reading_time: 30
+mins: 30
 ---
 
 工创基地的学长给我们（两个）软件组的新人发了两块开发板，于是我拿走了**树莓派4B8G**

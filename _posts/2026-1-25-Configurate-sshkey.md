@@ -12,7 +12,7 @@ tags:
   -  嵌入式
 comments: true
 entries_layout: grid
-reading_time: 10
+mins: 10
 # header:
 #     teaser: 
 

@@ -22,16 +22,21 @@
       <span class="page__meta-readtime">
         <i class="far {% if include.type == 'grid' and document.read_time and document.show_date %}fa-fw {% endif %}fa-clock" aria-hidden="true"></i>
 
-        {% if document.read_time == "auto" %}
+        {% if document.mins %}
+          {% comment %} 优先显示手动输入的分钟数 {% endcomment %}
+          {{ document.mins }} 分钟
+        {% elsif document.read_time == "auto" or document.read_time == true %}
+          {% comment %} 自动计算逻辑作为备选 {% endcomment %}
           {% assign words_per_minute = document.words_per_minute | default: site.words_per_minute | default: 180 %}
           {% assign words = document.content | strip_html | number_of_words %}
-          {% assign minutes = words | divided_by: words_per_minute %}
-          {% if minutes < 1 %}
+          {% assign minutes_calc = words | divided_by: words_per_minute %}
+          {% if minutes_calc < 1 %}
             少于 1 分钟
           {% else %}
-            {{ minutes }} 分钟
+            {{ minutes_calc }} 分钟
           {% endif %}
         {% else %}
+          {% comment %} 如果 read_time 既不是 auto 也不是 true，且没有 mins，则尝试直接输出（兼容原逻辑） {% endcomment %}
           {{ document.read_time }} 分钟
         {% endif %}
 

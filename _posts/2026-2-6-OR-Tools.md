@@ -13,7 +13,7 @@ tags:
   - OR-Tools
   - CSP
 
-reading_time: 45
+mins: 45
 comments: true
 entries_layout: grid
 ---

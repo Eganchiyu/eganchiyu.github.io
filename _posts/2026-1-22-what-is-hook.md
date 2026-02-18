@@ -14,7 +14,7 @@ entries_layout: grid
 
 # header:
 #     teaser: 
-reading_time: 5
+mins: 5
 ---
 
 # 定义

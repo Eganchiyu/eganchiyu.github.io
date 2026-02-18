@@ -9,7 +9,7 @@ tags:
   - 软件
 comments: true
 entries_layout: grid
-reading_time: 5
+mins: 5
 # header:
 #   teaser: /assets/images/2025-12-14-21-02-11.png
 ---

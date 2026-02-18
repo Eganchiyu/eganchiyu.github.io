@@ -10,7 +10,7 @@ tags:
   - 编程
 
 entries_layout: grid
-reading_time: 8
+mins: 8
 header:
   teaser: /assets/images/2025-12-14-21-02-11.png
 

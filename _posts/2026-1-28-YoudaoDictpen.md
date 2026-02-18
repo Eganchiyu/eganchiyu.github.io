@@ -7,7 +7,7 @@ categories:
 tags:
   -  博客
   -  记录
-reading_time: 120
+mins: 120
 comments: true
 entries_layout: grid
 
