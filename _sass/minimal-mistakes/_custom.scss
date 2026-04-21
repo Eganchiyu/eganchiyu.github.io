@@ -266,6 +266,13 @@ code {
 .highlight, pre.highlight {
   border-radius: 8px; /* Rounded code blocks */
   box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+  overflow: hidden; /* Prevent inner elements from breaking rounded corners */
+}
+
+/* Ensure inner code tag doesn't override the background and overflow */
+.highlight code, pre.highlight code {
+  background: transparent;
+  border-radius: 0;
 }
 
 /* 文章列表项的卡片效果和悬停动画 */
@@ -278,7 +285,37 @@ code {
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   backdrop-filter: blur(10px); /* 毛玻璃效果配合后面的渐变/图片背景 */
   border: 1px solid rgba(255, 255, 255, 0.5); /* 细微边框增加质感 */
+  position: relative; /* 为伪元素绝对定位提供基准 */
+  overflow: hidden; /* 防止背景叠加溢出圆角 */
 }
+
+/* 动态卡片背景叠加 (如果有头图或回退到爱丽丝蓝渐变) */
+.archive__item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  pointer-events: none; /* 避免阻挡鼠标事件 */
+
+  /* 默认：如果没有通过 var 传入 --teaser-image，则显示极其微弱的爱丽丝蓝色系渐变 */
+  /* AliceBlue 是 #F0F8FF，使用极低不透明度以避免喧宾夺主 */
+  background: linear-gradient(135deg, rgba(240, 248, 255, 0.5) 0%, rgba(225, 238, 255, 0.2) 100%);
+}
+
+/* 当传入了 teaser 头图时，覆盖掉默认渐变，并使用封面模式，保持比例，设置很浅的透明度 */
+.archive__item[style*="--teaser-image"]::before {
+  background-image: var(--teaser-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.15; /* 非常浅的透明度（约 0.2） */
+  /* 将原本的透明白色背景作为其底色，只让图片轻微透出 */
+  mix-blend-mode: multiply;
+}
+
 
 .archive__item:hover {
   transform: translateY(-5px);
