@@ -187,6 +187,120 @@ code {
   user-select: none;
 }
 
+/* -------------------------------------
+   Modern UI / Card & Animation Updates
+-------------------------------------- */
+
+/* Top Masthead (Navigation Bar) */
+.masthead {
+  background: rgba(255, 255, 255, 0.85) !important; /* Slightly transparent */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Soft shadow beneath nav */
+  border-bottom: none !important;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Make greedy nav links slightly bolder or with hover effect */
+.greedy-nav a {
+  transition: color 0.2s ease;
+}
+.greedy-nav a:hover {
+  color: #005cc5; /* Highlight color on hover */
+}
+
+/* Author Sidebar & Profile Enhancements */
+.author__avatar img {
+  border-radius: 50%; /* Ensure perfectly circular avatar */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Avatar soft shadow */
+  transition: transform 0.3s ease;
+}
+
+.author__avatar img:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.author__profile {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 1.5em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Content Typography Enhancements */
+.page__content h2 {
+  border-left: 4px solid #005cc5; /* Highlight bar on the left */
+  padding-left: 12px;
+  margin-top: 1.5em;
+  padding-bottom: 4px;
+}
+
+.page__content h3 {
+  border-left: 3px solid #6f42c1;
+  padding-left: 10px;
+  margin-top: 1.2em;
+}
+
+.page__content blockquote {
+  background: rgba(0, 92, 197, 0.05); /* Very light blue background */
+  border-left: 4px solid #005cc5;
+  border-radius: 0 8px 8px 0;
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  color: #555;
+  font-style: italic;
+}
+
+.page__content img {
+  border-radius: 8px; /* Rounded corners for content images */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Soft shadow */
+  transition: transform 0.3s ease;
+}
+
+.page__content img:hover {
+  transform: scale(1.01);
+}
+
+.highlight, pre.highlight {
+  border-radius: 8px; /* Rounded code blocks */
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+/* 文章列表项的卡片效果和悬停动画 */
+.archive__item {
+  background: rgba(255, 255, 255, 0.85); /* 略带透明度配合背景图 */
+  border-radius: 12px;
+  padding: 1.5em;
+  margin-bottom: 2em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  backdrop-filter: blur(10px); /* 毛玻璃效果配合后面的渐变/图片背景 */
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 细微边框增加质感 */
+}
+
+.archive__item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.archive__item-teaser {
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  margin: -1.5em -1.5em 1em -1.5em; /* 拉伸封面图以适配 padding */
+}
+
+.archive__item-teaser img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.5s ease;
+}
+
+.archive__item:hover .archive__item-teaser img {
+  transform: scale(1.03);
+}
+
 .layout--single{
   background-image: linear-gradient(rgba(255, 255, 255, 0.107)), url(https://free.picui.cn/free/2025/09/09/68c0398b3c11c.png) !important;
   background-size: cover ;
