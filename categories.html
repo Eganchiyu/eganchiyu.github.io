@@ -1,0 +1,127 @@
+---
+layout: default
+title: 分类
+permalink: /categories/
+---
+
+<section class="taxonomy-section">
+  <div class="container">
+    <h1 class="taxonomy-title">📁 分类</h1>
+    
+    <div class="taxonomy-grid">
+      {% assign categories_sorted = site.categories | sort %}
+      {% for category in categories_sorted %}
+      <div class="taxonomy-card">
+        <h2 class="taxonomy-name">
+          <a href="#{{ category[0] }}">{{ category[0] }}</a>
+          <span class="taxonomy-count">{{ category[1].size }}</span>
+        </h2>
+        <ul class="taxonomy-list">
+          {% for post in category[1] limit:5 %}
+          <li>
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            <time>{{ post.date | date: "%m-%d" }}</time>
+          </li>
+          {% endfor %}
+          {% if category[1].size > 5 %}
+          <li class="taxonomy-more">... 还有 {{ category[1].size | minus: 5 }} 篇</li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+.taxonomy-section {
+  padding: 3rem 0 4rem;
+}
+
+.taxonomy-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+}
+
+.taxonomy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.taxonomy-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: all 0.3s var(--smooth);
+}
+
+.taxonomy-card:hover {
+  border-color: var(--alice-300);
+  box-shadow: var(--shadow-card);
+}
+
+.taxonomy-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--alice-200);
+}
+
+.taxonomy-name a {
+  color: var(--alice-700);
+}
+
+.taxonomy-count {
+  background: var(--alice-100);
+  color: var(--alice-600);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.taxonomy-list {
+  list-style: none;
+}
+
+.taxonomy-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.taxonomy-list li:last-child {
+  border-bottom: none;
+}
+
+.taxonomy-list a {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: color 0.2s var(--smooth);
+}
+
+.taxonomy-list a:hover {
+  color: var(--alice-600);
+}
+
+.taxonomy-list time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.taxonomy-more {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+</style>

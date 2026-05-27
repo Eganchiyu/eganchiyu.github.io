@@ -18,7 +18,7 @@ layout: default
         <span class="read-time">
           {% assign words = page.content | number_of_words %}
           {% assign read_time = words | divided_by: 250 | plus: 1 %}
-          {{ read_time }} 分钟阅读
+          📖 {{ read_time }} min
         </span>
       </div>
       
@@ -41,10 +41,10 @@ layout: default
     </div>
     
     <!-- Post Footer -->
-    <footer class="post-footer">
+    <footer class="post-footer-section">
       <!-- Share -->
       <div class="share-section">
-        <h3>分享文章</h3>
+        <h3>📤 分享文章</h3>
         <div class="share-links">
           <a href="https://twitter.com/intent/tweet?url={{ page.url | absolute_url | uri_escape }}&text={{ page.title | uri_escape }}" 
              target="_blank" rel="noopener" class="share-link">
@@ -64,7 +64,7 @@ layout: default
       <!-- Related Posts -->
       {% if site.related_posts.size > 0 %}
       <div class="related-posts">
-        <h3>相关文章</h3>
+        <h3>📚 相关文章</h3>
         <div class="related-grid">
           {% for related in site.related_posts limit:3 %}
           <a href="{{ related.url | relative_url }}" class="related-item">
@@ -73,14 +73,6 @@ layout: default
           </a>
           {% endfor %}
         </div>
-      </div>
-      {% endif %}
-      
-      <!-- Comments -->
-      {% if page.comments %}
-      <div class="comments-section">
-        <h3>评论</h3>
-        <div id="comments"></div>
       </div>
       {% endif %}
     </footer>
