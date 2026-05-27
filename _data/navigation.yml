@@ -1,12 +1,10 @@
-# main links
-main: []
-  # - title: "Quick-Start Guide"
-  #   url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
-  # - title: "About"
-  #   url: https://mmistakes.github.io/minimal-mistakes/about/
-  # - title: "Sample Posts"
-  #   url: /year-archive/
-  # - title: "Sample Collections"
-  #   url: /collection-archive/
-  # - title: "Sitemap"
-  #   url: /sitemap/
+# 主导航菜单
+main:
+  - title: "分类"
+    url: /categories/
+  - title: "标签"
+    url: /tags/
+  - title: "归档"
+    url: /year-archive/
+  - title: "关于"
+    url: https://github.com/Eganchiyu

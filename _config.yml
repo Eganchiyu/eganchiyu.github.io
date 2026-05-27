@@ -1,18 +1,9 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your entire site, values
-# which you are expected to set up once and rarely need to edit after that.
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# `jekyll serve`. If you change this file, please restart the server process.
+# Jekyll 配置
+# 文档: https://mmistakes.github.io/minimal-mistakes/docs/configuration/
 
-# Theme Settings
-#
-# Review documentation to determine if you should use `theme` or `remote_theme`
-# https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#installing-the-theme
-
-# theme                  : "minimal-mistakes-jekyll"
+# 主题
 remote_theme           : "mmistakes/minimal-mistakes"
-minimal_mistakes_skin    : "contrast" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+minimal_mistakes_skin    : "contrast"
 
 collections:
   posts:
@@ -20,119 +11,66 @@ collections:
     sort_by: date
     order: descending
 
-# Site Settings
+# 站点设置
 locale                   : "zh-CN"
-rtl                      : false # true, false (default) # turns direction of the page into right to left for RTL languages
+rtl                      : false
 title                    : "Eganchiyu的Github Pages"
 title_separator          : "-"
-subtitle                 : "学习 · 记录 · 随想" # site tagline that appears below site title in masthead
+subtitle                 : "学习 · 记录 · 随想"
 name                     : "Eganchiyu"
 description              : "开始搭建一个基于Github Pages的静态个人网站，可能用于记录想法和学习心得，或者跟进项目动态，或者单纯用来发电。"
-url                      : https://eganchiyu.github.io/  # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
-baseurl                  :  # the subpath of your site, e.g. "/blog"
-repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
-teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
-logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
-masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
-breadcrumbs              : # true, false (default)
+url                      : "https://eganchiyu.github.io/"
+baseurl                  :
+repository               :
+teaser                   :
+logo                     :
+masthead_title           :
+breadcrumbs              :
 words_per_minute         : 50
-enable_copy_code_button  : true # true, false (default)
-copyright                : # "copyright" name, defaults to site.title
-copyright_url            : # "copyright" URL, defaults to site.url
-comments:
-  provider               : giscus # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
-  disqus:
-    shortname            : # https://help.disqus.com/customer/portal/articles/466208-what-s-a-shortname-
-  discourse:
-    server               : # https://meta.discourse.org/t/embedding-discourse-comments-via-javascript/31963 , e.g.: meta.discourse.org
-  facebook:
-    # https://developers.facebook.com/docs/plugins/comments
-    appid                :
-    num_posts            : # 5 (default)
-    colorscheme          : # "light" (default), "dark"
-  utterances:
-    theme                : # "github-light" (default), "github-dark"
-    issue_term           : # "pathname" (default)
-  giscus:
-    # repo_id              : # Shown during giscus setup at https://giscus.app
-    # category_name        : # Full text name of the category
-    # category_id          : # Shown during giscus setup at https://giscus.app
-    # discussion_term      : # "pathname" (default), "url", "title", "og:title"
-    # reactions_enabled    : # '1' for enabled (default), '0' for disabled
-    # theme                : # "light" (default), "dark", "dark_dimmed", "transparent_dark", "preferred_color_scheme"
-    # strict               : # 1 for enabled, 0 for disabled (default)
-    # input_position       : # "top", "bottom" # The comment input box will be placed above or below the comments
-    # emit_metadata        : # 1 for enabled, 0 for disabled (default) # https://github.com/giscus/giscus/blob/main/ADVANCED-USAGE.md#imetadatamessage
-    # lang                 : # "en" (default)
-    # lazy                 : # true, false # Loading of the comments will be deferred until the user scrolls near the comments container.
-    # repo_id           : R_kgDOQoT8Zg
-    # category_name     : Comments
-    # category_id       : DIC_kwDOQoT8Zs4C0q92
-    # discussion_term   : pathname
-    # reactions_enabled : 1
-    # theme             : preferred_color_scheme
-    # strict            : 0
-    # input_position    : top
-    # emit_metadata     : 0
-    # lang              : zh-CN
-    # lazy              : false
-  staticman:
-    branch               : # "master"
-    endpoint             : # "https://{your Staticman v3 API}/v3/entry/github/"
-reCaptcha:
-  siteKey                :
-  secret                 :
-atom_feed:
-  path                   : # blank (default) uses feed.xml
-  hide                   : # true, false (default)
-search                   : true # true, false (default)
-search_full_content      : # true, false (default)
-search_provider          : # lunr (default), algolia, google
-lunr:
-  search_within_pages    : # true, false (default)
-algolia:
-  application_id         : # YOUR_APPLICATION_ID
-  index_name             : # YOUR_INDEX_NAME
-  search_only_api_key    : # YOUR_SEARCH_ONLY_API_KEY
-  powered_by             : # true (default), false
-google:
-  search_engine_id       : # YOUR_SEARCH_ENGINE_ID
-  instant_search         : # false (default), true
-# SEO Related
-google_site_verification :
-bing_site_verification   :
-naver_site_verification  :
-yandex_site_verification :
-baidu_site_verification  :
+enable_copy_code_button  : true
+copyright                :
+copyright_url            :
 
-# Social Sharing
+# 评论系统
+comments:
+  provider               : "giscus"
+  giscus:
+    repo_id              : "R_kgDOQoT8Zg"
+    category_name        : "Comments"
+    category_id          : "DIC_kwDOQoT8Zs4C0q92"
+    discussion_term      : "pathname"
+    reactions_enabled    : "1"
+    theme                : "preferred_color_scheme"
+    strict               : "0"
+    input_position       : "top"
+    emit_metadata        : "0"
+    lang                 : "zh-CN"
+    lazy                 : false
+
+# 搜索
+search                   : true
+search_provider          : "lunr"
+lunr:
+  search_within_pages    :
+
+# 社交分享
 twitter:
   username               :
 facebook:
   username               :
   app_id                 :
   publisher              :
-og_image                 : # Open Graph/Twitter default site image
-# For specifying social profiles
-# - https://developers.google.com/structured-data/customize/social-profiles
+og_image                 :
+
 social:
-  type                   : # Person or Organization (defaults to Person)
-  name                   : # If the user or organization name differs from the site's name
-  links: # An array of links to social media profiles
+  type                   :
+  name                   :
+  links:
 
-# Analytics
-analytics:
-  provider               : # false (default), "google", "google-universal", "google-gtag", "custom"
-  google:
-    tracking_id          :
-    anonymize_ip         : # true, false (default)
-
-
-# Site Author
+# 站点作者
 author:
   name             : "Eganchiyu"
-  avatar           : "/assets/images/avatar.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  author:
+  avatar           : "/assets/images/avatar.png"
   bios:
     - type: one
       content: |
@@ -142,24 +80,20 @@ author:
         <span title="你知道的太多了" class="heimu">也就是沉迷网络的废柴大学生</span>
     - type: three
       content: |
-        我在做“系统的垂直解构”，从最底层到最顶层，彻底搞明白一个智能系统是如何运转的
+        我在做"系统的垂直解构"，从最底层到最顶层，彻底搞明白一个智能系统是如何运转的
     - type: four
       content: |
         从底层到中层到高层肉身打通整条技术栈这一块（
 
-
   location         : "西安"
-  email            : eganchiyu@163.com
+  email            : "eganchiyu@163.com"
   links:
     - label: "eganchiyu@163.com"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
     - label: "eganchiyu@gmail.com"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
     - label: "chiyujian@mail.nwpu.edu.cn"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
     - label: "个人网站"
       icon: "fas fa-fw fa-link"
       url: "https://eganchiyu.github.io/"
@@ -172,71 +106,31 @@ author:
     - label: "小辰 友链喵~"
       icon: "fas fa-fw fa-link"
       url: "https://www.240829.xyz/"
-    # - label: "Twitter"
-    #   icon: "fab fa-fw fa-twitter-square"
-    #   # url: "https://twitter.com/"
-    # - label: "Facebook"
-    #   icon: "fab fa-fw fa-facebook-square"
-    #   # url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/Eganchiyu"
-    # - label: "Instagram"
-    #   icon: "fab fa-fw fa-instagram"
-    #   # url: "https://instagram.com/"
 
-# Site Footer
+# 页脚
 footer:
-  # links:
-  #   - label: "Twitter"
-  #     icon: "fab fa-fw fa-twitter-square"
-  #     # url:
-  #   - label: "Facebook"
-  #     icon: "fab fa-fw fa-facebook-square"
-  #     # url:
-  #   - label: "GitHub"
-  #     icon: "fab fa-fw fa-github"
-  #     # url:
-  #   - label: "GitLab"
-  #     icon: "fab fa-fw fa-gitlab"
-  #     # url:
-  #   - label: "Bitbucket"
-  #     icon: "fab fa-fw fa-bitbucket"
-  #     # url:
-  #   - label: "Instagram"
-  #     icon: "fab fa-fw fa-instagram"
-  #     # url:
+  links:
     - label: "eganchiyu@163.com"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
     - label: "eganchiyu@gmail.com"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
     - label: "chiyujian@mail.nwpu.edu.cn"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:your.name@email.com"
     - label: "个人网站"
       icon: "fas fa-fw fa-link"
       url: "https://eganchiyu.github.io/"
     - label: "友情推荐网站-安满特电子有限公司"
       icon: "fas fa-fw fa-link"
       url: "http://www.amtechelecpower.com/"
-    # - label: "Twitter"
-    #   icon: "fab fa-fw fa-twitter-square"
-    #   # url: "https://twitter.com/"
-    # - label: "Facebook"
-    #   icon: "fab fa-fw fa-facebook-square"
-    #   # url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/Eganchiyu"
-    # - label: "Instagram"
-    #   icon: "fab fa-fw fa-instagram"
-    #   # url: "https://instagram.com/"
-since: "2025"
+  since: "2025"
 
-
-# Reading Files
+# 文件读取
 include:
   - .htaccess
   - _pages
@@ -251,7 +145,6 @@ exclude:
   - .sass-cache
   - assets/js/plugins
   - assets/js/_main.js
-
   - Capfile
   - CHANGELOG
   - config
@@ -267,24 +160,22 @@ exclude:
   - Rakefile
   - README
   - tmp
-  - /docs # ignore Minimal Mistakes /docs
-  - /test # ignore Minimal Mistakes /test
+  - /docs
+  - /test
 keep_files:
   - .git
   - .svn
 encoding: "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
-
-# Conversion
+# 转换
 markdown: kramdown
 highlighter: rouge
 lsi: false
 excerpt_separator: "\n\n"
 incremental: false
 
-
-# Markdown Processing
+# Markdown 处理
 kramdown:
   input: GFM
   math_engine: null
@@ -296,28 +187,21 @@ kramdown:
   smart_quotes: lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
 
-
 # Sass/SCSS
 sass:
   sass_dir: _sass
-  style: compressed # https://sass-lang.com/documentation/file.SASS_REFERENCE.html#output_style
+  style: compressed
 
-
-# Outputting
+# 输出
 permalink: /:categories/:year/:month/:day/:title/
-timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone:
 
-
-# Pagination with jekyll-paginate
-paginate: 10 # amount of posts to show
+# 分页 (jekyll-paginate)
+paginate: 10
 paginate_path: /page:num/
 
-# Pagination with jekyll-paginate-v2
-# See https://github.com/sverrirs/jekyll-paginate-v2/blob/master/README-GENERATOR.md#site-configuration
-#   for configuration details
+# 分页 (jekyll-paginate-v2)
 pagination:
-  # Set enabled to true to use paginate v2
-  # enabled: true
   debug: false
   collection: 'posts'
   per_page: 10
@@ -333,8 +217,7 @@ pagination:
     before: 2
     after: 2
 
-
-# Plugins (previously gems:)
+# 插件
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
@@ -342,7 +225,6 @@ plugins:
   - jekyll-feed
   - jekyll-include-cache
 
-# mimic GitHub Pages with --safe
 whitelist:
   - jekyll-paginate
   - jekyll-sitemap
@@ -350,47 +232,22 @@ whitelist:
   - jekyll-feed
   - jekyll-include-cache
 
-
-# Archives
-#  Type
-#  - GitHub Pages compatible archive pages built with Liquid ~> type: liquid (default)
-#  - Jekyll Archives plugin archive pages ~> type: jekyll-archives
-#  Path (examples)
-#  - Archive page should exist at path when using Liquid method or you can
-#    expect broken links (especially with breadcrumbs enabled)
-#  - <base_path>/tags/my-awesome-tag/index.html ~> path: /tags/
-#  - <base_path>/categories/my-awesome-category/index.html ~> path: /categories/
-#  - <base_path>/my-awesome-category/index.html ~> path: /
+# 归档
 category_archive:
   type: liquid
   path: /categories/
 tag_archive:
   type: liquid
   path: /tags/
-# https://github.com/jekyll/jekyll-archives
-# jekyll-archives:
-#   enabled:
-#     - categories
-#     - tags
-#   layouts:
-#     category: archive-taxonomy
-#     tag: archive-taxonomy
-#   permalinks:
-#     category: /categories/:name/
-#     tag: /tags/:name/
 
-
-# HTML Compression
-# - https://jch.penibelst.de/
+# HTML 压缩
 compress_html:
   clippings: all
   ignore:
     envs: development
 
-
-# Defaults
+# 默认值
 defaults:
-  # _posts
   - scope:
       path: ""
       type: posts
@@ -398,7 +255,7 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
-      comments: true # true
+      comments: true
       share: true
       related: true
       sidebar: false
