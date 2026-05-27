@@ -5,22 +5,29 @@
       <span class="logo-text">{{ site.title | split: "的" | first }}</span>
     </a>
     
-    <div class="nav-links">
-      <a href="{{ '/' | relative_url }}" class="nav-link{% if page.url == '/' %} active{% endif %}">首页</a>
-      <a href="{{ '/categories/' | relative_url }}" class="nav-link{% if page.url == '/categories/' %} active{% endif %}">分类</a>
-      <a href="{{ '/tags/' | relative_url }}" class="nav-link{% if page.url == '/tags/' %} active{% endif %}">标签</a>
-      <a href="{{ '/year-archive/' | relative_url }}" class="nav-link{% if page.url == '/year-archive/' %} active{% endif %}">归档</a>
-      <a href="https://github.com/Eganchiyu" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="{{ '/' | relative_url }}" class="nav-link{% if page.url == '/' %} active{% endif %}">首页</a>
+        <a href="{{ '/categories/' | relative_url }}" class="nav-link{% if page.url == '/categories/' %} active{% endif %}">分类</a>
+        <a href="{{ '/tags/' | relative_url }}" class="nav-link{% if page.url == '/tags/' %} active{% endif %}">标签</a>
+        <a href="{{ '/year-archive/' | relative_url }}" class="nav-link{% if page.url == '/year-archive/' %} active{% endif %}">归档</a>
+        <a href="https://github.com/Eganchiyu" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+      </div>
+      
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+        <span class="icon-moon">🌙</span>
+        <span class="icon-sun">☀️</span>
+      </button>
+      
+      <button class="menu-toggle" id="menuToggle" aria-label="菜单">
+        ☰
+      </button>
     </div>
-    
-    <button class="menu-toggle" aria-label="Toggle menu">
-      ☰
-    </button>
   </div>
 </nav>
 
 <!-- Mobile Menu -->
-<div class="mobile-menu">
+<div class="mobile-menu" id="mobileMenu">
   <a href="{{ '/' | relative_url }}" class="mobile-link">🏠 首页</a>
   <a href="{{ '/categories/' | relative_url }}" class="mobile-link">📁 分类</a>
   <a href="{{ '/tags/' | relative_url }}" class="mobile-link">🏷️ 标签</a>
