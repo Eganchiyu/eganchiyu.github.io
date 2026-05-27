@@ -1,134 +1,61 @@
-# Jekyll 配置
-# 文档: https://mmistakes.github.io/minimal-mistakes/docs/configuration/
-
-# 主题
-remote_theme           : "mmistakes/minimal-mistakes"
-minimal_mistakes_skin    : "contrast"
-
-collections:
-  posts:
-    output: true
-    sort_by: date
-    order: descending
+# Jekyll 配置 - 现代化自定义主题
+# 文档: https://jekyllrb.com/docs/configuration/
 
 # 站点设置
 locale                   : "zh-CN"
-rtl                      : false
 title                    : "Eganchiyu的Github Pages"
-title_separator          : "-"
 subtitle                 : "学习 · 记录 · 随想"
 name                     : "Eganchiyu"
 description              : "开始搭建一个基于Github Pages的静态个人网站，可能用于记录想法和学习心得，或者跟进项目动态，或者单纯用来发电。"
 url                      : "https://eganchiyu.github.io/"
 baseurl                  :
-repository               :
-teaser                   :
-logo                     :
-masthead_title           :
-breadcrumbs              :
-words_per_minute         : 50
-enable_copy_code_button  : true
-copyright                :
-copyright_url            :
+encoding                 : "utf-8"
 
-# 评论系统
-comments:
-  provider               : "giscus"
-  giscus:
-    repo_id              : "R_kgDOQoT8Zg"
-    category_name        : "Comments"
-    category_id          : "DIC_kwDOQoT8Zs4C0q92"
-    discussion_term      : "pathname"
-    reactions_enabled    : "1"
-    theme                : "preferred_color_scheme"
-    strict               : "0"
-    input_position       : "top"
-    emit_metadata        : "0"
-    lang                 : "zh-CN"
-    lazy                 : false
+# 构建
+markdown                 : kramdown
+highlighter              : rouge
+lsi                      : false
+excerpt_separator        : "\n\n"
+incremental              : false
 
-# 搜索
-search                   : true
-search_provider          : "lunr"
-lunr:
-  search_within_pages    :
+# Markdown 处理
+kramdown:
+  input                  : GFM
+  math_engine            : null
+  hard_wrap              : false
+  auto_ids               : true
+  footnote_nr            : 1
+  entity_output          : as_char
+  toc_levels             : 1..6
+  smart_quotes           : lsquo,rsquo,ldquo,rdquo
+  enable_coderay         : false
 
-# 社交分享
-twitter:
-  username               :
-facebook:
-  username               :
-  app_id                 :
-  publisher              :
-og_image                 :
+# Sass/SCSS
+sass:
+  sass_dir               : _sass
+  style                  : compressed
 
-social:
-  type                   :
-  name                   :
-  links:
+# 输出
+permalink                : /:categories/:year/:month/:day/:title/
 
-# 站点作者
-author:
-  name             : "Eganchiyu"
-  avatar           : "/assets/images/avatar.png"
-  bios:
-    - type: one
-      content: |
-        大一在读，目前专注智能无人系统与低功耗架构优化的全栈技术路径
-    - type: two
-      content: |
-        <span title="你知道的太多了" class="heimu">也就是沉迷网络的废柴大学生</span>
-    - type: three
-      content: |
-        我在做"系统的垂直解构"，从最底层到最顶层，彻底搞明白一个智能系统是如何运转的
-    - type: four
-      content: |
-        从底层到中层到高层肉身打通整条技术栈这一块（
+# 分页
+paginate                 : 10
+paginate_path            : /page:num/
 
-  location         : "西安"
-  email            : "eganchiyu@163.com"
-  links:
-    - label: "eganchiyu@163.com"
-      icon: "fas fa-fw fa-envelope-square"
-    - label: "eganchiyu@gmail.com"
-      icon: "fas fa-fw fa-envelope-square"
-    - label: "chiyujian@mail.nwpu.edu.cn"
-      icon: "fas fa-fw fa-envelope-square"
-    - label: "个人网站"
-      icon: "fas fa-fw fa-link"
-      url: "https://eganchiyu.github.io/"
-    - label: "友情推荐网站"
-      icon: "fas fa-fw fa-link"
-      url: "http://www.amtechelecpower.com/"
-    - label: "Kevin-WWK 友链喵~"
-      icon: "fas fa-fw fa-link"
-      url: "https://wk239.com/"
-    - label: "小辰 友链喵~"
-      icon: "fas fa-fw fa-link"
-      url: "https://www.240829.xyz/"
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/Eganchiyu"
+# 集合
+collections:
+  posts:
+    output               : true
+    sort_by              : date
+    order                : descending
 
-# 页脚
-footer:
-  links:
-    - label: "eganchiyu@163.com"
-      icon: "fas fa-fw fa-envelope-square"
-    - label: "eganchiyu@gmail.com"
-      icon: "fas fa-fw fa-envelope-square"
-    - label: "chiyujian@mail.nwpu.edu.cn"
-      icon: "fas fa-fw fa-envelope-square"
-    - label: "个人网站"
-      icon: "fas fa-fw fa-link"
-      url: "https://eganchiyu.github.io/"
-    - label: "友情推荐网站-安满特电子有限公司"
-      icon: "fas fa-fw fa-link"
-      url: "http://www.amtechelecpower.com/"
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/Eganchiyu"
-  since: "2025"
+# 插件
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-gist
+  - jekyll-feed
+  - jekyll-include-cache
 
 # 文件读取
 include:
@@ -143,12 +70,11 @@ exclude:
   - .bundle
   - .jekyll-assets-cache
   - .sass-cache
-  - assets/js/plugins
-  - assets/js/_main.js
   - Capfile
   - CHANGELOG
   - config
   - Gemfile
+  - Gemfile.lock
   - Gruntfile.js
   - gulpfile.js
   - LICENSE
@@ -165,100 +91,43 @@ exclude:
 keep_files:
   - .git
   - .svn
-encoding: "utf-8"
-markdown_ext: "markdown,mkdown,mkdn,mkd,md"
-
-# 转换
-markdown: kramdown
-highlighter: rouge
-lsi: false
-excerpt_separator: "\n\n"
-incremental: false
-
-# Markdown 处理
-kramdown:
-  input: GFM
-  math_engine: null
-  hard_wrap: false
-  auto_ids: true
-  footnote_nr: 1
-  entity_output: as_char
-  toc_levels: 1..6
-  smart_quotes: lsquo,rsquo,ldquo,rdquo
-  enable_coderay: false
-
-# Sass/SCSS
-sass:
-  sass_dir: _sass
-  style: compressed
-
-# 输出
-permalink: /:categories/:year/:month/:day/:title/
-timezone:
-
-# 分页 (jekyll-paginate)
-paginate: 10
-paginate_path: /page:num/
-
-# 分页 (jekyll-paginate-v2)
-pagination:
-  debug: false
-  collection: 'posts'
-  per_page: 10
-  permalink: '/page/:num/'
-  title: ':title - page :num'
-  limit: 0
-  sort_field: 'date'
-  sort_reverse: true
-  category: 'posts'
-  tag: ''
-  locale: ''
-  trail:
-    before: 2
-    after: 2
-
-# 插件
-plugins:
-  - jekyll-paginate
-  - jekyll-sitemap
-  - jekyll-gist
-  - jekyll-feed
-  - jekyll-include-cache
-
-whitelist:
-  - jekyll-paginate
-  - jekyll-sitemap
-  - jekyll-gist
-  - jekyll-feed
-  - jekyll-include-cache
-
-# 归档
-category_archive:
-  type: liquid
-  path: /categories/
-tag_archive:
-  type: liquid
-  path: /tags/
-
-# HTML 压缩
-compress_html:
-  clippings: all
-  ignore:
-    envs: development
 
 # 默认值
 defaults:
   - scope:
-      path: ""
-      type: posts
+      path              : ""
+      type              : posts
     values:
-      layout: single
-      author_profile: true
-      read_time: true
-      comments: true
-      share: true
-      related: true
-      sidebar: false
-      header:
-        overlay: false
-        show_overlay_excerpt: false
+      layout            : single
+      author_profile    : true
+      read_time         : true
+      comments          : true
+      share             : true
+
+# 站点作者
+author:
+  name                    : "Eganchiyu"
+  avatar                  : "/assets/images/avatar.png"
+  location                : "西安"
+  email                   : "eganchiyu@163.com"
+  links:
+    - label              : "GitHub"
+      icon               : "fab fa-fw fa-github"
+      url                : "https://github.com/Eganchiyu"
+    - label              : "个人网站"
+      icon               : "fas fa-fw fa-link"
+      url                : "https://eganchiyu.github.io/"
+
+# 归档
+category_archive:
+  type                    : liquid
+  path                    : /categories/
+tag_archive:
+  type                    : liquid
+  path                    : /tags/
+
+# HTML 压缩
+compress_html:
+  clippings               : all
+  ignore:
+    envs                  : development

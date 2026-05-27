@@ -1,24 +1,146 @@
 ---
-layout: archive
-# defalut: 'list'
-
+layout: default
 ---
 
-{{ content }}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <!-- 可爱的装饰元素 -->
+    <div class="decoration decoration-1">✨</div>
+    <div class="decoration decoration-2">🌸</div>
+    
+    <div class="hero-grid">
+      <!-- 左侧内容 -->
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          <span>正在学习中...</span>
+        </div>
+        
+        <span class="hero-greeting">你好，我是</span>
+        <h1 class="hero-name">{{ site.author.name }}</h1>
+        
+        <p class="hero-description">
+          {{ site.description }}
+        </p>
+        
+        <div class="hero-location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>{{ site.author.location }}</span>
+        </div>
+        
+        <div class="hero-links">
+          <a href="https://github.com/Eganchiyu" target="_blank" rel="noopener" class="hero-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
+          <a href="mailto:{{ site.author.email }}" class="hero-link hero-link-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            邮箱
+          </a>
+        </div>
+      </div>
+      
+      <!-- 右侧头像卡片 -->
+      <div class="hero-avatar">
+        <div class="avatar-card">
+          <div class="avatar-wrapper">
+            <img src="{{ '/assets/images/avatar.png' | relative_url }}" alt="{{ site.author.name }}" loading="lazy">
+          </div>
+          <div class="avatar-name">{{ site.author.name }}</div>
+          <div class="avatar-role">NWPU · 智能无人系统</div>
+          <div class="avatar-stats">
+            <div class="stat">
+              <span class="stat-number">{{ site.posts.size }}</span>
+              <span class="stat-label">文章</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">{{ site.categories.size }}</span>
+              <span class="stat-label">分类</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">{{ site.tags.size }}</span>
+              <span class="stat-label">标签</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<h3 class="archive__subtitle">{{ site.data.ui-text[site.locale].recent_posts | default: "Recent Posts" }}</h3>
-
-{% if paginator %}
-  {% assign posts = paginator.posts %}
-{% else %}
-  {% assign posts = site.posts %}
-{% endif %}
-
-
-
-{% assign entries_layout = page.entries_layout | default: 'list' %} 
-<div class="entries-{{ entries_layout }}">
-  {% include documents-collection.html entries=posts type=entries_layout %}
-</div>
-
-{% include paginator.html %}
+<!-- Posts Section -->
+<section class="posts-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">最新文章</h2>
+    </div>
+    
+    <div class="posts-grid">
+      {% for post in paginator.posts %}
+      <article class="post-card">
+        <div class="post-meta">
+          <time datetime="{{ post.date | date_to_xmlschema }}">
+            {{ post.date | date: "%Y年%m月%d日" }}
+          </time>
+          {% if post.categories.size > 0 %}
+          <span class="post-category">
+            {{ post.categories | first }}
+          </span>
+          {% endif %}
+        </div>
+        
+        <h3 class="post-title">
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        </h3>
+        
+        <p class="post-excerpt">
+          {{ post.excerpt | strip_html | truncate: 100 }}
+        </p>
+        
+        <div class="post-footer">
+          <div class="post-tags">
+            {% for tag in post.tags limit:3 %}
+            <span class="tag">#{{ tag }}</span>
+            {% endfor %}
+          </div>
+          <span class="read-time">
+            {% assign words = post.content | number_of_words %}
+            {% assign read_time = words | divided_by: 250 | plus: 1 %}
+            📖 {{ read_time }} min
+          </span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if paginator.total_pages > 1 %}
+    <nav class="pagination">
+      {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path | relative_url }}" class="pagination-btn">
+        ← 上一页
+      </a>
+      {% endif %}
+      
+      <span class="pagination-info">
+        {{ paginator.page }} / {{ paginator.total_pages }}
+      </span>
+      
+      {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path | relative_url }}" class="pagination-btn">
+        下一页 →
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
+  </div>
+</section>
