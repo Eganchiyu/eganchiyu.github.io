@@ -2,95 +2,87 @@
 layout: default
 ---
 
-{% if page.header.overlay_color or page.header.overlay_image or page.header.image %}
-  {% include page__hero.html %}
-{% elsif page.header.video.id and page.header.video.provider %}
-  {% include page__hero_video.html %}
-{% endif %}
-
-{% assign breadcrumbs_enabled = site.breadcrumbs %}
-{% if page.breadcrumbs != null %}
-  {% assign breadcrumbs_enabled = page.breadcrumbs %}
-{% endif %}
-{% if page.url != "/" and breadcrumbs_enabled %}
-  {% unless paginator %}
-    {% include breadcrumbs.html %}
-  {% endunless %}
-{% endif %}
-
-<div id="main" role="main">
-  {% include sidebar.html %}
-
-  <article class="page" itemscope itemtype="https://schema.org/CreativeWork"{% if page.locale %} lang="{{ page.locale }}"{% endif %}>
-    {% if page.title %}<meta itemprop="headline" content="{{ page.title | replace: '|', '&#124;' | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
-    {% if page.excerpt %}<meta itemprop="description" content="{{ page.excerpt | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
-    {% if page.date %}<meta itemprop="datePublished" content="{{ page.date | date_to_xmlschema }}">{% endif %}
-    {% if page.last_modified_at %}<meta itemprop="dateModified" content="{{ page.last_modified_at | date_to_xmlschema }}">{% endif %}
-
-    <div class="page__inner-wrap">
-      {% unless page.header.overlay_color or page.header.overlay_image %}
-        <header>
-          {% if page.title -%}
-          <h1 id="page-title" class="page__title" itemprop="headline">
-            <a href="{{ page.url | absolute_url }}" itemprop="url">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</a>
-          </h1>
-          {%- endif %}
-          {% include page__meta.html %}
-        </header>
-      {% endunless %}
-
-      <section class="page__content" itemprop="text">
-        {% if page.toc %}
-          <aside class="sidebar__right {% if page.toc_sticky %}sticky{% endif %}">
-            <nav class="toc">
-              <header><h4 class="nav__title"><i class="fas fa-{{ page.toc_icon | default: 'file-alt' }}"></i> {{ page.toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On this page" }}</h4></header>
-              {% include toc.html sanitize=true html=content h_min=1 h_max=6 class="toc__menu" skip_no_ids=true %}
-            </nav>
-          </aside>
+<article class="post">
+  <div class="container">
+    <!-- Post Header -->
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime="{{ page.date | date_to_xmlschema }}">
+          {{ page.date | date: "%Y年%m月%d日" }}
+        </time>
+        {% if page.categories.size > 0 %}
+        <span class="post-category">
+          {{ page.categories | first }}
+        </span>
         {% endif %}
-        {{ content }}
-        {% if page.link %}<div><a href="{{ page.link }}" class="btn btn--primary">{{ site.data.ui-text[site.locale].ext_link_label | default: "Direct Link" }}</a></div>{% endif %}
-      </section>
-
-      <footer class="page__meta">
-        {% if site.data.ui-text[site.locale].meta_label %}
-          <h4 class="page__meta-title">{{ site.data.ui-text[site.locale].meta_label }}</h4>
-        {% endif %}
-        {% include page__taxonomy.html %}
-        {% include page__date.html %}
-          
-          <p class="page__taxonomy">
-          <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 阅读量：</strong>
-            <span id="busuanzi_container_page_pv">
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
-          </p>
-      </footer>
-
-      {% if page.share %}{% include social-share.html %}{% endif %}
-
-      {% include post_pagination.html %}
-    </div>
-
-    {% if site.comments.provider and page.comments %}
-      {% if jekyll.environment == 'production' %}
-        {% include comments.html %}
-      {% else %}
-        <p>
-          Comments are configured with provider: <strong>{{ site.comments.provider }}</strong>,
-          but are disabled in non-production environments.
-        </p>
+        <span class="read-time">
+          {% assign words = page.content | number_of_words %}
+          {% assign read_time = words | divided_by: 250 | plus: 1 %}
+          {{ read_time }} 分钟阅读
+        </span>
+      </div>
+      
+      <h1 class="post-title">{{ page.title }}</h1>
+      
+      {% if page.excerpt %}
+      <p class="post-excerpt">{{ page.excerpt | strip_html }}</p>
       {% endif %}
-    {% endif %}
-  </article>
-
-  {% comment %}<!-- only show related on a post page when `related: true` -->{% endcomment %}
-  {% if page.id and page.related and site.related_posts.size > 0 %}
-    {% include page__related.html posts=site.related_posts %}
-  {% comment %}<!-- otherwise show recent posts if no related when `related: true` -->{% endcomment %}
-  {% elsif page.id and page.related %}
-    {% include page__related.html posts=site.posts %}
-  {% endif %}
-</div>
-
-
+      
+      <div class="post-tags">
+        {% for tag in page.tags %}
+        <a href="{{ '/tags/' | relative_url }}#{{ tag }}" class="tag">#{{ tag }}</a>
+        {% endfor %}
+      </div>
+    </header>
+    
+    <!-- Post Content -->
+    <div class="post-content">
+      {{ content }}
+    </div>
+    
+    <!-- Post Footer -->
+    <footer class="post-footer">
+      <!-- Share -->
+      <div class="share-section">
+        <h3>分享文章</h3>
+        <div class="share-links">
+          <a href="https://twitter.com/intent/tweet?url={{ page.url | absolute_url | uri_escape }}&text={{ page.title | uri_escape }}" 
+             target="_blank" rel="noopener" class="share-link">
+            Twitter
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{ page.url | absolute_url | uri_escape }}" 
+             target="_blank" rel="noopener" class="share-link">
+            Facebook
+          </a>
+          <a href="https://service.weibo.com/share/share.php?url={{ page.url | absolute_url | uri_escape }}&title={{ page.title | uri_escape }}" 
+             target="_blank" rel="noopener" class="share-link">
+            微博
+          </a>
+        </div>
+      </div>
+      
+      <!-- Related Posts -->
+      {% if site.related_posts.size > 0 %}
+      <div class="related-posts">
+        <h3>相关文章</h3>
+        <div class="related-grid">
+          {% for related in site.related_posts limit:3 %}
+          <a href="{{ related.url | relative_url }}" class="related-item">
+            <span class="related-date">{{ related.date | date: "%Y年%m月%d日" }}</span>
+            <span class="related-title">{{ related.title }}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Comments -->
+      {% if page.comments %}
+      <div class="comments-section">
+        <h3>评论</h3>
+        <div id="comments"></div>
+      </div>
+      {% endif %}
+    </footer>
+  </div>
+</article>
