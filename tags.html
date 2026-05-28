@@ -11,7 +11,7 @@ permalink: /tags/
     <div class="tags-cloud">
       {% assign tags_sorted = site.tags | sort %}
       {% for tag in tags_sorted %}
-      <a href="#{{ tag[0] }}" class="tag-item" style="font-size: {{ tag[1].size | times: 0.1 | plus: 0.9 }}rem;">
+      <a href="#{{ tag[0] }}" class="tag-item" style="font-size: {{ tag[1].size | times: 0.02 | plus: 0.88 }}rem;">
         #{{ tag[0] }}
         <span class="tag-count">{{ tag[1].size }}</span>
       </a>
