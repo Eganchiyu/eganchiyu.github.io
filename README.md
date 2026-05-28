@@ -41,14 +41,18 @@ bundle exec jekyll serve
 ### 项目结构
 
 ```
-_layouts/       → 页面布局模板
-_includes/      → 可复用组件
-assets/css/     → 样式表（含双主题）
-assets/js/      → 交互脚本
-_posts/         → 博客文章
+_layouts/          → 页面布局模板 (default, home, single)
+_includes/         → 可复用组件 (navigation, footer)
+_sass/             → Sass 样式源码
+assets/css/        → 主样式表 (Alice Blue 设计系统 + 双主题)
+assets/js/         → 交互脚本 (主题切换、移动菜单)
+_posts/            → 博客文章 (18篇)
+.github/           → GitHub 模板与 Actions 部署
+.trae/             → Trae IDE 规则与技能文件
+docs/              → 项目文档 (架构、布局、样式、脚本等)
 ```
 
-详细文档见 [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+详细文档见 [docs/](./docs/README.md)
 
 ## 部署
 

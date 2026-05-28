@@ -1,30 +1,41 @@
-<!--
-  Thanks for creating a Pull Request! Before you submit, please make sure
-  you've done the following:
+## 变更说明
 
-  - Read the contributing document at https://github.com/mmistakes/minimal-mistakes#contributing
--->
+<!-- 请简要描述这个 PR 做了什么改动 -->
 
-<!--
-  Choose one of the following by uncommenting it:
--->
 
-<!-- This is a bug fix. -->
-<!-- This is an enhancement or feature. -->
-<!-- This is a documentation change. -->
+## 变更类型
 
-## Summary
+<!-- 请勾选适用的类型 -->
 
-<!--
-  Provide a description of what your pull request changes.
--->
+- [ ] 🐛 Bug 修复
+- [ ] ✨ 新功能
+- [ ] 📝 内容更新（文章修改/新增）
+- [ ] 🎨 样式调整
+- [ ] ♻️ 代码重构
+- [ ] 📦 依赖更新
+- [ ] 🔧 配置修改
+- [ ] 📖 文档更新
 
-## Context
+## 关联 Issue
 
-<!--
-  Is this related to any GitHub issue(s)?
--->
+<!-- 如果有相关的 Issue，请在此关联 -->
 
-<!--
-  Please confirm that you want to submit this Pull Request to Minimal Mistakes, the free Jekyll theme by Michael Rose, by deleting this comment block.
--->
+Closes #
+
+## 测试
+
+<!-- 请描述你如何测试了这些改动 -->
+
+- [ ] 本地 `bundle exec jekyll serve` 构建成功
+- [ ] 页面显示正常（桌面端）
+- [ ] 页面显示正常（移动端）
+- [ ] 深色模式正常
+- [ ] 链接可正常访问
+
+## 截图
+
+<!-- 如果有 UI 变更，请提供截图 -->
+
+## 其他说明
+
+<!-- 任何其他需要说明的内容 -->

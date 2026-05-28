@@ -1,0 +1,85 @@
+name: 📝 内容反馈
+description: 报告文章错误、提出内容建议或反馈
+title: "[内容] "
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你的内容反馈！如果你发现文章有错误或有好的内容建议，请在这里告诉我。
+
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: 反馈类型
+      description: 请选择最符合的类型
+      options:
+        - 文章错误（事实错误、笔误等）
+        - 代码错误（代码片段有 bug）
+        - 内容不清楚（需要补充说明）
+        - 内容建议（希望写某方面的文章）
+        - 链接失效
+        - 其他
+    validations:
+      required: true
+
+  - type: input
+    id: article-url
+    attributes:
+      label: 相关文章
+      description: 请提供相关文章的 URL
+      placeholder: "https://eganchiyu.github.io/..."
+    validations:
+      required: false
+
+  - type: input
+    id: article-title
+    attributes:
+      label: 文章标题
+      description: 相关文章的标题
+      placeholder: "例如: 从零搭建树莓派集群"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 详细说明
+      description: 请详细描述你发现的问题或建议
+      placeholder: 请描述你发现的错误或建议...
+    validations:
+      required: true
+
+  - type: textarea
+    id: correction
+    attributes:
+      label: 建议的修正
+      description: 如果你知道正确的信息，请在这里提供
+      placeholder: 正确的内容应该是...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 文章分类
+      description: 相关文章所属的分类
+      options:
+        - 随想
+        - 学习记录
+        - 树莓派
+        - ESP32
+        - 线性代数
+        - LLM
+        - 小结
+        - 其他/不确定
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 补充信息
+      description: 其他你认为有帮助的信息
+    validations:
+      required: false

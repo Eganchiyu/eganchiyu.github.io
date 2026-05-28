@@ -1,0 +1,81 @@
+name: 💡 功能建议
+description: 提出新功能或改进建议
+title: "[功能] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你的建议！请描述你希望添加的功能或改进。
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: 建议类型
+      description: 请选择最符合的类型
+      options:
+        - 新功能
+        - 现有功能改进
+        - UI/样式优化
+        - 性能优化
+        - 用户体验改进
+        - SEO 优化
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 功能描述
+      description: 请详细描述你希望的功能或改进
+      placeholder: 我希望博客能够...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 使用场景
+      description: 这个功能在什么场景下会用到？
+      placeholder: 当我...的时候，我需要...
+    validations:
+      required: false
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 建议的实现方式
+      description: 如果你有实现思路，请在这里描述
+      placeholder: 可以通过...
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: 参考示例
+      description: 如果其他博客或网站有类似功能，请提供链接
+      placeholder: "参考链接: https://..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 优先级
+      description: 你认为这个功能的重要程度
+      options:
+        - 低 - 锦上添花
+        - 中 - 有会更好
+        - 高 - 很需要这个功能
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 补充信息
+      description: 其他你认为有帮助的信息
+    validations:
+      required: false

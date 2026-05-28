@@ -12,6 +12,24 @@
 - 代码块语法高亮优化
 - 文章目录（TOC）支持
 
+## [2.1.0] - 2026-05-28
+
+### 新增
+- GitHub Issue 模板：Bug 报告、功能建议、内容反馈（YAML 表单格式）
+- GitHub PR 模板、贡献指南、CODEOWNERS、FUNDING.yml
+- GitHub Actions 部署 workflow (actions/deploy-pages)
+- `.trae/` 目录：项目规则 + 4 个 Skill 文件（Jekyll 基础、主题定制、写作、部署）
+- `docs/` 模块文档：layouts、components、styling、javascript、posts、configuration（共 6 篇）
+
+### 变更
+- `.github/workflows/build.yml` 从 Minimal Mistakes 模板替换为 GitHub Pages 标准部署
+- `docs/README.md` 更新为完整文档导航入口
+- `README.md` 项目结构更新，添加 `.github/`、`.trae/`、`docs/` 说明
+
+### 移除
+- Minimal Mistakes 主题仓库的 Issue 模板（bug_report、documentation）
+- Minimal Mistakes 的 PR 模板和 CONTRIBUTING.md（指向 mmistakes/minimal-mistakes）
+
 ## [2.0.0] - 2026-05-27
 
 ### 新增
