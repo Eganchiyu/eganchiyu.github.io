@@ -718,9 +718,9 @@ img {
   align-items: center;
   gap: 0.25rem;
   padding: 0.2rem 0.6rem;
-  background: rgba(255, 180, 130, 0.18);
-  color: #c47030;
-  border: 1px solid rgba(255, 180, 130, 0.35);
+  background: rgba(220, 60, 60, 0.1);
+  color: #c53030;
+  border: 1px solid rgba(220, 60, 60, 0.25);
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.7rem;
@@ -729,9 +729,9 @@ img {
 }
 
 [data-theme="dark"] .post-wip {
-  background: rgba(255, 160, 100, 0.12);
-  color: #e8a060;
-  border-color: rgba(255, 160, 100, 0.25);
+  background: rgba(255, 100, 100, 0.12);
+  color: #f87171;
+  border-color: rgba(255, 100, 100, 0.25);
 }
 
 @keyframes wip-pulse {
