@@ -15,6 +15,9 @@ layout: default
           {{ page.categories | first }}
         </span>
         {% endif %}
+        {% if page.wip %}
+        <span class="post-wip">🚧 未完成</span>
+        {% endif %}
         <span class="read-time">
           {% assign words = page.content | number_of_words %}
           {% assign read_time = words | divided_by: 250 | plus: 1 %}

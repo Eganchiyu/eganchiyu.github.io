@@ -96,6 +96,9 @@ layout: default
             {{ post.categories | first }}
           </span>
           {% endif %}
+          {% if post.wip %}
+          <span class="post-wip">🚧 未完成</span>
+          {% endif %}
         </div>
         
         <h3 class="post-title">

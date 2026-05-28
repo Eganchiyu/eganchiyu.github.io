@@ -1,5 +1,5 @@
 ---
-title: 解剖一支词典笔：从 SSH 接管到交叉编译的系统逆向记录
+title: 解剖一支词典笔：从 SSH 接管到交叉编译的系统逆向记录（未完成）
 excerpt: 一次嵌入式 Linux 设备的完整摸底过程：启动链路、init 机制、显示系统与 glibc 约束下的编译尝试
 
 categories: 
@@ -8,6 +8,7 @@ tags:
   -  博客
   -  记录
 mins: 120
+wip: true
 comments: true
 entries_layout: grid
 
@@ -15,6 +16,7 @@ entries_layout: grid
 #     teaser: 
 
 ---
+
 ## 部署ssh公钥
 
 在PC上确认公钥：（id_xxx.pub 常见为id_ed25519.pub、id_rsa.pub）
