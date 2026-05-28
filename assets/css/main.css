@@ -56,8 +56,8 @@
   --shadow-card: 0 8px 32px rgba(43, 141, 214, 0.12);
   --shadow-hover: 0 12px 40px rgba(43, 141, 214, 0.18);
   --nav-bg: rgba(255, 255, 255, 0.88);
-  --code-bg: #1e293b;
-  --code-text: #e2e8f0;
+  --code-bg: #f6f8fa;
+  --code-text: #24292e;
   --hero-gradient: linear-gradient(135deg, var(--alice-50) 0%, #f8f4ff 50%, var(--alice-50) 100%);
   --card-before-bg: linear-gradient(135deg, var(--alice-100) 0%, var(--accent-lavender) 100%);
   --blockquote-bg: var(--alice-50);
@@ -960,6 +960,466 @@ img {
   color: inherit;
 }
 
+/* ---------- 代码块容器 ---------- */
+.code-block-wrapper {
+  position: relative;
+  margin: 1.5em 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card-solid);
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, var(--alice-100), var(--bg-secondary));
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.code-block-lang {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+  color: var(--alice-600);
+}
+
+[data-theme="dark"] .code-block-lang {
+  color: var(--alice-300);
+}
+
+.code-block-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.code-block-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-block-dot:nth-child(1) { background: #ff5f57; }
+.code-block-dot:nth-child(2) { background: #febc2e; }
+.code-block-dot:nth-child(3) { background: #28c840; }
+
+.code-block-wrapper .highlight,
+.code-block-wrapper pre.highlight {
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+  padding: 0;
+  background: var(--code-bg) !important;
+  color: var(--code-text) !important;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.code-block-wrapper pre code {
+  background: transparent !important;
+  padding: 0;
+  color: inherit;
+  font-family: var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* 复制按钮 */
+.code-copy-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s var(--smooth);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.code-block-wrapper:hover .code-copy-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.code-copy-btn:hover {
+  background: var(--alice-500);
+  color: white;
+  border-color: var(--alice-500);
+  box-shadow: 0 4px 12px rgba(43, 141, 214, 0.3);
+  transform: translateY(-2px);
+}
+
+.code-copy-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.code-copy-btn.copied {
+  background: var(--accent-teal);
+  color: white;
+  border-color: var(--accent-teal);
+}
+
+.code-copy-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.code-copy-btn .copy-text {
+  transition: opacity 0.2s ease;
+}
+
+.code-copy-btn .success-text {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.code-copy-btn.copied .success-text {
+  opacity: 1;
+}
+
+/* 普通代码块（没有wrapper的） */
+.post-content .highlight,
+.post-content pre.highlight {
+  position: relative;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 1.25rem;
+  overflow-x: auto;
+  line-height: 1.7;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-color);
+  margin: 1.5em 0;
+}
+
+.post-content .highlight code,
+.post-content pre.highlight code {
+  background: transparent;
+  border-radius: 0;
+  font-family: var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+}
+
+/* 行内代码 */
+.post-content code {
+  background: var(--tag-bg);
+  color: var(--alice-600);
+  padding: 0.125em 0.4em;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875em;
+}
+
+[data-theme="dark"] .post-content code {
+  color: var(--alice-300);
+}
+
+/* 语法高亮色 - Light 主题 */
+.highlight .c, .highlight .c1, .highlight .cm, .highlight .cp,
+.highlight .cs, .highlight .cd { 
+  color: #6a737d; 
+  font-style: italic; 
+}
+
+.highlight .k, .highlight .kd, .highlight .kt, .highlight .kr, .highlight .kp,
+.highlight .kn, .highlight .kc { 
+  color: #d73a49; 
+  font-weight: 500;
+}
+
+.highlight .nc, .highlight .nn, .highlight .nf, .highlight .na { 
+  color: #6f42c1; 
+}
+
+.highlight .s, .highlight .s1, .highlight .s2, .highlight .sb, .highlight .sc,
+.highlight .sd, .highlight .sh, .highlight .sx, .highlight .si, .highlight .se { 
+  color: #032f62; 
+}
+
+.highlight .mi, .highlight .mf, .highlight .mh, .highlight .il,
+.highlight .m, .highlight .mo { 
+  color: #005cc5; 
+}
+
+.highlight .o, .highlight .ow { 
+  color: #d73a49; 
+}
+
+.highlight .nv, .highlight .nb, .highlight .bp { 
+  color: #e36209; 
+}
+
+.highlight .n, .highlight .p { 
+  color: #24292e; 
+}
+
+.highlight .hll { 
+  background-color: #fffae6; 
+  border-radius: 2px;
+  padding: 2px 0;
+}
+
+.highlight .nt { 
+  color: #22863a; 
+}
+
+.highlight .nd { 
+  color: #6f42c1; 
+}
+
+.highlight .ni { 
+  color: #24292e; 
+}
+
+.highlight .ne { 
+  color: #d73a49; 
+  font-weight: 500;
+}
+
+.highlight .nl { 
+  color: #005cc5; 
+}
+
+.highlight .no { 
+  color: #005cc5; 
+}
+
+.highlight .nx { 
+  color: #24292e; 
+}
+
+.highlight .py { 
+  color: #24292e; 
+}
+
+.highlight .w { 
+  color: #24292e; 
+}
+
+.highlight .gd { 
+  color: #b31d28; 
+  background: rgba(255, 22, 22, 0.05);
+}
+
+.highlight .gi { 
+  color: #22863a; 
+  background: rgba(34, 134, 58, 0.05);
+}
+
+.highlight .gh { 
+  color: #005cc5; 
+  font-weight: 600;
+}
+
+.highlight .gu { 
+  color: #6f42c1; 
+  font-weight: 600;
+}
+
+.highlight .gs { 
+  font-weight: 600;
+}
+
+.highlight .ge { 
+  font-style: italic;
+}
+
+.highlight .gp { 
+  color: #005cc5; 
+  font-weight: 600;
+}
+
+/* Dark 主题语法高亮 */
+[data-theme="dark"] .highlight .c, 
+[data-theme="dark"] .highlight .c1, 
+[data-theme="dark"] .highlight .cm, 
+[data-theme="dark"] .highlight .cp,
+[data-theme="dark"] .highlight .cs, 
+[data-theme="dark"] .highlight .cd { 
+  color: #8b949e; 
+}
+
+[data-theme="dark"] .highlight .k, 
+[data-theme="dark"] .highlight .kd, 
+[data-theme="dark"] .highlight .kt, 
+[data-theme="dark"] .highlight .kr, 
+[data-theme="dark"] .highlight .kp,
+[data-theme="dark"] .highlight .kn, 
+[data-theme="dark"] .highlight .kc { 
+  color: #ff7b72; 
+}
+
+[data-theme="dark"] .highlight .nc, 
+[data-theme="dark"] .highlight .nn, 
+[data-theme="dark"] .highlight .nf, 
+[data-theme="dark"] .highlight .na { 
+  color: #d2a8ff; 
+}
+
+[data-theme="dark"] .highlight .s, 
+[data-theme="dark"] .highlight .s1, 
+[data-theme="dark"] .highlight .s2, 
+[data-theme="dark"] .highlight .sb, 
+[data-theme="dark"] .highlight .sc,
+[data-theme="dark"] .highlight .sd, 
+[data-theme="dark"] .highlight .sh, 
+[data-theme="dark"] .highlight .sx, 
+[data-theme="dark"] .highlight .si, 
+[data-theme="dark"] .highlight .se { 
+  color: #a5d6ff; 
+}
+
+[data-theme="dark"] .highlight .mi, 
+[data-theme="dark"] .highlight .mf, 
+[data-theme="dark"] .highlight .mh, 
+[data-theme="dark"] .highlight .il,
+[data-theme="dark"] .highlight .m, 
+[data-theme="dark"] .highlight .mo { 
+  color: #79c0ff; 
+}
+
+[data-theme="dark"] .highlight .o, 
+[data-theme="dark"] .highlight .ow { 
+  color: #ff7b72; 
+}
+
+[data-theme="dark"] .highlight .nv, 
+[data-theme="dark"] .highlight .nb, 
+[data-theme="dark"] .highlight .bp { 
+  color: #ffa657; 
+}
+
+[data-theme="dark"] .highlight .n, 
+[data-theme="dark"] .highlight .p { 
+  color: #e6edf3; 
+}
+
+[data-theme="dark"] .highlight .hll { 
+  background-color: rgba(255, 220, 50, 0.15); 
+}
+
+[data-theme="dark"] .highlight .nt { 
+  color: #7ee787; 
+}
+
+[data-theme="dark"] .highlight .nd { 
+  color: #d2a8ff; 
+}
+
+[data-theme="dark"] .highlight .ni { 
+  color: #e6edf3; 
+}
+
+[data-theme="dark"] .highlight .ne { 
+  color: #ff7b72; 
+}
+
+[data-theme="dark"] .highlight .nl { 
+  color: #79c0ff; 
+}
+
+[data-theme="dark"] .highlight .no { 
+  color: #79c0ff; 
+}
+
+[data-theme="dark"] .highlight .nx { 
+  color: #e6edf3; 
+}
+
+[data-theme="dark"] .highlight .gd { 
+  color: #ffa198; 
+  background: rgba(248, 81, 73, 0.1);
+}
+
+[data-theme="dark"] .highlight .gi { 
+  color: #7ee787; 
+  background: rgba(63, 185, 80, 0.1);
+}
+
+[data-theme="dark"] .highlight .gh { 
+  color: #79c0ff; 
+}
+
+[data-theme="dark"] .highlight .gu { 
+  color: #d2a8ff; 
+}
+
+.highlight table td.gutter {
+  color: var(--text-muted);
+  padding-right: 0.8em;
+  user-select: none;
+  opacity: 0.6;
+}
+
+/* 代码块滚动条美化 */
+.highlight::-webkit-scrollbar,
+pre.highlight::-webkit-scrollbar,
+.code-block-wrapper pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.highlight::-webkit-scrollbar-thumb,
+pre.highlight::-webkit-scrollbar-thumb,
+.code-block-wrapper pre::-webkit-scrollbar-thumb {
+  background: var(--border-color-strong);
+  border-radius: 3px;
+}
+
+.highlight::-webkit-scrollbar-track,
+pre.highlight::-webkit-scrollbar-track,
+.code-block-wrapper pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 移动端复制按钮始终显示 */
+@media (max-width: 768px) {
+  .code-copy-btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .code-block-wrapper {
+    margin: 1em 0;
+  }
+  
+  .code-block-header {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .code-copy-btn {
+    padding: 0.4rem 0.625rem;
+    font-size: 0.7rem;
+  }
+  
+  .code-copy-btn .btn-label {
+    display: none;
+  }
+}
+
 .post-content img {
   border-radius: var(--radius-lg);
   margin: 1.5rem 0;
@@ -1291,6 +1751,30 @@ img {
     font-size: 0.8em;
     color: #666;
   }
+}
+
+/* ---------- MathJax LaTeX 渲染 ---------- */
+mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+}
+
+mjx-container[display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1.5em 0;
+  padding: 0.75em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+mjx-container svg {
+  overflow: visible;
+}
+
+[data-theme="dark"] mjx-container {
+  color: var(--text-primary);
 }
 
 /* ---------- 无障碍：减少动画 ---------- */
