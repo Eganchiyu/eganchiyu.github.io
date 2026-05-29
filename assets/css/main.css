@@ -1783,6 +1783,42 @@ pre.highlight::-webkit-scrollbar-track,
   color: var(--text-muted);
 }
 
+/* ---------- 页脚友链 ---------- */
+.footer-friends {
+  text-align: center;
+}
+
+.footer-friends-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.footer-friends-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.footer-friends-links a {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-base) var(--smooth);
+}
+
+.footer-friends-links a:hover {
+  color: var(--alice-500);
+  border-color: var(--alice-300);
+  background: var(--alice-100);
+  transform: translateY(-2px);
+}
+
 .footer-links {
   display: flex;
   gap: 1.5rem;
