@@ -14,6 +14,13 @@
         <a href="https://github.com/Eganchiyu" target="_blank" rel="noopener" class="nav-link">GitHub</a>
       </div>
       
+      <button class="search-toggle" id="searchToggle" aria-label="搜索">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      
       <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
         <span class="icon-moon">🌙</span>
         <span class="icon-sun">☀️</span>
@@ -27,6 +34,7 @@
 </nav>
 
 <!-- Mobile Menu -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="{{ '/' | relative_url }}" class="mobile-link">🏠 首页</a>
   <a href="{{ '/categories/' | relative_url }}" class="mobile-link">📁 分类</a>

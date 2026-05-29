@@ -43,26 +43,51 @@
     init() {
       this.toggle = document.getElementById('menuToggle');
       this.menu = document.getElementById('mobileMenu');
+      this.overlay = document.getElementById('mobileOverlay');
       if (!this.toggle || !this.menu) return;
 
       this.toggle.addEventListener('click', () => {
-        this.menu.classList.toggle('active');
-        this.toggle.textContent = this.menu.classList.contains('active') ? '✕' : '☰';
+        this.toggleMenu();
       });
+
+      if (this.overlay) {
+        this.overlay.addEventListener('click', () => {
+          this.closeMenu();
+        });
+      }
 
       this.menu.querySelectorAll('.mobile-link').forEach(link => {
         link.addEventListener('click', () => {
-          this.menu.classList.remove('active');
-          this.toggle.textContent = '☰';
+          this.closeMenu();
         });
       });
 
       document.addEventListener('click', (e) => {
         if (!this.toggle.contains(e.target) && !this.menu.contains(e.target)) {
-          this.menu.classList.remove('active');
-          this.toggle.textContent = '☰';
+          this.closeMenu();
         }
       });
+    },
+
+    toggleMenu() {
+      const isActive = this.menu.classList.contains('active');
+      if (isActive) {
+        this.closeMenu();
+      } else {
+        this.openMenu();
+      }
+    },
+
+    openMenu() {
+      this.menu.classList.add('active');
+      if (this.overlay) this.overlay.classList.add('active');
+      this.toggle.textContent = '✕';
+    },
+
+    closeMenu() {
+      this.menu.classList.remove('active');
+      if (this.overlay) this.overlay.classList.remove('active');
+      this.toggle.textContent = '☰';
     }
   };
 
@@ -250,6 +275,296 @@
     }
   };
 
+  // ========== 阅读进度条 ==========
+  const ReadingProgress = {
+    init() {
+      this.progressBar = document.getElementById('readingProgress');
+      if (!this.progressBar) return;
+
+      this.ticking = false;
+
+      window.addEventListener('scroll', () => {
+        if (!this.ticking) {
+          window.requestAnimationFrame(() => {
+            this.updateProgress();
+            this.ticking = false;
+          });
+          this.ticking = true;
+        }
+      });
+    },
+
+    updateProgress() {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      this.progressBar.style.width = `${Math.min(progress, 100)}%`;
+    }
+  };
+
+  // ========== 文章目录 (TOC) ==========
+  const TOCManager = {
+    init() {
+      this.postContent = document.querySelector('.post-content');
+      if (!this.postContent) return;
+
+      this.tocNav = document.getElementById('tocNav');
+      this.tocMobileNav = document.getElementById('tocMobileNav');
+      this.tocMobileToggle = document.getElementById('tocMobileToggle');
+
+      if (!this.tocNav && !this.tocMobileNav) return;
+
+      this.headings = this.postContent.querySelectorAll('h2, h3, h4');
+      if (this.headings.length === 0) {
+        const sidebar = document.getElementById('tocSidebar');
+        const mobile = document.getElementById('tocMobile');
+        if (sidebar) sidebar.style.display = 'none';
+        if (mobile) mobile.style.display = 'none';
+        return;
+      }
+
+      this.buildTOC();
+      this.setupIntersectionObserver();
+      this.setupMobileToggle();
+    },
+
+    buildTOC() {
+      const fragment = document.createDocumentFragment();
+
+      this.headings.forEach((heading, index) => {
+        if (!heading.id) {
+          heading.id = `heading-${index}`;
+        }
+
+        const link = document.createElement('a');
+        link.href = `#${heading.id}`;
+        link.className = `toc-link toc-${heading.tagName.toLowerCase()}`;
+        link.textContent = heading.textContent;
+        link.dataset.target = heading.id;
+
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        fragment.appendChild(link.cloneNode(true));
+
+        if (this.tocMobileNav) {
+          const mobileLink = link.cloneNode(true);
+          mobileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.tocMobileNav.classList.remove('active');
+            this.tocMobileToggle.classList.remove('active');
+          });
+          this.tocMobileNav.appendChild(mobileLink);
+        }
+      });
+
+      if (this.tocNav) {
+        this.tocNav.appendChild(fragment);
+      }
+    },
+
+    setupIntersectionObserver() {
+      const options = {
+        rootMargin: '-80px 0px -80% 0px',
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const id = entry.target.id;
+          const links = document.querySelectorAll(`.toc-link[data-target="${id}"]`);
+
+          if (entry.isIntersecting) {
+            document.querySelectorAll('.toc-link.active').forEach(l => l.classList.remove('active'));
+            links.forEach(l => l.classList.add('active'));
+          }
+        });
+      }, options);
+
+      this.headings.forEach(heading => observer.observe(heading));
+    },
+
+    setupMobileToggle() {
+      if (!this.tocMobileToggle || !this.tocMobileNav) return;
+
+      this.tocMobileToggle.addEventListener('click', () => {
+        this.tocMobileToggle.classList.toggle('active');
+        this.tocMobileNav.classList.toggle('active');
+      });
+    }
+  };
+
+  // ========== 搜索功能 ==========
+  const SearchManager = {
+    searchData: null,
+
+    init() {
+      this.searchToggle = document.getElementById('searchToggle');
+      this.searchModal = document.getElementById('searchModal');
+      this.searchOverlay = document.getElementById('searchOverlay');
+      this.searchInput = document.getElementById('searchInput');
+      this.searchClose = document.getElementById('searchClose');
+      this.searchResults = document.getElementById('searchResults');
+
+      if (!this.searchToggle || !this.searchModal) return;
+
+      this.loadSearchData();
+      this.bindEvents();
+    },
+
+    async loadSearchData() {
+      try {
+        const response = await fetch('{{ "/search.json" | relative_url }}');
+        this.searchData = await response.json();
+      } catch (err) {
+        console.error('加载搜索数据失败:', err);
+      }
+    },
+
+    bindEvents() {
+      this.searchToggle.addEventListener('click', () => this.openSearch());
+      this.searchClose.addEventListener('click', () => this.closeSearch());
+      this.searchOverlay.addEventListener('click', () => this.closeSearch());
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.searchModal.classList.contains('active')) {
+          this.closeSearch();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          this.openSearch();
+        }
+      });
+
+      let debounceTimer;
+      this.searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          this.performSearch(e.target.value);
+        }, 300);
+      });
+    },
+
+    openSearch() {
+      this.searchModal.classList.add('active');
+      this.searchInput.focus();
+      document.body.style.overflow = 'hidden';
+    },
+
+    closeSearch() {
+      this.searchModal.classList.remove('active');
+      this.searchInput.value = '';
+      this.searchResults.innerHTML = '<div class="search-hint">输入关键词开始搜索</div>';
+      document.body.style.overflow = '';
+    },
+
+    performSearch(query) {
+      if (!query.trim()) {
+        this.searchResults.innerHTML = '<div class="search-hint">输入关键词开始搜索</div>';
+        return;
+      }
+
+      if (!this.searchData) {
+        this.searchResults.innerHTML = '<div class="search-hint">搜索数据加载中...</div>';
+        return;
+      }
+
+      const lowerQuery = query.toLowerCase();
+      const results = this.searchData.filter(post => {
+        return post.title.toLowerCase().includes(lowerQuery) ||
+               post.excerpt.toLowerCase().includes(lowerQuery) ||
+               post.categories.some(cat => cat.toLowerCase().includes(lowerQuery)) ||
+               post.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+      });
+
+      this.displayResults(results, query);
+    },
+
+    displayResults(results, query) {
+      if (results.length === 0) {
+        this.searchResults.innerHTML = '<div class="search-no-results">未找到相关文章</div>';
+        return;
+      }
+
+      const html = results.map(post => `
+        <a href="${post.url}" class="search-result-item">
+          <div class="search-result-title">${this.highlightText(post.title, query)}</div>
+          <div class="search-result-excerpt">${this.highlightText(post.excerpt, query)}</div>
+          <div class="search-result-meta">
+            <span>${post.date}</span>
+            ${post.categories.length > 0 ? `<span>${post.categories[0]}</span>` : ''}
+          </div>
+        </a>
+      `).join('');
+
+      this.searchResults.innerHTML = html;
+    },
+
+    highlightText(text, query) {
+      if (!query.trim()) return text;
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(regex, '<mark>$1</mark>');
+    }
+  };
+
+  // ========== 图片灯箱 ==========
+  const LightboxManager = {
+    init() {
+      this.createOverlay();
+      this.bindEvents();
+    },
+
+    createOverlay() {
+      this.overlay = document.createElement('div');
+      this.overlay.className = 'lightbox-overlay';
+      this.overlay.innerHTML = `
+        <button class="lightbox-close" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        </button>
+        <img class="lightbox-image" src="" alt="">
+      `;
+      document.body.appendChild(this.overlay);
+
+      this.lightboxImage = this.overlay.querySelector('.lightbox-image');
+      this.lightboxClose = this.overlay.querySelector('.lightbox-close');
+    },
+
+    bindEvents() {
+      document.querySelectorAll('.post-content img').forEach(img => {
+        img.addEventListener('click', () => this.open(img.src, img.alt));
+      });
+
+      this.lightboxClose.addEventListener('click', () => this.close());
+      this.overlay.addEventListener('click', (e) => {
+        if (e.target === this.overlay) this.close();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.overlay.classList.contains('active')) {
+          this.close();
+        }
+      });
+    },
+
+    open(src, alt) {
+      this.lightboxImage.src = src;
+      this.lightboxImage.alt = alt || '';
+      this.overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    },
+
+    close() {
+      this.overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  };
+
   // ========== 初始化 ==========
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -258,6 +573,10 @@
     SmoothScroll.init();
     CodeBlockManager.init();
     BackToTop.init();
+    ReadingProgress.init();
+    TOCManager.init();
+    SearchManager.init();
+    LightboxManager.init();
   });
 
 })();

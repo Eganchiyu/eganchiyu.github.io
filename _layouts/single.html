@@ -2,6 +2,8 @@
 layout: default
 ---
 
+<div class="reading-progress-bar" id="readingProgress"></div>
+
 <article class="post">
   <div class="container">
     <!-- Post Header -->
@@ -49,9 +51,28 @@ layout: default
     </header>
     
     <!-- Post Content -->
-    <div class="post-content">
-      {{ content }}
+    <div class="post-content-wrapper">
+      {% if page.toc != false %}
+      <aside class="toc-sidebar" id="tocSidebar">
+        <div class="toc-header">目录</div>
+        <nav class="toc-nav" id="tocNav"></nav>
+      </aside>
+      {% endif %}
+
+      <div class="post-content">
+        {{ content }}
+      </div>
     </div>
+
+    {% if page.toc != false %}
+    <div class="toc-mobile" id="tocMobile">
+      <button class="toc-mobile-toggle" id="tocMobileToggle">
+        <span>📑 目录</span>
+        <span class="toc-toggle-icon">▼</span>
+      </button>
+      <nav class="toc-mobile-nav" id="tocMobileNav"></nav>
+    </div>
+    {% endif %}
     
     <!-- Post Footer -->
     <footer class="post-footer-section">

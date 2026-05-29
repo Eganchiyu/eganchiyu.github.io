@@ -57,6 +57,25 @@
   <!-- Footer -->
   {% include footer.html %}
   
+  <!-- Search Modal -->
+  <div class="search-modal" id="searchModal">
+    <div class="search-modal-overlay" id="searchOverlay"></div>
+    <div class="search-modal-content">
+      <div class="search-modal-header">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索文章..." autocomplete="off">
+        <button class="search-close" id="searchClose" aria-label="关闭搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-hint">输入关键词开始搜索</div>
+      </div>
+    </div>
+  </div>
+  
   <!-- Scripts -->
   <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
   
