@@ -11,10 +11,12 @@ tags:
 
 entries_layout: grid
 mins: 8
+cover_image: /assets/images/2025-12-14-21-02-11.png
 header:
   teaser: /assets/images/2025-12-14-21-02-11.png
 
 comments: true
+featured: true
 ---
 
 

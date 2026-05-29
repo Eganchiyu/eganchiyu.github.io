@@ -77,6 +77,50 @@ layout: default
   </div>
 </section>
 
+<!-- Featured Posts Section -->
+{% assign featured_posts = site.posts | where: "featured", true %}
+{% if featured_posts.size > 0 %}
+<section class="featured-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">✨ 精选文章</h2>
+    </div>
+    <div class="featured-grid">
+      {% for post in featured_posts limit:2 %}
+      <article class="featured-card">
+        {% if post.cover_image %}
+        <div class="featured-cover">
+          <img src="{{ post.cover_image | relative_url }}" alt="{{ post.title }}" loading="lazy">
+        </div>
+        {% endif %}
+        <div class="featured-content">
+          <div class="featured-meta">
+            <time datetime="{{ post.date | date_to_xmlschema }}">
+              {{ post.date | date: "%Y年%m月%d日" }}
+            </time>
+            {% if post.categories.size > 0 %}
+            <span class="post-category">{{ post.categories | first }}</span>
+            {% endif %}
+          </div>
+          <h3 class="featured-title">
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          </h3>
+          <p class="featured-excerpt">
+            {{ post.excerpt | strip_html | truncate: 150 }}
+          </p>
+          <div class="featured-tags">
+            {% for tag in post.tags limit:3 %}
+            <span class="tag">#{{ tag }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <!-- Posts Section -->
 <section class="posts-section">
   <div class="container">
@@ -87,6 +131,11 @@ layout: default
     <div class="posts-grid">
       {% for post in paginator.posts %}
       <article class="post-card">
+        {% if post.cover_image %}
+        <div class="post-card-cover">
+          <img src="{{ post.cover_image | relative_url }}" alt="{{ post.title }}" loading="lazy">
+        </div>
+        {% endif %}
         <div class="post-meta">
           <time datetime="{{ post.date | date_to_xmlschema }}">
             {{ post.date | date: "%Y年%m月%d日" }}

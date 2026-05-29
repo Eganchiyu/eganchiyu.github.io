@@ -39,6 +39,12 @@ layout: default
       
       <h1 class="post-title">{{ page.title }}</h1>
       
+      {% if page.cover_image %}
+      <div class="post-cover-image">
+        <img src="{{ page.cover_image | relative_url }}" alt="{{ page.title }}" loading="lazy">
+      </div>
+      {% endif %}
+      
       {% if page.excerpt %}
       <p class="post-excerpt">{{ page.excerpt | strip_html }}</p>
       {% endif %}
@@ -107,6 +113,14 @@ layout: default
           </a>
           {% endfor %}
         </div>
+      </div>
+      {% endif %}
+
+      <!-- Comments -->
+      {% if page.comments != false %}
+      <div class="comments-section">
+        <h3>💬 评论</h3>
+        {% include comments-providers/giscus.html %}
       </div>
       {% endif %}
       

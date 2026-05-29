@@ -35,6 +35,21 @@
       if (meta) {
         meta.content = theme === this.DARK ? '#0f172a' : '#f0f8ff';
       }
+      this.updateGiscusTheme(theme);
+    },
+
+    updateGiscusTheme(theme) {
+      const giscusTheme = theme === this.DARK ? 'dark' : 'light';
+      const iframe = document.querySelector('iframe.giscus-frame');
+      if (iframe) {
+        iframe.contentWindow.postMessage({
+          giscus: {
+            setConfig: {
+              theme: giscusTheme
+            }
+          }
+        }, 'https://giscus.app');
+      }
     }
   };
 

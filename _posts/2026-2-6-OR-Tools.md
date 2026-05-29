@@ -16,6 +16,7 @@ tags:
 mins: 45
 comments: true
 entries_layout: grid
+featured: true
 ---
 
 # 前言
