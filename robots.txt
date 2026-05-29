@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /assets/js/
+Sitemap: https://eganchiyu.github.io/sitemap.xml

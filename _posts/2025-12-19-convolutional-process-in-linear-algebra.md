@@ -9,7 +9,6 @@ tags:
   - 记录
   - 线性代数
 
-mathjax: true
 mins: 15
 entries_layout: grid
 comments: true

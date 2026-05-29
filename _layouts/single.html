@@ -6,6 +6,16 @@ layout: default
   <div class="container">
     <!-- Post Header -->
     <header class="post-header">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="面包屑导航">
+        <a href="{{ '/' | relative_url }}">首页</a>
+        <span class="separator">›</span>
+        {% if page.categories.size > 0 %}
+        <a href="{{ '/categories/' | relative_url }}#{{ page.categories | first }}">{{ page.categories | first }}</a>
+        <span class="separator">›</span>
+        {% endif %}
+        <span class="current">{{ page.title }}</span>
+      </nav>
       <div class="post-meta">
         <time datetime="{{ page.date | date_to_xmlschema }}">
           {{ page.date | date: "%Y年%m月%d日" }}
@@ -78,6 +88,27 @@ layout: default
         </div>
       </div>
       {% endif %}
+      
+      <!-- Post Navigation -->
+      <nav class="post-navigation" aria-label="文章导航">
+        {% if page.previous %}
+        <a href="{{ page.previous.url | relative_url }}" class="nav-item prev">
+          <span class="nav-label">← 上一篇</span>
+          <span class="nav-title">{{ page.previous.title }}</span>
+        </a>
+        {% else %}
+        <div></div>
+        {% endif %}
+        
+        {% if page.next %}
+        <a href="{{ page.next.url | relative_url }}" class="nav-item next">
+          <span class="nav-label">下一篇 →</span>
+          <span class="nav-title">{{ page.next.title }}</span>
+        </a>
+        {% else %}
+        <div></div>
+        {% endif %}
+      </nav>
     </footer>
   </div>
 </article>

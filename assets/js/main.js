@@ -219,6 +219,37 @@
     }
   };
 
+  // ========== 返回顶部 ==========
+  const BackToTop = {
+    init() {
+      this.btn = document.getElementById('backToTop');
+      if (!this.btn) return;
+
+      this.ticking = false;
+
+      window.addEventListener('scroll', () => {
+        if (!this.ticking) {
+          window.requestAnimationFrame(() => {
+            if (window.pageYOffset > 300) {
+              this.btn.classList.add('visible');
+            } else {
+              this.btn.classList.remove('visible');
+            }
+            this.ticking = false;
+          });
+          this.ticking = true;
+        }
+      });
+
+      this.btn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  };
+
   // ========== 初始化 ==========
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -226,6 +257,7 @@
     NavbarScroll.init();
     SmoothScroll.init();
     CodeBlockManager.init();
+    BackToTop.init();
   });
 
 })();
