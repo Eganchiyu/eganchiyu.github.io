@@ -1,6 +1,6 @@
 # 项目架构文档
 
-> 最后更新: 2026-05-27
+> 最后更新: 2026-05-29
 
 ## 目录结构
 
@@ -12,7 +12,11 @@ eganchiyu.github.io/
 │   └── ui-text.yml          # 多语言 UI 文本
 ├── _includes/               # 可复用模板片段
 │   ├── navigation.html      # 导航栏（桌面 + 移动端）
-│   └── footer.html          # 页脚
+│   ├── footer.html          # 页脚
+│   ├── skip-links.html      # 无障碍跳过链接
+│   ├── toc.html             # 文章目录（预留）
+│   └── comments-providers/  # 评论系统
+│       └── giscus.html      # Giscus 评论组件
 ├── _layouts/                # 页面布局模板
 │   ├── default.html         # 基础骨架（所有页面继承）
 │   ├── home.html            # 首页布局
@@ -22,13 +26,18 @@ eganchiyu.github.io/
 │   ├── css/
 │   │   └── main.css         # 主样式表（含设计系统 + 双主题）
 │   ├── images/
-│   │   └── avatar.png       # 头像图片
+│   │   ├── avatar.png       # 头像图片
+│   │   └── favicon.svg      # SVG Favicon
 │   └── js/
 │       └── main.js          # 主交互脚本
+├── about.md                 # 关于我页面
 ├── categories.html          # 分类页
 ├── tags.html                # 标签页
 ├── year-archive.html        # 时间线归档页
 ├── index.html               # 首页入口
+├── 404.html                 # 自定义 404 页面
+├── robots.txt               # SEO 爬虫配置
+├── search.json              # 搜索索引（Liquid 模板）
 ├── Gemfile                  # Ruby 依赖
 └── docs/                    # 项目文档
     ├── README.md            # 文档入口
@@ -77,22 +86,30 @@ eganchiyu.github.io/
 
 首页布局。职责：
 - Hero 区域（头像卡片 + 个人简介）
-- 文章卡片列表
+- 精选文章区域（`featured: true` 标记，仅第一页显示）
+- 文章卡片列表（瀑布流布局，支持封面图）
 - 分页导航
 
 ### `_layouts/single.html`
 
 文章页布局。职责：
+- 阅读进度条
+- 面包屑导航
 - 文章头部（标题 + 元信息 + 标签）
+- 文章封面图（可选）
+- 文章目录 TOC（桌面端右侧固定，移动端可折叠）
 - 文章内容渲染
 - 分享链接
 - 相关文章推荐
+- Giscus 评论区
+- 上一篇 / 下一篇导航
 
 ### `_includes/navigation.html`
 
 导航栏组件。职责：
-- 桌面端导航链接
+- 桌面端导航链接（首页、分类、标签、归档、关于、GitHub）
 - 移动端汉堡菜单
+- 搜索按钮（打开搜索模态框）
 - 主题切换按钮
 
 ### `assets/css/main.css`
@@ -100,18 +117,24 @@ eganchiyu.github.io/
 主样式表。职责：
 - CSS 变量定义（Light/Dark 双主题）
 - 全局样式重置
-- 组件样式（导航、卡片、文章等）
+- 组件样式（导航、卡片、文章、精选、评论区等）
 - 响应式适配
 - 打印样式
 - 无障碍（减少动画）
 
 ### `assets/js/main.js`
 
-主交互脚本。职责：
-- 主题切换（localStorage 持久化）
-- 移动端菜单开关
-- 导航栏滚动阴影
-- 平滑滚动
+主交互脚本（~580 行）。职责：
+- ThemeManager — 主题切换（localStorage 持久化）+ Giscus 主题同步
+- MobileMenu — 移动端菜单开关
+- NavbarScroll — 导航栏滚动阴影
+- SmoothScroll — 平滑滚动
+- CodeBlockManager — 代码块复制按钮
+- BackToTop — 返回顶部按钮
+- ReadingProgress — 阅读进度条
+- TOCManager — 文章目录
+- SearchManager — 搜索功能
+- LightboxManager — 图片灯箱
 
 ## 主题切换机制
 

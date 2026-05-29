@@ -1,7 +1,7 @@
 # 交互脚本文档
 
-> 主脚本文件: `assets/js/main.js`（132 行）
-> 采用 IIFE 立即执行函数封装，包含 4 个功能模块。
+> 主脚本文件: `assets/js/main.js`（~580 行）
+> 采用 IIFE 立即执行函数封装，包含 10 个功能模块。
 
 ---
 
@@ -11,16 +11,28 @@
 (function() {
   'use strict';
 
-  const ThemeManager = { ... };   // 主题切换
-  const MobileMenu = { ... };     // 移动端菜单
-  const NavbarScroll = { ... };   // 导航栏滚动效果
-  const SmoothScroll = { ... };   // 平滑滚动
+  const ThemeManager = { ... };       // 主题切换
+  const MobileMenu = { ... };         // 移动端菜单
+  const NavbarScroll = { ... };       // 导航栏滚动效果
+  const SmoothScroll = { ... };       // 平滑滚动
+  const CodeBlockManager = { ... };   // 代码块复制
+  const BackToTop = { ... };          // 返回顶部
+  const ReadingProgress = { ... };    // 阅读进度条
+  const TOCManager = { ... };         // 文章目录
+  const SearchManager = { ... };      // 搜索功能
+  const LightboxManager = { ... };    // 图片灯箱
 
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
     MobileMenu.init();
     NavbarScroll.init();
     SmoothScroll.init();
+    CodeBlockManager.init();
+    BackToTop.init();
+    ReadingProgress.init();
+    TOCManager.init();
+    SearchManager.init();
+    LightboxManager.init();
   });
 })();
 ```
@@ -271,10 +283,16 @@ init() {
 │   └── 渲染 footer.html
 │
 ├── DOMContentLoaded 事件触发
-│   ├── ThemeManager.init()    // 绑定主题按钮 + 确认主题
-│   ├── MobileMenu.init()      // 绑定菜单按钮 + 关闭逻辑
-│   ├── NavbarScroll.init()    // 绑定滚动监听
-│   └── SmoothScroll.init()    // 绑定锚点链接
+│   ├── ThemeManager.init()       // 绑定主题按钮 + 确认主题
+│   ├── MobileMenu.init()         // 绑定菜单按钮 + 关闭逻辑
+│   ├── NavbarScroll.init()       // 绑定滚动监听
+│   ├── SmoothScroll.init()       // 绑定锚点链接
+│   ├── CodeBlockManager.init()   // 处理代码块复制按钮
+│   ├── BackToTop.init()          // 绑定返回顶部按钮
+│   ├── ReadingProgress.init()    // 绑定阅读进度条
+│   ├── TOCManager.init()         // 构建文章目录
+│   ├── SearchManager.init()      // 加载搜索数据 + 绑定事件
+│   └── LightboxManager.init()    // 绑定图片灯箱
 │
 └── main.js 使用 defer 加载，确保在 DOM 解析后执行
 ```
@@ -294,3 +312,96 @@ if (!this.navbar) return;  // NavbarScroll
 ### 作用域隔离
 
 所有代码封装在 IIFE `(function() { ... })()` 中，不会污染全局命名空间。各模块之间无依赖关系，可以独立修改。
+
+---
+
+## 6. CodeBlockManager — 代码块复制
+
+### 功能
+
+为代码块添加复制按钮和语言标签，提升代码阅读体验。
+
+### 特性
+
+- 自动检测代码语言
+- 代码块头部显示三个圆点 + 语言标签
+- 复制按钮带 SVG 图标
+- 复制成功后显示"已复制!"提示
+- 2 秒后自动恢复按钮状态
+
+---
+
+## 7. BackToTop — 返回顶部
+
+### 功能
+
+页面滚动超过 300px 后显示返回顶部按钮。
+
+### 特性
+
+- 初始隐藏，滚动后渐显
+- 点击平滑滚动回顶部
+- 使用 `requestAnimationFrame` 节流
+
+---
+
+## 8. ReadingProgress — 阅读进度条
+
+### 功能
+
+在文章详情页显示阅读进度条。
+
+### 特性
+
+- 仅在 `single.html` 布局显示
+- 进度条宽度随滚动位置动态变化
+- 0% 在顶部，100% 在底部
+
+---
+
+## 9. TOCManager — 文章目录
+
+### 功能
+
+自动从文章内容中提取标题生成目录。
+
+### 特性
+
+- 提取 h2/h3/h4 标题
+- 桌面端：右侧固定目录，滚动时高亮当前章节
+- 移动端：可折叠目录面板
+- 使用 `IntersectionObserver` 实现滚动高亮
+- 通过 Front Matter `toc: false` 可关闭
+
+---
+
+## 10. SearchManager — 搜索功能
+
+### 功能
+
+纯前端搜索，支持关键词匹配。
+
+### 特性
+
+- 异步加载 `search.json` 索引
+- 支持标题、摘要、分类、标签搜索
+- 搜索结果高亮匹配文本
+- Ctrl/Cmd+K 快捷键打开
+- ESC 键关闭
+- 300ms 防抖
+
+---
+
+## 11. LightboxManager — 图片灯箱
+
+### 功能
+
+点击文章内图片弹出全屏查看。
+
+### 特性
+
+- 点击 `.post-content img` 打开灯箱
+- 半透明遮罩 + 居中显示原图
+- 点击遮罩或 ESC 关闭
+- 关闭时带缩放动画
+- 移动端支持

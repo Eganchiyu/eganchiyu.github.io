@@ -40,6 +40,10 @@ header:
 | `entries_layout` | 字符串 | 否 | 布局方式（`grid` 或 `list`），遗留字段 |
 | `mins` | 数字 | 否 | 手动指定阅读时间（分钟），实际使用自动计算 |
 | `mathjax` | 布尔 | 否 | 是否启用 MathJax 数学公式渲染 |
+| `featured` | 布尔 | 否 | 是否为精选文章，首页突出显示 |
+| `cover_image` | 字符串 | 否 | 封面图路径，显示在首页卡片和文章详情页 |
+| `toc` | 布尔 | 否 | 是否显示目录（默认 `true`，设为 `false` 关闭） |
+| `wip` | 布尔 | 否 | 是否为未完成文章（显示🚧标记） |
 | `header.teaser` | 字符串 | 否 | 文章缩略图路径（Minimal Mistakes 遗留字段） |
 
 ### 默认值

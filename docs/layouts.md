@@ -94,7 +94,7 @@ default.html          ← 基础骨架（HTML 文档结构）
 **文件路径**: `_layouts/home.html`
 **继承**: `default`
 
-首页由两个主要区域组成：**Hero 区域** 和 **文章卡片列表**。
+首页由三个主要区域组成：**Hero 区域**、**精选文章** 和 **文章卡片列表**。
 
 ### 2.1 Hero 区域
 
@@ -125,9 +125,24 @@ default.html          ← 基础骨架（HTML 文档结构）
 
 使用 emoji 作为浮动装饰（`✨` 和 `🌸`），带 `float` 动画，Dark 模式降低透明度。
 
-### 2.2 文章卡片列表
+### 2.2 精选文章区域
 
-使用 `paginator.posts` 进行分页遍历，每张卡片包含：
+当存在标记为 `featured: true` 的文章时显示，仅在第一页显示。
+
+| 元素 | 说明 |
+|------|------|
+| 封面图 | `post.cover_image`，可选，`object-fit: cover` |
+| 日期 | `post.date`，格式 `"%Y年%m月%d日"` |
+| 分类 | 第一个分类 |
+| 标题 | 可点击链接到文章详情 |
+| 摘要 | 截断 150 字符 |
+| 标签 | 最多 3 个 |
+
+最多显示 2 篇精选文章，桌面端双列布局，移动端单列。
+
+### 2.3 文章卡片列表
+
+使用 `paginator.posts` 进行分页遍历，采用**瀑布流布局**（CSS Columns），每张卡片包含：
 
 | 元素 | 说明 |
 |------|------|
@@ -138,7 +153,7 @@ default.html          ← 基础骨架（HTML 文档结构）
 | 标签 | 最多显示 3 个标签 |
 | 阅读时间 | 按 250 字/分钟计算，显示 `📖 X min` |
 
-### 2.3 分页导航
+### 2.4 分页导航
 
 当 `paginator.total_pages > 1` 时显示，包含：
 - "← 上一页" 按钮（仅有上一页时显示）
@@ -165,7 +180,15 @@ default.html          ← 基础骨架（HTML 文档结构）
 **文件路径**: `_layouts/single.html`
 **继承**: `default`
 
-### 3.1 文章头部 (Post Header)
+### 3.1 阅读进度条
+
+页面顶部的细长进度条（3px），随滚动动态显示阅读进度。
+
+### 3.2 面包屑导航
+
+结构：`首页 > 分类名 > 文章标题`
+
+### 3.3 文章头部 (Post Header)
 
 | 元素 | CSS 类 | 说明 |
 |------|--------|------|
@@ -176,7 +199,17 @@ default.html          ← 基础骨架（HTML 文档结构）
 | 摘要 | `.post-excerpt` | `page.excerpt`，去 HTML（可选） |
 | 标签列表 | `.post-tags` | 遍历 `page.tags`，每个标签链接到 `/tags/#标签名` |
 
-### 3.2 文章内容
+### 3.4 文章封面图
+
+通过 Front Matter `cover_image` 字段指定，显示在标题下方。
+
+### 3.5 文章目录 (TOC)
+
+- 桌面端（> 900px）：右侧固定目录，滚动时高亮当前章节
+- 移动端（≤ 900px）：标题下方可折叠面板
+- 通过 `toc: false` 可关闭
+
+### 3.6 文章内容
 
 ```html
 <div class="post-content">
@@ -195,7 +228,7 @@ default.html          ← 基础骨架（HTML 文档结构）
 - **图片** — 圆角 + 阴影，悬停放大
 - **表格** — 完整边框 + 表头背景色 + 行悬停高亮
 
-### 3.3 分享链接
+### 3.7 分享链接
 
 ```html
 <div class="share-section">
@@ -213,7 +246,7 @@ default.html          ← 基础骨架（HTML 文档结构）
 
 URL 和标题均通过 Liquid 的 `uri_escape` 过滤器编码。
 
-### 3.4 相关文章
+### 3.8 相关文章
 
 ```html
 {% if site.related_posts.size > 0 %}
@@ -231,6 +264,21 @@ URL 和标题均通过 Liquid 的 `uri_escape` 过滤器编码。
 - 使用 Jekyll 内置的 `site.related_posts`（默认返回最近 10 篇）
 - 限制显示 3 篇
 - 每篇显示日期和标题，悬停时向右平移 4px
+
+### 3.9 Giscus 评论区
+
+基于 GitHub Discussions 的评论系统，通过 `{% include comments-providers/giscus.html %}` 引入。
+
+- 通过 `comments: false` 可关闭
+- 主题跟随站点切换（Light/Dark）
+- 使用懒加载
+
+### 3.10 上一篇 / 下一篇导航
+
+文章底部显示前后文章链接：
+- 左侧：上一篇（`page.previous`）
+- 右侧：下一篇（`page.next`）
+- 最早/最新的文章只显示单侧
 
 ---
 

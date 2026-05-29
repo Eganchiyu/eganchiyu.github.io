@@ -36,6 +36,7 @@
 | 分类 | `/categories/` | `page.url == '/categories/'` |
 | 标签 | `/tags/` | `page.url == '/tags/'` |
 | 归档 | `/year-archive/` | `page.url == '/year-archive/'` |
+| 关于 | `/about/` | `page.url == '/about/'` |
 | GitHub | `https://github.com/Eganchiyu` | 无（外部链接） |
 
 - 激活状态 (`.active`)：文字变为 Alice Blue，背景变为 `--alice-100`，底部有 2px 指示条
@@ -71,6 +72,7 @@
   <a class="mobile-link">📁 分类</a>
   <a class="mobile-link">🏷️ 标签</a>
   <a class="mobile-link">📅 归档</a>
+  <a class="mobile-link">👋 关于</a>
   <a class="mobile-link">🐙 GitHub</a>
 </div>
 ```

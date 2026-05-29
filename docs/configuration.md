@@ -202,6 +202,8 @@ main:
   - title: "归档"
     url: /year-archive/
   - title: "关于"
+    url: /about/
+  - title: "GitHub"
     url: https://github.com/Eganchiyu
 ```
 
@@ -213,7 +215,7 @@ main:
 | `title` | 菜单项显示文本 |
 | `url` | 菜单链接地址（内部相对路径或外部 URL） |
 
-> 注意：当前自定义主题的导航栏 (`navigation.html`) 是硬编码的，此文件主要供 Minimal Mistakes 主题的遗留组件参考。"关于" 链接指向 GitHub 主页而非独立关于页。
+> 注意：当前自定义主题的导航栏 (`navigation.html`) 是硬编码的，此文件主要供 Minimal Mistakes 主题的遗留组件参考。"关于" 链接指向独立关于页 `/about/`。
 
 ---
 
