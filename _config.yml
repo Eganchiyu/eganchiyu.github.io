@@ -118,6 +118,13 @@ author:
       icon               : "fas fa-fw fa-link"
       url                : "https://eganchiyu.github.io/"
 
+# 友链
+friends:
+  - label                : "Kevin-WWK 友链"
+    url                  : "https://wk239.com/"
+  - label                : "小辰 友链"
+    url                  : "https://www.240829.xyz/"
+
 # 归档
 category_archive:
   type                    : liquid
