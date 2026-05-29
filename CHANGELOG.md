@@ -14,6 +14,10 @@
 
 ## [2.1.1] - 2026-05-29
 
+### 修复
+- LaTeX 数学公式渲染：将 kramdown `math_engine` 从 `null` 改为 `mathjax`，添加 MathJax v3 CDN 脚本到布局
+- MathJax 容器样式适配暗色模式
+
 ### 变更
 - `.gitignore` 添加 `.trae/` 目录忽略规则，移除 IDE 配置文件的版本控制
 - Post_Commit_Check 技能增强：新增 docs 文件夹同步检查脚本、CHANGELOG 更新流程、提交推送规范
