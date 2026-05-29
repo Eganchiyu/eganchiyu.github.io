@@ -804,12 +804,13 @@ img {
 
 /* ---------- 文章列表区域 ---------- */
 .posts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
+  columns: 2;
+  column-gap: 1.25rem;
 }
 
 .post-card {
+  break-inside: avoid;
+  margin-bottom: 1.25rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -1837,7 +1838,7 @@ pre.highlight::-webkit-scrollbar-track,
 /* ---------- 响应式：手机 ---------- */
 @media (max-width: 768px) {
   .posts-grid {
-    grid-template-columns: 1fr;
+    columns: 1;
   }
 
   .nav-links {
