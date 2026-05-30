@@ -432,7 +432,7 @@
 
     async loadSearchData() {
       try {
-        const response = await fetch('{{ "/search.json" | relative_url }}');
+        const response = await fetch('/search.json');
         this.searchData = await response.json();
       } catch (err) {
         console.error('加载搜索数据失败:', err);
