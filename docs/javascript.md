@@ -392,16 +392,26 @@ if (!this.navbar) return;  // NavbarScroll
 
 ---
 
-## 11. LightboxManager — 图片灯箱
+## 11. LightboxManager — 图片灯箱（缩略图 + 按需加载原图）
 
 ### 功能
 
-点击文章内图片弹出全屏查看。
+点击文章内图片弹出全屏查看，支持缩略图快速加载和原图按需加载。
 
 ### 特性
 
-- 点击 `.post-content img` 打开灯箱
-- 半透明遮罩 + 居中显示原图
+- 自动将 `.post-content img` 的 src 替换为压缩缩略图（`assets/images/thumbs/`）
+- 原图路径存储在 `data-original` 属性
+- 点击图片打开灯箱时：显示旋转加载圈 → 后台加载原图 → 加载完成后渐显显示
+- 半透明遮罩 + 居中显示
 - 点击遮罩或 ESC 关闭
 - 关闭时带缩放动画
 - 移动端支持
+- `prefers-reduced-motion` 时禁用动画
+
+### 图片压缩
+
+- 使用 `scripts/generate_thumbs.py` 生成压缩缩略图
+- 缩略图最大宽度 800px，JPEG 质量 60%
+- 原始图片 57MB → 缩略图 1.3MB（压缩率 98%）
+- 页面加载时只下载缩略图，点击后才加载原图

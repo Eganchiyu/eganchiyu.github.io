@@ -31,22 +31,34 @@ default.html          ← 基础骨架（HTML 文档结构）
 | `<meta name="theme-color">` | 主题色 `#f0f8ff`（Alice Blue），Dark 模式下 JS 动态切换为 `#0f172a` |
 | `<title>` | 页面标题，格式：`页面标题 | 站点标题`，首页仅显示站点标题 |
 | `<meta name="description">` | SEO 描述，优先使用页面摘要，回退到站点描述，截断 160 字符 |
-| `<link rel="icon">` | Favicon，指向 `/assets/images/favicon.png` |
+| `<link rel="icon">` | Favicon，指向 `/assets/images/favicon.svg` |
 
-### 1.2 字体加载
+### 1.2 字体加载（本地托管）
 
-通过 Google Fonts 加载两个字体家族：
+字体文件已本地托管，消除外部 DNS 查询：
 
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+```css
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/assets/fonts/inter-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/assets/fonts/jetbrains-mono-latin.woff2') format('woff2');
+}
 ```
 
-- **Inter** — 主要正文和标题字体（400/500/600/700）
-- **JetBrains Mono** — 代码字体（400/500）
-
-使用 `preconnect` 提前建立连接，加速字体加载。
+- **Inter** — 主要正文和标题字体（400/500/600/700，woff2 可变字体）
+- **JetBrains Mono** — 代码字体（400/500，woff2 可变字体）
+- 字体文件存放于 `assets/fonts/` 目录
+- 使用 `font-display: swap` 确保文字不阻塞显示
 
 ### 1.3 主题初始化内联脚本
 

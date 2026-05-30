@@ -1,7 +1,7 @@
 # 样式系统文档
 
 > 基于 CSS 自定义属性 (CSS Variables) 的设计系统，支持 Light/Dark 双模式。
-> 主样式文件: `assets/css/main.css`（约 2900 行）
+> 主样式文件: `assets/css/main.scss`（约 3000 行，构建后压缩为 ~45KB）
 
 ---
 

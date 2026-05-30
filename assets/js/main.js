@@ -525,10 +525,11 @@
     }
   };
 
-  // ========== 图片灯箱 ==========
+  // ========== 图片灯箱（缩略图 + 按需加载原图） ==========
   const LightboxManager = {
     init() {
       this.createOverlay();
+      this.prepareThumbs();
       this.bindEvents();
     },
 
@@ -542,22 +543,39 @@
             <path d="m6 6 12 12"/>
           </svg>
         </button>
+        <div class="lightbox-spinner"></div>
         <img class="lightbox-image" src="" alt="">
       `;
       document.body.appendChild(this.overlay);
 
       this.lightboxImage = this.overlay.querySelector('.lightbox-image');
       this.lightboxClose = this.overlay.querySelector('.lightbox-close');
+      this.lightboxSpinner = this.overlay.querySelector('.lightbox-spinner');
+    },
+
+    prepareThumbs() {
+      document.querySelectorAll('.post-content img').forEach(img => {
+        const src = img.getAttribute('src') || img.src;
+        if (src && !src.includes('/thumbs/')) {
+          const thumbSrc = src.replace(/\/([^\/]+)$/, '/thumbs/$1').replace(/\.\w+$/, '.jpg');
+          img.dataset.original = src;
+          img.dataset.thumb = thumbSrc;
+          img.src = thumbSrc;
+        }
+      });
     },
 
     bindEvents() {
       document.querySelectorAll('.post-content img').forEach(img => {
-        img.addEventListener('click', () => this.open(img.src, img.alt));
+        img.addEventListener('click', () => {
+          const original = img.dataset.original || img.src;
+          this.open(original, img.alt, img.dataset.thumb);
+        });
       });
 
       this.lightboxClose.addEventListener('click', () => this.close());
       this.overlay.addEventListener('click', (e) => {
-        if (e.target === this.overlay) this.close();
+        if (e.target === this.overlay || e.target === this.lightboxSpinner) this.close();
       });
 
       document.addEventListener('keydown', (e) => {
@@ -567,15 +585,35 @@
       });
     },
 
-    open(src, alt) {
-      this.lightboxImage.src = src;
-      this.lightboxImage.alt = alt || '';
+    open(src, alt, thumbSrc) {
       this.overlay.classList.add('active');
+      this.lightboxSpinner.classList.add('active');
+      this.lightboxImage.classList.remove('loaded');
+      this.lightboxImage.src = '';
+      this.lightboxImage.alt = alt || '';
       document.body.style.overflow = 'hidden';
+
+      const fullImg = new Image();
+      fullImg.onload = () => {
+        this.lightboxImage.src = src;
+        this.lightboxImage.alt = alt || '';
+        this.lightboxImage.classList.add('loaded');
+        this.lightboxSpinner.classList.remove('active');
+      };
+      fullImg.onerror = () => {
+        this.lightboxSpinner.classList.remove('active');
+        this.lightboxImage.src = thumbSrc || src;
+        this.lightboxImage.alt = alt || '';
+        this.lightboxImage.classList.add('loaded');
+      };
+      fullImg.src = src;
     },
 
     close() {
       this.overlay.classList.remove('active');
+      this.lightboxImage.classList.remove('loaded');
+      this.lightboxSpinner.classList.remove('active');
+      this.lightboxImage.src = '';
       document.body.style.overflow = '';
     }
   };

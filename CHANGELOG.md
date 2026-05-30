@@ -10,15 +10,32 @@
 ### 计划
 - 深色模式图片适配（减少亮度）
 - 代码块语法高亮优化
-- 字体本地托管
-- JSON-LD 结构化数据
-- 图片懒加载统一处理
-- CSS 优化与压缩
 - 暗色模式语法高亮验证
 - 引用块装饰增强
 - 文章卡片微交互增强
 - Footer 增强
 - Hero 区域装饰优化
+
+## [2.5.0] - 2026-05-29
+
+### 新增
+- 字体本地托管（Inter + JetBrains Mono woff2 文件）
+- JSON-LD 结构化数据（首页 WebSite 类型，文章页 Article 类型）
+- 图片压缩缩略图系统（57MB → 1.3MB，压缩率 98%）
+- 灯箱按需加载原图（点击后显示旋转加载圈，加载完成后渐显）
+- `scripts/generate_thumbs.py` 图片压缩脚本
+
+### 变更
+- 移除 Google Fonts 外部依赖（消除 2 次 DNS 查询）
+- `main.css` 重命名为 `main.scss`，利用 Jekyll Sass 自动压缩
+- 灯箱从直接加载原图改为缩略图 + 按需加载模式
+- 文章内图片 src 自动替换为压缩缩略图路径
+
+### 文档
+- 更新 `docs/styling.md` 反映 main.scss 变更
+- 更新 `docs/layouts.md` 字体加载章节（本地托管）
+- 更新 `docs/javascript.md` 灯箱功能说明（缩略图 + 按需加载）
+- 更新 `DEVELOPMENT-PLAN.md` 第四阶段为已完成
 
 ## [2.4.0] - 2026-05-29
 
