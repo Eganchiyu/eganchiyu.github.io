@@ -568,7 +568,15 @@
           const thumbSrc = src.replace(/\/([^\/]+)$/, '/thumbs/$1').replace(/\.\w+$/, '.jpg');
           img.dataset.original = src;
           img.dataset.thumb = thumbSrc;
-          img.src = thumbSrc;
+
+          const thumbImg = new Image();
+          thumbImg.onload = () => {
+            img.src = thumbSrc;
+          };
+          thumbImg.onerror = () => {
+            img.dataset.thumb = src;
+          };
+          thumbImg.src = thumbSrc;
         }
       });
     },

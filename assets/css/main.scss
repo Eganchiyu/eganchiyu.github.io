@@ -127,6 +127,9 @@
   --tag-text: var(--alice-700);
   --category-bg: var(--alice-100);
   --category-text: var(--alice-700);
+  --color-error: #dc3c3c;
+  --color-error-light: rgba(220, 60, 60, 0.1);
+  --color-error-border: rgba(220, 60, 60, 0.25);
 }
 
 /* Dark 主题变量 */
@@ -156,6 +159,9 @@
   --alice-50: #1e293b;
   --alice-100: rgba(43, 141, 214, 0.15);
   --alice-200: rgba(43, 141, 214, 0.25);
+  --color-error: #f87171;
+  --color-error-light: rgba(255, 100, 100, 0.12);
+  --color-error-border: rgba(255, 100, 100, 0.25);
 }
 
 /* 阻止浏览器强制深色模式 */
@@ -953,20 +959,14 @@ img {
   align-items: center;
   gap: 0.25rem;
   padding: 0.2rem 0.6rem;
-  background: rgba(220, 60, 60, 0.1);
-  color: #c53030;
-  border: 1px solid rgba(220, 60, 60, 0.25);
+  background: var(--color-error-light);
+  color: var(--color-error);
+  border: 1px solid var(--color-error-border);
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.7rem;
   letter-spacing: 0.02em;
   animation: wip-pulse 2.4s ease-in-out infinite;
-}
-
-[data-theme="dark"] .post-wip {
-  background: rgba(255, 100, 100, 0.12);
-  color: #f87171;
-  border-color: rgba(255, 100, 100, 0.25);
 }
 
 @keyframes wip-pulse {
@@ -1196,18 +1196,7 @@ img {
   opacity: 0.6;
 }
 
-.post-content code {
-  font-family: var(--font-mono);
-  font-size: 0.875em;
-  background: var(--tag-bg);
-  padding: 0.125em 0.4em;
-  border-radius: var(--radius-sm);
-  color: var(--alice-600);
-}
 
-[data-theme="dark"] .post-content code {
-  color: var(--alice-300);
-}
 
 .post-content pre {
   background: var(--code-bg);
@@ -1693,11 +1682,6 @@ pre.highlight::-webkit-scrollbar-track,
   margin: 1.5rem 0;
   box-shadow: var(--shadow-soft);
   transition: all 0.3s var(--smooth);
-}
-
-.post-content img:hover {
-  transform: scale(1.02);
-  box-shadow: var(--shadow-hover);
 }
 
 .post-content table {
@@ -3065,10 +3049,6 @@ mjx-container svg {
   transition: transform 0.2s var(--smooth), opacity 0.4s ease;
 }
 
-.post-content img:hover {
-  transform: scale(1.02);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .lightbox-overlay,
   .lightbox-image,
@@ -3199,15 +3179,6 @@ mjx-container svg {
   border-color: transparent;
   box-shadow: var(--shadow-elevated);
   transform: translateY(-6px);
-}
-
-/* Hero 区域渐变增强 */
-.hero::before {
-  background: radial-gradient(circle, rgba(189, 224, 255, 0.15) 0%, transparent 70%);
-}
-
-[data-theme="dark"] .hero::before {
-  background: radial-gradient(circle, rgba(43, 141, 214, 0.1) 0%, transparent 70%);
 }
 
 .hero::after {
@@ -3795,7 +3766,7 @@ button:focus-visible {
 }
 
 .toast-error {
-  border-left: 3px solid #f87171;
+  border-left: 3px solid var(--color-error);
 }
 
 .toast-info {

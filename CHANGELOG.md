@@ -10,6 +10,9 @@
 ### 修复
 - 修复 Toast 通知 CSS 类名不匹配问题（`.toast.visible` → `.toast.show`）
 - 修复搜索结果 XSS 安全风险（添加 `escapeHtml` 函数转义 HTML 实体）
+- 修复 CSS 重复定义（清理重复的 `.post-content code`、`img:hover`、`.hero::before`）
+- 修复 LightboxManager 硬编码路径（添加图片存在性检查，防止 404）
+- 修复硬编码颜色值（添加 `--color-error` 变量替换硬编码红色）
 
 ### 计划
 - 深色模式图片适配（减少亮度）
