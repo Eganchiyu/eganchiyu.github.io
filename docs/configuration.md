@@ -36,7 +36,7 @@
 ```yaml
 kramdown:
   input: GFM              # GitHub Flavored Markdown
-  math_engine: null        # 禁用内置数学引擎
+  math_engine: mathjax     # 使用 MathJax 渲染数学公式
   hard_wrap: false         # 不强制换行
   auto_ids: true           # 自动为标题生成 ID
   footnote_nr: 1           # 脚注起始编号

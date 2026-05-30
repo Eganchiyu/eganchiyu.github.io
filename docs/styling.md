@@ -1,7 +1,7 @@
 # 样式系统文档
 
 > 基于 CSS 自定义属性 (CSS Variables) 的设计系统，支持 Light/Dark 双模式。
-> 主样式文件: `assets/css/main.scss`（约 3000 行，构建后压缩为 ~45KB）
+> 主样式文件: `assets/css/main.scss`（约 3800 行，构建后压缩为 ~55KB）
 
 ---
 
@@ -344,3 +344,99 @@ Dark 模式降低透明度（从 0.05 降到 0.03）。
   --my-new-color: #ff8787;
 }
 ```
+
+---
+
+## 9. 第六阶段增强系统
+
+### 9.1 多层次阴影系统
+
+| 变量 | Light 值 | Dark 值 | 用途 |
+|------|----------|---------|------|
+| `--shadow-xs` | `0 1px 2px rgba(43,141,214,0.04)` | `0 1px 2px rgba(0,0,0,0.2)` | 最轻阴影 |
+| `--shadow-sm` | `0 2px 8px rgba(43,141,214,0.06)` | `0 2px 8px rgba(0,0,0,0.25)` | 小阴影 |
+| `--shadow-elevated` | `0 20px 60px rgba(43,141,214,0.12), 0 8px 20px rgba(43,141,214,0.08)` | `0 20px 60px rgba(0,0,0,0.4), 0 8px 20px rgba(0,0,0,0.3)` | 高层阴影 |
+| `--shadow-glow` | `0 0 20px rgba(43,141,214,0.15), 0 0 60px rgba(43,141,214,0.05)` | `0 0 20px rgba(43,141,214,0.1), 0 0 60px rgba(43,141,214,0.04)` | 发光阴影 |
+| `--shadow-inner` | `inset 0 2px 4px rgba(43,141,214,0.06)` | `inset 0 2px 4px rgba(0,0,0,0.2)` | 内阴影 |
+
+### 9.2 渐变变量系统
+
+| 变量 | 用途 |
+|------|------|
+| `--gradient-primary` | Alice Blue → Lavender 主渐变 |
+| `--gradient-subtle` | 微妙背景渐变 |
+| `--gradient-warm` | Pink → Peach 暖色渐变 |
+| `--gradient-cool` | Alice-300 → Teal 冷色渐变 |
+| `--gradient-surface` | 卡片表面渐变 |
+| `--gradient-hero-bg` | Hero 区域背景渐变 |
+
+### 9.3 排版比例系统（Major Third 1.25）
+
+| 变量 | 值 | 用途 |
+|------|-----|------|
+| `--font-size-xs` | `0.64rem` | 最小文字 |
+| `--font-size-sm` | `0.8rem` | 次要文字 |
+| `--font-size-base` | `1rem` | 正文 |
+| `--font-size-md` | `1.125rem` | 大正文/引用 |
+| `--font-size-lg` | `1.25rem` | h3 标题 |
+| `--font-size-xl` | `1.563rem` | h2 标题 |
+| `--font-size-2xl` | `1.953rem` | 文章标题 |
+| `--font-size-3xl` | `2.441rem` | Hero 标题 |
+| `--font-size-4xl` | `3.052rem` | 最大标题 |
+
+行高系统：`--leading-tight` (1.3) → `--leading-loose` (2.2)
+字间距系统：`--tracking-tight` (-0.02em) → `--tracking-wider` (0.05em)
+
+### 9.4 玻璃态效果 (`.glass-card`)
+
+```css
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+```
+
+### 9.5 渐变边框效果
+
+精选文章卡片悬浮时显示渐变边框，使用 CSS `mask-composite` 技术实现：
+
+```css
+.featured-card::after {
+  background: linear-gradient(135deg, var(--alice-400), var(--accent-lavender), var(--accent-pink));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+```
+
+### 9.6 滚动触发动画
+
+CSS 类 `.reveal`、`.reveal-left`、`.reveal-right`、`.reveal-scale`、`.reveal-stagger` 配合 JS `ScrollReveal` 模块使用：
+
+- 元素初始 `opacity: 0`，进入视口时添加 `.revealed` 类变为 `opacity: 1`
+- `.reveal-stagger` 为子元素提供交错动画延迟（0.05s ~ 0.5s）
+- 遵守 `prefers-reduced-motion` 设置
+
+### 9.7 焦点环样式
+
+所有交互元素使用 `:focus-visible` 提供清晰的键盘导航焦点环：
+
+```css
+:focus-visible {
+  outline: 2px solid var(--alice-500);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(43, 141, 214, 0.15);
+}
+```
+
+### 9.8 触摸设备优化
+
+`@media (hover: none)` 下：
+- 禁用悬浮变换效果
+- 确保最小点击区域 44px
+- 使用 `:active` 替代 `:hover` 反馈
+
+### 9.9 自定义滚动条
+
+WebKit 浏览器自定义滚动条：8px 宽度，圆角，主题跟随。

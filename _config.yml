@@ -61,7 +61,6 @@ plugins:
 include:
   - .htaccess
   - _pages
-  - assets/js/vendor
 exclude:
   - "*.sublime-project"
   - "*.sublime-workspace"
@@ -79,7 +78,6 @@ exclude:
   - gulpfile.js
   - LICENSE
   - log
-  - minimal-mistakes-jekyll.gemspec
   - node_modules
   - package.json
   - package-lock.json

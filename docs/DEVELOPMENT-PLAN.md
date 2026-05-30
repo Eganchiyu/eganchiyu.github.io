@@ -36,14 +36,18 @@
 ### 现有文件结构
 
 ```
-_layouts/       → default.html, home.html, single.html（实际使用）
-_includes/      → navigation.html, footer.html, skip-links.html（实际使用）
+_layouts/       → default.html, home.html, single.html（3 个）
+_includes/      → navigation.html, footer.html, skip-links.html,
+                  comments-providers/giscus.html（4 个）
 _posts/         → 18 篇博文
-assets/css/     → main.css（~2270 行，完整设计系统）
+assets/css/     → main.scss（~2270 行，完整设计系统）
 assets/js/      → main.js（~260 行，主题/菜单/代码复制/返回顶部）
-assets/images/  → avatar.png, favicon.svg
-页面            → index.html, 404.html, categories.html, tags.html, year-archive.html
+assets/fonts/   → Inter, JetBrains Mono（本地字体）
+assets/images/  → avatar.png, favicon.svg, thumbs/（压缩缩略图）
+页面            → index.html, 404.html, about.md,
+                  categories.html, tags.html, year-archive.html
 SEO             → robots.txt, sitemap.xml（自动生成）
+配置            → _config.yml, search.json
 ```
 
 ### 已实现的功能
@@ -103,7 +107,7 @@ SEO             → robots.txt, sitemap.xml（自动生成）
 | SEO | 缺少 Open Graph 标签 | 社交平台分享无预览卡片 | ✅ 已解决 |
 | SEO | 缺少 JSON-LD 结构化数据 | 搜索引擎理解不充分 | ✅ 已解决 |
 | 无障碍 | skip-links.html 存在但未引用 | 键盘用户无法跳过导航 | ✅ 已解决 |
-| 遗留 | 大量未使用的 minimal-mistakes 模板文件 | 增加维护成本 | 待处理 |
+| 遗留 | 大量未使用的 minimal-mistakes 模板文件 | 增加维护成本 | ✅ 已清理（116 个文件） |
 
 ---
 
@@ -956,37 +960,56 @@ SEO             → robots.txt, sitemap.xml（自动生成）
 
 ## 清理与维护
 
-### 遗留文件清理
+### 遗留文件清理 ✅ 已完成
 
-以下文件来自 minimal-mistakes 主题，当前博客未使用，建议评估后清理：
+> **完成日期：2026-05-30**
+> 清理前：150 个源文件 | 清理后：34 个源文件 | 删除：116 个文件（-77%）
+> 构建速度：0.405s → 0.333s（-18%）
 
-**布局文件**（`_layouts/`）：
-- `archive.html`, `archive-taxonomy.html`
-- `categories.html`, `category.html`
-- `collection.html`
-- `compress.html`
-- `posts.html`
-- `search.html`
-- `splash.html`
-- `tag.html`, `tags.html`
+以下文件来自 minimal-mistakes 主题，经逐一验证确认未被引用后已全部清理：
 
-**包含文件**（`_includes/`）：
-- `analytics/` 目录（3 个文件）
-- `comments-providers/` 目录（10+ 个文件，保留 `giscus.html` 如果计划集成）
-- `search/` 目录（3 个文件，如计划实现搜索可参考）
-- `head/`, `footer/` 子目录
-- 其他未引用的模板文件
+**布局文件**（`_layouts/`，删除 11 个）：
+- ✅ `archive.html`, `archive-taxonomy.html`
+- ✅ `categories.html`, `category.html`
+- ✅ `collection.html`, `compress.html`
+- ✅ `posts.html`, `search.html`, `splash.html`
+- ✅ `tag.html`, `tags.html`
 
-**其他文件**：
-- `_sass/minimal-mistakes/_custom.scss`（遗留 SCSS）
-- `assets/js/plugins/`（jQuery 插件，未使用）
-- `assets/js/vendor/jquery/`（jQuery，未使用）
-- `assets/js/lunr/`（Lunr 搜索库，如不使用可清理）
-- `minimal-mistakes-jekyll.gemspec`
-- `staticman.yml`
-- `.travis.yml`
+**包含文件**（`_includes/`，删除 54 个）：
+- ✅ `analytics-providers/` 目录（4 个文件）
+- ✅ `comments-providers/` 目录（保留 `giscus.html`，删除 12 个文件）
+- ✅ `search/` 目录（4 个文件）
+- ✅ `head/`, `footer/` 子目录
+- ✅ 其他未引用的模板文件（34 个）
 
-> ⚠️ 清理前请确认每个文件确实未被引用，建议逐个检查后再删除。
+**SCSS 文件**（删除整个 `_sass/` 目录，68 个文件）：
+- ✅ `_sass/minimal-mistakes.scss` 入口文件
+- ✅ `_sass/minimal-mistakes/` 整个目录树（含 vendor 库：susy, breakpoint, magnific-popup）
+
+**JS 文件**（删除 14 个）：
+- ✅ `assets/js/plugins/`（6 个 jQuery 插件）
+- ✅ `assets/js/vendor/jquery/`（jQuery 3.6.0）
+- ✅ `assets/js/lunr/`（Lunr 搜索库，4 个文件）
+- ✅ `assets/js/main.min.js`, `main.min.js.map`, `_main.js`
+
+**根目录配置文件**（删除 3 个）：
+- ✅ `minimal-mistakes-jekyll.gemspec`
+- ✅ `staticman.yml`
+- ✅ `.travis.yml`
+
+**配置清理**：
+- ✅ `_config.yml` 移除 `assets/js/vendor` 引用
+- ✅ `_config.yml` 移除 `minimal-mistakes-jekyll.gemspec` 排除项
+
+**清理后保留的文件**：
+
+```
+_layouts/          → default.html, home.html, single.html（3 个）
+_includes/         → skip-links.html, navigation.html, footer.html
+                     comments-providers/giscus.html（4 个）
+assets/css/        → main.scss（1 个，自包含设计系统）
+assets/js/         → main.js（1 个）
+```
 
 ---
 

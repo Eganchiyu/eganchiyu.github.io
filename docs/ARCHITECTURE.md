@@ -1,6 +1,6 @@
 # 项目架构文档
 
-> 最后更新: 2026-05-29
+> 最后更新: 2026-05-30
 
 ## 目录结构
 
@@ -14,7 +14,6 @@ eganchiyu.github.io/
 │   ├── navigation.html      # 导航栏（桌面 + 移动端）
 │   ├── footer.html          # 页脚
 │   ├── skip-links.html      # 无障碍跳过链接
-│   ├── toc.html             # 文章目录（预留）
 │   └── comments-providers/  # 评论系统
 │       └── giscus.html      # Giscus 评论组件
 ├── _layouts/                # 页面布局模板
@@ -24,10 +23,12 @@ eganchiyu.github.io/
 ├── _posts/                  # 博客文章（Markdown）
 ├── assets/
 │   ├── css/
-│   │   └── main.css         # 主样式表（含设计系统 + 双主题）
+│   │   └── main.scss        # 主样式表（含设计系统 + 双主题）
+│   ├── fonts/               # 本地字体（Inter + JetBrains Mono）
 │   ├── images/
 │   │   ├── avatar.png       # 头像图片
-│   │   └── favicon.svg      # SVG Favicon
+│   │   ├── favicon.svg      # SVG Favicon
+│   │   └── thumbs/          # 压缩缩略图
 │   └── js/
 │       └── main.js          # 主交互脚本
 ├── about.md                 # 关于我页面
@@ -38,11 +39,12 @@ eganchiyu.github.io/
 ├── 404.html                 # 自定义 404 页面
 ├── robots.txt               # SEO 爬虫配置
 ├── search.json              # 搜索索引（Liquid 模板）
+├── CHANGELOG.md             # 变更日志
 ├── Gemfile                  # Ruby 依赖
 └── docs/                    # 项目文档
     ├── README.md            # 文档入口
     ├── ARCHITECTURE.md      # 本文件
-    └── CHANGELOG.md         # 变更日志
+    └── ...                  # 其他模块文档
 ```
 
 ## 设计系统

@@ -21,6 +21,9 @@
   const TOCManager = { ... };         // 文章目录
   const SearchManager = { ... };      // 搜索功能
   const LightboxManager = { ... };    // 图片灯箱
+  const RippleManager = { ... };      // 涟漪效果
+  const ScrollReveal = { ... };       // 滚动显示动画
+  const ToastManager = { ... };       // Toast 通知
 
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -33,6 +36,9 @@
     TOCManager.init();
     SearchManager.init();
     LightboxManager.init();
+    RippleManager.init();
+    ScrollReveal.init();
+    ToastManager.init();
   });
 })();
 ```
@@ -292,7 +298,10 @@ init() {
 │   ├── ReadingProgress.init()    // 绑定阅读进度条
 │   ├── TOCManager.init()         // 构建文章目录
 │   ├── SearchManager.init()      // 加载搜索数据 + 绑定事件
-│   └── LightboxManager.init()    // 绑定图片灯箱
+│   ├── LightboxManager.init()    // 绑定图片灯箱
+│   ├── RippleManager.init()      // 绑定涟漪效果
+│   ├── ScrollReveal.init()       // 初始化滚动动画观察器
+│   └── ToastManager.init()       // 初始化 Toast 容器
 │
 └── main.js 使用 defer 加载，确保在 DOM 解析后执行
 ```
@@ -415,3 +424,72 @@ if (!this.navbar) return;  // NavbarScroll
 - 缩略图最大宽度 800px，JPEG 质量 60%
 - 原始图片 57MB → 缩略图 1.3MB（压缩率 98%）
 - 页面加载时只下载缩略图，点击后才加载原图
+
+---
+
+## 12. RippleManager — 涟漪效果
+
+### 功能
+
+为按钮添加 Material Design 风格的涟漪点击效果。
+
+### 使用方式
+
+在 HTML 元素上添加 `data-ripple` 属性即可启用涟漪效果。
+
+### 特性
+
+- 事件委托：监听 `document` 上的 `click` 事件
+- 自动计算涟漪大小和位置
+- 涟漪动画 600ms 后自动移除 DOM 元素
+
+---
+
+## 13. ScrollReveal — 滚动显示动画
+
+### 功能
+
+使用 `IntersectionObserver` 实现元素进入视口时的淡入/滑入动画。
+
+### 使用方式
+
+在 HTML 元素上添加对应的 CSS 类：
+
+| CSS 类 | 动画效果 |
+|--------|----------|
+| `.reveal` | 从下方淡入 |
+| `.reveal-left` | 从左侧滑入 |
+| `.reveal-right` | 从右侧滑入 |
+| `.reveal-scale` | 缩放淡入 |
+| `.reveal-stagger` | 子元素交错淡入 |
+
+### 特性
+
+- 使用 `IntersectionObserver` API，性能优秀
+- 元素进入视口后添加 `.revealed` 类触发 CSS 过渡
+- 触发后自动取消观察（只执行一次）
+- 遵守 `prefers-reduced-motion` 设置
+
+---
+
+## 14. ToastManager — Toast 通知
+
+### 功能
+
+提供轻量级的浮动通知组件。
+
+### 使用方式
+
+```javascript
+// 在 JS 中调用
+ToastManager.success('操作成功');
+ToastManager.error('操作失败');
+ToastManager.info('提示信息');
+```
+
+### 特性
+
+- 支持三种类型：`success`、`error`、`info`
+- 自动创建容器元素
+- 3 秒后自动消失（可自定义）
+- CSS 过渡动画

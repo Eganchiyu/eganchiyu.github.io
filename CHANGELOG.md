@@ -10,6 +10,26 @@
 ### 计划
 - 深色模式图片适配（减少亮度）
 
+## [2.7.0] - 2026-05-30
+
+### 移除
+- 遗留文件清理：删除 116 个未使用的 Minimal Mistakes 主题文件（-77%）
+  - `_layouts/`：11 个未使用的布局文件（archive, categories, tags 等）
+  - `_includes/`：54 个未使用的模板文件（analytics, comments-providers, search 等）
+  - `_sass/`：整个目录（68 个 SCSS 文件，含 vendor 库 susy/breakpoint/magnific-popup）
+  - `assets/js/`：14 个遗留 JS 文件（jQuery、插件、Lunr 搜索库、旧版 main.js）
+  - 根目录：3 个配置文件（gemspec、staticman.yml、.travis.yml）
+
+### 变更
+- `_config.yml` 移除 `assets/js/vendor` include 引用
+- `_config.yml` 移除 `minimal-mistakes-jekyll.gemspec` exclude 项
+- 构建速度提升 18%（0.405s → 0.333s）
+
+### 文档
+- 更新 `docs/ARCHITECTURE.md` 目录结构（移除已清理文件，添加 fonts/thumbs）
+- 更新 `docs/DEVELOPMENT-PLAN.md` 遗留文件清理状态为已完成
+- 更新 `docs/configuration.md` 修正 math_engine 配置说明
+
 ## [2.6.0] - 2026-05-30
 
 ### 新增
