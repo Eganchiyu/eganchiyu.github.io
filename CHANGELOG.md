@@ -7,6 +7,10 @@
 
 ## [未发布]
 
+### 修复
+- 修复 Toast 通知 CSS 类名不匹配问题（`.toast.visible` → `.toast.show`）
+- 修复搜索结果 XSS 安全风险（添加 `escapeHtml` 函数转义 HTML 实体）
+
 ### 计划
 - 深色模式图片适配（减少亮度）
 

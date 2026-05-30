@@ -518,10 +518,18 @@
       this.searchResults.innerHTML = html;
     },
 
+    escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    },
+
     highlightText(text, query) {
-      if (!query.trim()) return text;
-      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      return text.replace(regex, '<mark>$1</mark>');
+      const escaped = this.escapeHtml(text);
+      if (!query.trim()) return escaped;
+      const escapedQuery = this.escapeHtml(query);
+      const regex = new RegExp(`(${escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return escaped.replace(regex, '<mark>$1</mark>');
     }
   };
 

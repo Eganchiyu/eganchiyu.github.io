@@ -1,29 +1,29 @@
 # Eganchiyu 博客开发计划
 
 > 最后更新：2026-05-30
-> 基于对代码库的全面审查与分析制定
-> **第六阶段已完成** ✅
+> 版本：v2.0（互动性增强专项规划）
+> 基于第六阶段完成后的全面代码审阅与产品规划
 
 ---
 
 ## 目录
 
-- [项目现状](#项目现状)
-- [优化目标](#优化目标)
-- [第一阶段：基础体验补全](#第一阶段基础体验补全)
-- [第二阶段：交互体验增强](#第二阶段交互体验增强)
-- [第三阶段：内容发现与社区](#第三阶段内容发现与社区)
-- [第四阶段：性能与 SEO 优化](#第四阶段性能与-seo-优化)
-- [第五阶段：视觉精致化](#第五阶段视觉精致化)
-- [第六阶段：视觉与交互深度打磨](#第六阶段视觉与交互深度打磨)
-- [清理与维护](#清理与维护)
-- [验收标准](#验收标准)
+- [一、项目现状总览](#一项目现状总览)
+- [二、代码审阅报告](#二代码审阅报告)
+- [三、代码结构整理计划](#三代码结构整理计划)
+- [四、技术文档更新计划](#四技术文档更新计划)
+- [五、开发规划：互动性功能增强](#五开发规划互动性功能增强)
+- [六、视觉设计与交互体验优化](#六视觉设计与交互体验优化)
+- [七、功能优先级与资源分配](#七功能优先级与资源分配)
+- [八、时间节点规划](#八时间节点规划)
+- [九、风险评估](#九风险评估)
+- [十、验收标准](#十验收标准)
 
 ---
 
-## 项目现状
+## 一、项目现状总览
 
-### 技术栈
+### 1.1 技术栈
 
 | 组件 | 版本/说明 |
 |------|-----------|
@@ -32,1023 +32,1090 @@
 | 主题 | 自定义 Alice Blue（非 gem 主题） |
 | 托管 | GitHub Pages |
 | 插件 | jekyll-paginate, jekyll-sitemap, jekyll-gist, jekyll-feed, jekyll-include-cache |
+| 评论 | Giscus（基于 GitHub Discussions） |
 
-### 现有文件结构
+### 1.2 现有文件结构
 
 ```
-_layouts/       → default.html, home.html, single.html（3 个）
-_includes/      → navigation.html, footer.html, skip-links.html,
-                  comments-providers/giscus.html（4 个）
-_posts/         → 18 篇博文
-assets/css/     → main.scss（~2270 行，完整设计系统）
-assets/js/      → main.js（~260 行，主题/菜单/代码复制/返回顶部）
-assets/fonts/   → Inter, JetBrains Mono（本地字体）
-assets/images/  → avatar.png, favicon.svg, thumbs/（压缩缩略图）
-页面            → index.html, 404.html, about.md,
-                  categories.html, tags.html, year-archive.html
-SEO             → robots.txt, sitemap.xml（自动生成）
-配置            → _config.yml, search.json
+eganchiyu.github.io/
+├── _config.yml                    # Jekyll 主配置
+├── _layouts/                      # 页面布局（3 个）
+│   ├── default.html               #   基础布局
+│   ├── home.html                  #   首页布局
+│   └── single.html                #   文章详情布局
+├── _includes/                     # 可复用模板（9 个）
+│   ├── navigation.html            #   导航栏
+│   ├── footer.html                #   页脚
+│   ├── skip-links.html            #   无障碍跳转
+│   ├── head-seo.html              #   SEO 元标签
+│   ├── head-custom.html           #   自定义 head 内容
+│   ├── post-card.html             #   文章卡片组件
+│   ├── toc.html                   #   文章目录组件
+│   ├── giscus.html                #   Giscus 评论组件
+│   └── comments.html              #   评论区包装器
+├── _posts/                        # 博文（20 篇）
+├── _data/                         # 数据文件
+│   ├── navigation.yml             #   导航配置（未引用）
+│   └── ui-text.yml                #   UI 文本（仅 3 字段被用）
+├── _sass/                         # SCSS 源文件（空）
+├── assets/
+│   ├── css/
+│   │   └── main.scss              #   主样式表（~3900 行）
+│   ├── js/
+│   │   └── main.js                #   主脚本（726 行，13 个模块）
+│   ├── fonts/                     #   本地字体（Inter, JetBrains Mono）
+│   └── images/                    #   图片资源（102 个文件）
+│       └── thumbs/                #     压缩缩略图（50 张）
+├── pages/                         # 独立页面
+│   ├── about.md                   #   关于页面
+│   ├── categories.html            #   分类页
+│   ├── tags.html                  #   标签页
+│   └── year-archive.html          #   年份归档页
+├── scripts/                       # 工具脚本
+│   └── generate_thumbs.py         #   缩略图生成脚本
+├── docs/                          # 项目文档（9 个）
+├── .github/workflows/
+│   └── build.yml                  #   CI/CD 工作流
+├── index.html                     # 首页入口
+├── 404.html                       # 自定义 404 页面
+├── robots.txt                     # 搜索引擎爬虫配置
+├── search.json                    # 搜索索引（Liquid 模板）
+├── Gemfile                        # Ruby 依赖
+├── package.json                   # Node 依赖（MM 遗留，待清理）
+└── .gitignore                     # Git 忽略配置
 ```
 
-### 已实现的功能
+### 1.3 已实现功能清单
 
-- [x] Light / Dark 双主题切换（localStorage 持久化 + 防闪烁脚本）
-- [x] Alice Blue 色系 CSS 变量系统
-- [x] 响应式布局（900px / 768px / 480px 三档断点）
-- [x] 移动端汉堡菜单
-- [x] 代码块复制按钮 + 语法高亮
-- [x] MathJax LaTeX 渲染（全局加载）
-- [x] RSS Feed + Sitemap
-- [x] 分页功能
-- [x] 分类 / 标签 / 归档页面
-- [x] 文章阅读时间估算
-- [x] WIP 文章标记
-- [x] 分享链接（Twitter / Facebook / 微博）
-- [x] 相关文章推荐
-- [x] `prefers-reduced-motion` 无障碍支持
-- [x] 打印样式
-- [x] 自定义 404 错误页面
-- [x] SVG Favicon
-- [x] robots.txt SEO 配置
-- [x] Skip Links 无障碍支持
-- [x] Open Graph / Twitter Card 社交标签
-- [x] 返回顶部按钮
-- [x] 文章面包屑导航
-- [x] 上一篇 / 下一篇导航
-- [x] 样式统一管理（内联样式已迁移）
-- [x] 阅读进度条
-- [x] 文章目录 (TOC)
-- [x] 搜索功能
-- [x] 图片灯箱 (Lightbox)
-- [x] 移动端菜单优化（平滑动画 + 遮罩层）
-- [x] 表格响应式处理
-- [x] 首页双列网格布局
-- [x] 精选/置顶文章
-- [x] Giscus 评论系统
-- [x] "关于我"页面
-- [x] 文章封面图支持
-- [x] 暗色模式语法高亮验证
-- [x] 引用块装饰增强
-- [x] 文章卡片微交互增强
-- [x] Footer 增强（站点统计）
-- [x] Hero 区域装饰优化
+| 模块 | 功能 | 质量 |
+|------|------|------|
+| ThemeManager | Light/Dark 主题切换 + localStorage 持久化 + 防闪烁 | ★★★★★ |
+| MobileMenu | 移动端汉堡菜单 + 遮罩层 + 平滑动画 | ★★★★ |
+| NavbarScroll | 导航栏滚动阴影效果 | ★★★★ |
+| SmoothScroll | 锚点平滑滚动 | ★★★★ |
+| CodeBlockManager | 代码块复制 + Mac 风格圆点 + 语言标签 | ★★★★★ |
+| BackToTop | 返回顶部按钮 | ★★★★ |
+| ReadingProgress | 阅读进度条 | ★★★★ |
+| TOCManager | 自动生成目录 + IntersectionObserver 高亮 | ★★★★★ |
+| SearchManager | Ctrl+K 全文搜索 + 高亮 + 300ms 防抖 | ★★★★ |
+| LightboxManager | 图片灯箱 + 缩略图按需加载原图 | ★★★★★ |
+| RippleManager | Material Design 涟漪效果 | ★★★★ |
+| ScrollReveal | 滚动显示动画（多方向 + 交错） | ★★★★ |
+| ToastManager | Toast 通知（⚠️ CSS 类名不匹配） | ★★★ |
+| Giscus | 评论系统（GitHub Discussions 后端） | ★★★★ |
 
-### 已识别的问题
+### 1.4 设计系统现状
 
-| 类别 | 问题 | 影响 | 状态 |
-|------|------|------|------|
-| 缺失页面 | 没有 404 页面 | 用户遇到死链接时体验差 | ✅ 已解决 |
-| 缺失资源 | favicon.png 被引用但不存在 | 浏览器标签页显示默认图标 | ✅ 已解决 |
-| 性能 | MathJax 在每个页面都加载 | 非数学页面浪费带宽 | ✅ 已确认（全局加载更合适） |
-| 性能 | Google Fonts 外部依赖 | 增加 DNS 查询和加载时间 | ✅ 已解决 |
-| 样式 | 分类/标签/归档页使用内联 `<style>` | 样式管理不统一 | ✅ 已解决 |
-| 功能 | 完全没有搜索功能 | 内容发现效率低 | ✅ 已解决 |
-| 功能 | 没有评论系统 | 缺少读者互动渠道 | ✅ 已解决 |
-| SEO | 缺少 Open Graph 标签 | 社交平台分享无预览卡片 | ✅ 已解决 |
-| SEO | 缺少 JSON-LD 结构化数据 | 搜索引擎理解不充分 | ✅ 已解决 |
-| 无障碍 | skip-links.html 存在但未引用 | 键盘用户无法跳过导航 | ✅ 已解决 |
-| 遗留 | 大量未使用的 minimal-mistakes 模板文件 | 增加维护成本 | ✅ 已清理（116 个文件） |
+- **色彩体系**：Alice Blue 10 级色阶 + 4 种强调色（Pink/Teal/Lavender/Peach）
+- **字体系统**：Major Third (1.25) 比例，9 级字体大小，5 级行高，4 级字间距
+- **圆角系统**：5 级（sm/md/lg/xl/full）
+- **阴影系统**：6 级层次 + 内阴影 + 发光阴影
+- **渐变系统**：5 种预设渐变
+- **动画系统**：缓动函数 + 过渡时间变量
+- **主题切换**：`data-theme` 属性，~50+ 变量双模式覆盖
+- **响应式**：5 级断点（1200px/900px/768px/600px/480px）
+- **无障碍**：Skip Links、焦点样式、减少动画、打印样式、触摸优化
 
 ---
 
-## 优化目标
+## 二、代码审阅报告
 
-1. **补全基础体验**：404 页面、Favicon、面包屑、返回顶部等缺失的基础功能 ✅
-2. **提升交互体验**：搜索、目录、进度条、灯箱等增强阅读体验的功能 ✅
-3. **建立内容社区**：评论系统、精选文章、上/下篇导航等内容发现机制 ✅
-4. **优化性能与 SEO**：条件加载、本地字体、OG 标签、结构化数据等（部分完成）
-5. **视觉精致化**：布局优化、动效增强、暗色语法高亮验证等 ✅
-6. **视觉与交互深度打磨**：色彩系统、排版层次、图形元素、动效设计、交互反馈等 ✅
+### 2.1 综合评分
 
----
+| 维度 | 评分 | 说明 |
+|------|------|------|
+| 整体架构 | ★★★★ | Jekyll 标准架构，布局/包含/样式分离清晰 |
+| CSS 设计系统 | ★★★★★ | 变量体系完整，Light/Dark 双模式全覆盖 |
+| JavaScript | ★★★★★ | 13 个模块化设计，性能优化到位 |
+| 响应式设计 | ★★★★ | 5 级断点覆盖全设备 |
+| 无障碍支持 | ★★★★★ | 完整的无障碍方案 |
+| 内容管理 | ★★★ | 20 篇博文，元数据规范性有待提升 |
+| 代码卫生 | ★★★ | 存在遗留文件、CSS 重复定义 |
+| CI/CD | ★★★★ | GitHub Actions 工作流完备 |
 
-## 第一阶段：基础体验补全 ✅ 已完成
+**综合评分：4.0/5.0** — 技术基础扎实，具备良好的扩展能力。
 
-> 目标：修复明显缺失，提升基础可用性
-> 预计改动文件：6-8 个
-> **实际改动文件：13 个** | **完成日期：2026-05-29**
+### 2.2 高优先级问题（需立即修复）
 
-### 1.1 创建 404 页面 ✅
+| # | 问题 | 位置 | 影响 |
+|---|------|------|------|
+| 1 | **Toast CSS 类名不匹配** | JS: `.toast.show` / CSS: `.toast.visible` | Toast 通知永远不可见 |
+| 2 | **搜索结果 XSS 风险** | SearchManager 中 `post.title` 直接插入 HTML | 安全风险 |
 
-**问题**：项目中没有 `404.html`，用户访问不存在的页面时会看到 GitHub Pages 的默认 404 页面，体验生硬且不一致。
+### 2.3 中优先级问题（应尽快处理）
 
-**方案**：
-- 在项目根目录创建 `404.html`，使用 `default` 布局
-- 页面内容包含：
-  - 友好的 404 提示信息（配合 Alice Blue 主题风格）
-  - 返回首页的按钮
-  - 最近 5 篇文章的推荐列表（使用 `{% for post in site.posts limit:5 %}`）
-  - 搜索框（如第二阶段实现了搜索功能）
-- 样式直接写在页面内或添加到 `main.css`
+| # | 问题 | 位置 | 影响 |
+|---|------|------|------|
+| 3 | **CSS 重复定义** | `.post-content code`×2、`.post-content img:hover`×2、阴影变量×2、`.hero::before`×2 | 可维护性差 |
+| 4 | **LightboxManager 硬编码路径** | 假设所有图片都有 `/thumbs/` 版本 | 无缩略图时 404 |
+| 5 | **`!important` 使用** | 代码块背景色 | 覆盖性问题 |
+| 6 | **硬编码颜色值** | `.post-wip` 使用硬编码红色 | 违反设计系统规范 |
+| 7 | **10 篇博文文件名不规范** | 月份为单位数、格式不一致 | 与项目规则不一致 |
 
-**涉及文件**：
-- 新建：`404.html`
-- 可能修改：`assets/css/main.css`（添加 404 页面样式）
+### 2.4 低优先级问题（技术债务）
 
-**验收标准**：
-- 访问 `http://localhost:4000/不存在的路径` 显示自定义 404 页面
-- 404 页面风格与全站一致（Light / Dark 均正常）
-- 移动端显示正常
-- 返回首页和推荐文章链接可正常点击
-
----
-
-### 1.2 创建 Favicon ✅
-
-**问题**：`default.html` 第 11 行引用了 `/assets/images/favicon.png`，但该文件不存在。浏览器标签页显示默认图标，缺乏品牌识别度。
-
-**方案**：
-- 设计一个与 Alice Blue 主题一致的 favicon
-  - 建议方案：使用品牌首字母 "E" 的简约设计，底色为 `--alice-500` (#2b8dd6)
-  - 或使用一个简洁的图形标识
-- 生成多种尺寸以适配不同设备：
-  - `favicon.ico`（16x16, 32x32）
-  - `favicon-16x16.png`
-  - `favicon-32x32.png`
-  - `apple-touch-icon.png`（180x180）
-- 在 `default.html` 的 `<head>` 中添加完整的 favicon 声明
-
-**涉及文件**：
-- 新建：`assets/images/favicon.ico`, `assets/images/favicon-16x16.png`, `assets/images/favicon-32x32.png`, `assets/images/apple-touch-icon.png`
-- 修改：`_layouts/default.html`（更新 favicon 引用）
-
-**验收标准**：
-- 浏览器标签页显示自定义图标
-- 书签栏和移动端主屏幕图标正常显示
-- 各尺寸图标清晰无模糊
+| # | 问题 | 说明 |
+|---|------|------|
+| 8 | 8 个 Minimal Mistakes 遗留文件 | `_includes/` 中 feature_row, figure, gallery 等 |
+| 9 | `package.json` 来自 Minimal Mistakes | 需重写或删除 |
+| 10 | `_data/ui-text.yml` 2184 行 | 仅 3 个字段被使用 |
+| 11 | `_data/navigation.yml` 未被引用 | 死文件 |
+| 12 | `.gitignore` 缺少 `.env` 和 `Thumbs.db` | 小风险 |
+| 13 | CSS 单文件 3900 行 | 未利用 SCSS 模块化 |
+| 14 | 图片使用 PNG 格式 | 未优化为 WebP |
 
 ---
 
-### 1.3 添加面包屑导航 ✅
+## 三、代码结构整理计划
 
-**问题**：文章详情页（`single.html`）没有面包屑导航，用户无法直观了解当前文章所属的分类层级。项目中已有 `_includes/breadcrumbs.html` 但未被使用。
+### 3.1 遗留文件清理
 
-**方案**：
-- 在 `single.html` 的文章标题上方添加面包屑导航
-- 结构：`首页 > 分类名 > 文章标题`
-- 使用 CSS 变量保持主题一致性
-- 移动端可适当简化（如只显示"返回分类"）
-
-**涉及文件**：
-- 修改：`_layouts/single.html`（添加面包屑引用或直接实现）
-- 修改：`assets/css/main.css`（添加面包屑样式）
-
-**验收标准**：
-- 文章详情页标题上方显示面包屑
-- 面包屑中的链接可正常跳转
-- Light / Dark 模式下样式正常
-- 移动端显示正常（不换行溢出）
-
----
-
-### 1.4 添加上一篇 / 下一篇导航 ✅
-
-**问题**：文章底部没有前后文章的导航链接，用户读完一篇后需要返回列表才能找到下一篇。
-
-**方案**：
-- 在 `single.html` 的 `post-footer-section` 中，在分享区域之后添加导航
-- 使用 Jekyll 的 `page.previous` 和 `page.next` 变量
-- 展示格式：左侧"上一篇"标题，右侧"下一篇"标题
-- 添加简单的箭头图标
-
-**涉及文件**：
-- 修改：`_layouts/single.html`（添加导航 HTML）
-- 修改：`assets/css/main.css`（添加导航样式）
-
-**验收标准**：
-- 文章底部显示上/下篇链接
-- 最早和最新的文章只显示单侧导航
-- 链接可正常跳转
-- 移动端上下排列显示
-
----
-
-### 1.5 添加 Open Graph 和社交标签 ✅
-
-**问题**：`default.html` 缺少 OG 标签，在社交平台（微信、Twitter、Facebook）分享链接时无法显示标题、描述和预览图。
-
-**方案**：
-- 在 `default.html` 的 `<head>` 中添加以下标签：
-  ```html
-  <!-- Open Graph -->
-  <meta property="og:title" content="...">
-  <meta property="og:description" content="...">
-  <meta property="og:url" content="...">
-  <meta property="og:type" content="article"> <!-- 文章页 -->
-  <meta property="og:type" content="website"> <!-- 首页 -->
-  <meta property="og:site_name" content="...">
-  <meta property="og:image" content="..."> <!-- 如有封面图 -->
-  
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="...">
-  <meta name="twitter:description" content="...">
-  ```
-- 首页使用 `site.description`，文章页使用 `page.excerpt`
-
-**涉及文件**：
-- 修改：`_layouts/default.html`（添加 meta 标签）
-
-**验收标准**：
-- 使用 [Open Graph Debugger](https://www.opengraph.xyz/) 验证标签正确性
-- 微信/QQ 分享时显示标题和描述
-- Twitter 分享时显示卡片
-
----
-
-### 1.6 添加返回顶部按钮 ✅
-
-**问题**：长文章阅读时，用户需要手动滚动回顶部，操作不便。
-
-**方案**：
-- 在 `default.html` 底部添加一个浮动按钮（初始隐藏）
-- 使用 `main.js` 监听滚动事件，滚动超过 300px 时显示按钮
-- 点击后平滑滚动回顶部
-- 按钮样式：圆形，使用 Alice Blue 主色，带向上箭头图标
-- 位置：右下角固定定位
-
-**涉及文件**：
-- 修改：`_layouts/default.html`（添加按钮 HTML）
-- 修改：`assets/js/main.js`（添加滚动监听和点击逻辑）
-- 修改：`assets/css/main.css`（添加按钮样式和显示/隐藏动画）
-
-**验收标准**：
-- 页面未滚动时按钮不可见
-- 滚动超过 300px 后按钮以渐显动画出现
-- 点击后平滑滚动回顶部
-- Light / Dark 模式下样式正常
-- 移动端位置和大小合适（不遮挡内容）
-
----
-
-### 1.7 引入 Skip Links ✅
-
-**问题**：`_includes/skip-links.html` 文件已存在但未被引用，键盘用户无法跳过导航直接访问主内容。
-
-**方案**：
-- 在 `default.html` 的 `<body>` 开头引入 `{% include skip-links.html %}`
-- 确保 skip link 的目标锚点 `#main-content` 存在于页面中
-- skip link 默认隐藏，聚焦时显示
-
-**涉及文件**：
-- 修改：`_layouts/default.html`（添加 include）
-- 修改：`assets/css/main.css`（如需补充 skip-links 样式）
-
-**验收标准**：
-- 按 Tab 键时页面顶部显示"跳到主内容"链接
-- 点击链接后焦点移动到主内容区域
-- 非键盘操作时链接不可见
-
----
-
-### 1.8 创建 robots.txt ✅
-
-**问题**：缺少 `robots.txt`，搜索引擎爬虫无法获取爬取指引。
-
-**方案**：
-- 在项目根目录创建 `robots.txt`：
-  ```
-  User-agent: *
-  Allow: /
-  Disallow: /assets/js/
-  Sitemap: https://eganchiyu.github.io/sitemap.xml
-  ```
-
-**涉及文件**：
-- 新建：`robots.txt`
-
-**验收标准**：
-- 访问 `https://eganchiyu.github.io/robots.txt` 显示正确内容
-- Sitemap 链接可正常访问
-
----
-
-### 1.9 内联样式迁移 ✅
-
-**问题**：`categories.html`、`tags.html`、`year-archive.html` 三个页面使用 `<style>` 标签内联样式，与主样式文件 `main.css` 管理方式不统一。
-
-**方案**：
-- 将三个页面中的 `<style>` 内容迁移到 `main.css` 末尾
-- 使用 `.taxonomy-*`、`.tags-*`、`.archive-*` 前缀避免类名冲突
-- 删除三个页面中的 `<style>` 标签
-
-**涉及文件**：
-- 修改：`assets/css/main.css`（添加迁移的样式）
-- 修改：`categories.html`（删除 `<style>`）
-- 修改：`tags.html`（删除 `<style>`）
-- 修改：`year-archive.html`（删除 `<style>`）
-
-**验收标准**：
-- 三个页面的样式显示与迁移前完全一致
-- Light / Dark 模式均正常
-- 移动端显示正常
-- `main.css` 中的样式使用 CSS 变量（非硬编码颜色）
-
----
-
-## 第二阶段：交互体验增强 ✅ 已完成
-
-> 目标：提升阅读体验和操作流畅度
-> 预计改动文件：4-6 个
-> **实际改动文件：6 个** | **完成日期：2026-05-29**
-
-### 2.1 添加阅读进度条 ✅
-
-**问题**：长文章阅读时，用户无法直观了解阅读进度。
-
-**方案**：
-- 在导航栏下方添加一个细长的进度条（高度 3px）
-- 使用 JavaScript 监听 `scroll` 事件，计算当前滚动位置占页面总高度的比例
-- 进度条宽度动态设置为该比例
-- 颜色使用 Alice Blue 渐变（`--alice-400` 到 `--accent-lavender`）
-- 仅在文章详情页（`single.html`）显示
-
-**涉及文件**：
-- 修改：`_layouts/single.html`（添加进度条元素）
-- 修改：`assets/js/main.js`（添加滚动计算逻辑）
-- 修改：`assets/css/main.css`（添加进度条样式）
-
-**验收标准**：
-- 文章页导航栏下方显示进度条
-- 滚动时进度条宽度实时变化
-- 页面顶部时进度为 0%，底部时为 100%
-- 不影响导航栏的 `sticky` 定位
-- 移动端正常显示
-
----
-
-### 2.2 添加文章目录 (TOC) ✅
-
-**问题**：长文章（如 OR-Tools 文章约 45 分钟阅读时间）没有目录，用户无法快速跳转到感兴趣的小节。项目中已有 `_includes/toc.html` 但未使用。
-
-**方案**：
-- 在文章详情页添加浮动目录：
-  - **桌面端**（> 900px）：目录固定在文章右侧，随滚动高亮当前小节
-  - **移动端**（<= 900px）：在文章标题下方添加一个可折叠的目录面板
-- 使用 kramdown 自动生成的标题 ID 作为锚点
-- 利用 `IntersectionObserver` 实现滚动时自动高亮当前小节
-- 可通过 Front Matter `toc: false` 关闭特定文章的目录
-
-**涉及文件**：
-- 修改：`_layouts/single.html`（添加目录结构）
-- 修改：`assets/js/main.js`（添加目录高亮逻辑）
-- 修改：`assets/css/main.css`（添加目录样式）
-
-**验收标准**：
-- 桌面端文章右侧显示固定目录
-- 点击目录项平滑跳转到对应章节
-- 滚动时当前章节在目录中高亮
-- 移动端目录可折叠/展开
-- `toc: false` 的文章不显示目录
-- 文章中没有标题时不显示目录
-
----
-
-### 2.3 添加搜索功能 ✅
-
-**问题**：博客完全没有搜索功能，用户只能通过分类和标签浏览内容，内容发现效率低。
-
-**方案**：
-- 采用纯前端方案，不依赖外部服务：
-  1. Jekyll 构建时生成 `search.json` 索引文件（包含每篇文章的标题、摘要、标签、URL）
-  2. 在导航栏添加搜索图标按钮
-  3. 点击后弹出搜索面板（模态框）
-  4. 使用原生 JavaScript 实现关键词匹配搜索（或集成轻量级 Fuse.js 实现模糊搜索）
-  5. 搜索结果实时显示，点击跳转到对应文章
-- 搜索面板支持 ESC 键关闭
-- 移动端搜索面板全屏显示
-
-**涉及文件**：
-- 新建：`search.json`（Liquid 模板生成索引）
-- 修改：`_includes/navigation.html`（添加搜索按钮）
-- 修改：`_layouts/default.html`（添加搜索模态框 HTML）
-- 修改：`assets/js/main.js`（添加搜索逻辑）
-- 修改：`assets/css/main.css`（添加搜索面板样式）
-
-**验收标准**：
-- 导航栏显示搜索图标
-- 点击后弹出搜索面板
-- 输入关键词后实时显示匹配结果
-- 搜索结果包含文章标题、日期、分类
-- 点击结果跳转到对应文章
-- ESC 键和点击遮罩可关闭面板
-- 移动端搜索体验良好
-
----
-
-### 2.4 图片灯箱 (Lightbox) ✅
-
-**问题**：技术文章中的截图和图表无法放大查看，小屏设备上细节难以辨认。
-
-**方案**：
-- 纯 JavaScript + CSS 实现，不依赖外部库
-- 点击 `.post-content img` 时弹出全屏遮罩显示原图
-- 遮罩支持点击关闭和 ESC 键关闭
-- 添加简单的缩放动画
-- 移动端支持双指缩放（使用 CSS `touch-action`）
-
-**涉及文件**：
-- 修改：`assets/js/main.js`（添加灯箱逻辑）
-- 修改：`assets/css/main.css`（添加灯箱样式）
-
-**验收标准**：
-- 点击文章内图片弹出灯箱
-- 灯箱显示原图，背景半透明遮罩
-- 点击遮罩或按 ESC 关闭
-- 关闭时有缩放动画
-- 移动端可正常查看和关闭
-
----
-
-### 2.5 移动端菜单优化 ✅
-
-**问题**：移动端菜单使用 `display:none/block` 切换，无法实现平滑过渡；菜单展开时没有遮罩层。
-
-**方案**：
-- 将菜单显示方式从 `display:none` 改为 `transform: translateY(-100%)` + `opacity: 0`，实现平滑滑入/滑出
-- 添加半透明遮罩层 `.mobile-overlay`，菜单展开时显示
-- 点击遮罩层关闭菜单
-- 菜单项添加入场动画（依次淡入）
-
-**涉及文件**：
-- 修改：`_includes/navigation.html`（添加遮罩层元素）
-- 修改：`assets/css/main.css`（修改菜单过渡样式）
-- 修改：`assets/js/main.js`（修改菜单切换逻辑）
-
-**验收标准**：
-- 菜单展开/收起有平滑过渡动画
-- 展开时背景有半透明遮罩
-- 点击遮罩层可关闭菜单
-- 菜单项依次淡入显示
-- 关闭后菜单项状态重置
-
----
-
-### 2.6 表格响应式处理 ✅
-
-**问题**：`main.css` 中的表格样式（第 1435-1459 行）没有处理小屏溢出，宽表格可能超出视口。
-
-**方案**：
-- 为 `.post-content table` 添加 `display: block; overflow-x: auto;` 或将其包裹在可滚动容器中
-- 在小屏设备上表格可水平滚动
-
-**涉及文件**：
-- 修改：`assets/css/main.css`（修改表格样式）
-
-**验收标准**：
-- 宽表格在移动端可水平滚动
-- 不会溢出视口
-- 滚动时表格边框保持完整
-
----
-
-## 第三阶段：内容发现与社区 ✅ 已完成
-
-> 目标：增强内容组织和用户互动
-> 预计改动文件：5-7 个
-> **实际改动文件：8 个** | **完成日期：2026-05-29**
-
-### 3.1 首页文章网格布局 ✅
-
-**问题**：首页文章列表是单列布局（`posts-grid` 只有 `gap` 没有 `grid-template-columns`），信息密度较低。
-
-**方案**：
-- 桌面端（> 900px）：双列网格布局
-- 平板端（768-900px）：双列网格布局
-- 移动端（< 768px）：保持单列
-- 文章卡片高度自适应，使用 `align-items: start` 避免拉伸
-
-**涉及文件**：
-- 修改：`assets/css/main.css`（修改 `.posts-grid` 布局）
-
-**验收标准**：
-- 桌面端文章以双列网格显示
-- 移动端保持单列
-- 卡片高度自适应内容
-- 卡片间距均匀
-
----
-
-### 3.2 精选/置顶文章 ✅
-
-**问题**：所有文章平等展示，优质内容无法突出。
-
-**方案**：
-- 利用 Front Matter 的 `featured: true` 标记精选文章
-- 在首页 Hero 区域下方、文章列表上方添加"精选文章"区域
-- 精选文章使用更大的卡片样式，可展示摘要
-- 最多显示 2 篇精选文章
-
-**涉及文件**：
-- 修改：`_layouts/home.html`（添加精选区域）
-- 修改：`assets/css/main.css`（添加精选卡片样式）
-- 修改相关文章的 Front Matter（添加 `featured: true`）
-
-**验收标准**：
-- 标记为 `featured: true` 的文章在首页突出显示
-- 精选区域位于文章列表上方
-- 无精选文章时不显示该区域
-- 移动端显示正常
-
----
-
-### 3.3 集成 Giscus 评论系统 ✅
-
-**问题**：博客缺少评论功能，读者无法互动和反馈。项目中已有 `_includes/comments-providers/giscus.html` 模板但未使用。
-
-**方案**：
-- 集成 Giscus（基于 GitHub Discussions 的评论系统）：
-  1. 在 GitHub 仓库中启用 Discussions 功能
-  2. 安装 Giscus App 并配置
-  3. 在 `single.html` 文章底部添加 Giscus 组件
-  4. 评论区跟随主题切换（Light / Dark）
-- 通过 Front Matter `comments: true/false` 控制是否显示
-
-**涉及文件**：
-- 修改：`_layouts/single.html`（添加 Giscus 组件）
-- 修改：`assets/js/main.js`（添加主题切换时同步 Giscus 主题的逻辑）
-
-**验收标准**：
-- 文章底部显示评论区
-- 使用 GitHub 账号登录后可发表评论
-- 切换主题时评论区主题同步变化
-- `comments: false` 的文章不显示评论区
-- 移动端评论区可用
-
----
-
-### 3.4 添加"关于我"页面 ✅
-
-**问题**：个人信息分散在首页 Hero 区域和 `_config.yml` 中，没有专门的个人介绍页面。
-
-**方案**：
-- 创建 `about.md` 页面，使用 `single` 布局
-- 内容包括：
-  - 个人简介
-  - 技术栈和兴趣领域
-  - 学习经历（NWPU · 智能无人系统）
-  - 联系方式
-  - GitHub 项目链接
-- 在导航栏中添加"关于"链接
-
-**涉及文件**：
-- 新建：`about.md`
-- 修改：`_includes/navigation.html`（添加"关于"导航项）
-
-**验收标准**：
-- 导航栏显示"关于"链接
-- 点击后进入个人介绍页面
-- 页面风格与文章页一致
-- 移动端显示正常
-
----
-
-### 3.5 文章封面图支持 ✅
-
-**问题**：文章卡片没有封面图，首页视觉吸引力不足。
-
-**方案**：
-- 支持在 Front Matter 中添加 `cover_image` 字段
-- 文章卡片顶部展示封面图（如未设置则不显示）
-- 封面图使用 `object-fit: cover` 保持比例
-- 首页卡片和文章详情页都支持显示
-
-**涉及文件**：
-- 修改：`_layouts/home.html`（文章卡片添加封面图）
-- 修改：`_layouts/single.html`（文章详情添加封面图）
-- 修改：`assets/css/main.css`（添加封面图样式）
-
-**验收标准**：
-- 设置了 `cover_image` 的文章在首页显示封面图
-- 封面图不影响卡片布局
-- 未设置封面图的文章正常显示（无空白区域）
-- 移动端封面图比例正确
-
----
-
-## 第四阶段：性能与 SEO 优化 ✅ 已完成
-
-> 目标：提升加载速度和搜索引擎表现
-> 预计改动文件：3-5 个
-> **实际改动文件：7 个** | **完成日期：2026-05-29**
-
-### 4.1 MathJax 加载策略 ✅ 已确认
-
-**问题**：`default.html` 第 51-74 行在每个页面都加载 MathJax 脚本，但只有包含 LaTeX 公式的文章才需要。MathJax 库约 200KB，对非数学页面是浪费。
-
-**决策**：经评估，用户 LaTeX 使用频率较高，采用**全局加载**策略更合适。
-
-**方案**：
-- ~~方案 A（推荐）：在 Front Matter 中添加 `math: true` 字段，仅在该字段为 true 时加载 MathJax~~
-- **最终方案**：保持全局加载，确保所有文章都能渲染 LaTeX 公式
-
-**涉及文件**：
-- 无需修改（保持现状）
-
-**验收标准**：
-- ✅ 所有文章正常渲染数学公式
-- ✅ LaTeX 使用频率高的场景下用户体验一致
-
----
-
-### 4.2 字体本地托管 ✅
-
-**问题**：`default.html` 第 14-16 行加载 Google Fonts（Inter 和 JetBrains Mono），增加 2 次外部 DNS 查询和连接时间，在网络不佳时可能导致字体加载延迟。
-
-**方案**：
-- 下载 Inter（Regular, Medium, SemiBold, Bold）和 JetBrains Mono（Regular, Medium）的 woff2 格式文件
-- 放置到 `assets/fonts/` 目录
-- 在 `main.css` 中使用 `@font-face` 声明
-- 移除 `default.html` 中的 Google Fonts `<link>` 标签
-- 使用 `font-display: swap` 确保文字不被阻塞显示
-
-**涉及文件**：
-- 新建：`assets/fonts/` 目录及字体文件
-- 修改：`assets/css/main.css`（添加 `@font-face` 声明）
-- 修改：`_layouts/default.html`（移除 Google Fonts 链接）
-
-**验收标准**：
-- 字体正常显示，外观与之前一致
-- 无外部字体请求
-- 首次加载时使用系统字体，字体加载完成后平滑切换
-- 字体文件大小合理（woff2 格式）
-
----
-
-### 4.3 添加 JSON-LD 结构化数据 ✅
-
-**问题**：缺少结构化数据标记，搜索引擎无法充分理解页面内容和关系。
-
-**方案**：
-- 在 `default.html` 中添加 JSON-LD `<script>` 标签
-- 首页使用 `WebSite` 类型
-- 文章页使用 `Article` 类型（包含 headline, datePublished, author, description 等）
-- 使用 Liquid 模板动态生成
-
-**涉及文件**：
-- 修改：`_layouts/default.html`（添加 JSON-LD）
-
-**验收标准**：
-- 使用 [Google Rich Results Test](https://search.google.com/test/rich-results) 验证结构化数据
-- 文章页包含完整的 Article 标记
-- 首页包含 WebSite 标记
-
----
-
-### 4.4 图片压缩处理 ✅
-
-**问题**：文章内图片直接加载原图（最大 21MB），页面加载缓慢。
-
-**方案**（已修改）：
-- 使用 Python + Pillow 生成压缩缩略图（`assets/images/thumbs/`）
-- 缩略图最大宽度 800px，JPEG 质量 60%
-- **57MB → 1.3MB，压缩率 98%**
-- 灯箱按需加载原图：点击后显示旋转加载圈，加载完成后渐显显示
-- `scripts/generate_thumbs.py` 脚本可随时重新生成缩略图
-
-**涉及文件**：
-- 新建：`assets/images/thumbs/` 目录（51 个压缩缩略图）
-- 新建：`scripts/generate_thumbs.py`（图片压缩脚本）
-- 修改：`assets/js/main.js`（灯箱支持缩略图 + 按需加载原图）
-- 修改：`assets/css/main.scss`（灯箱加载动画样式）
-
-**验收标准**：
-- ✅ 页面加载时只下载压缩缩略图（1.3MB vs 57MB）
-- ✅ 点击图片打开灯箱时显示旋转加载圈
-- ✅ 原图加载完成后渐显显示
-- ✅ ESC 或点击遮罩可关闭灯箱
-- ✅ `prefers-reduced-motion` 时禁用动画
-
----
-
-### 4.5 CSS 优化与压缩 ✅
-
-**问题**：`main.css` 约 1790 行，作为普通 CSS 文件未利用 Jekyll 的 Sass 压缩功能。
-
-**方案**：
-- 将 `assets/css/main.css` 重命名为 `assets/css/main.scss`
-- 在文件开头添加 Jekyll front matter（空的 `---`）
-- 利用 `_config.yml` 中已配置的 `sass: style: compressed` 自动压缩
-- 或保持 `.css` 但添加构建后的压缩步骤
-
-**涉及文件**：
-- 重命名：`assets/css/main.css` → `assets/css/main.scss`
-- 修改：文件开头添加 Jekyll front matter
-
-**验收标准**：
-- 构建后的 CSS 文件被压缩（无多余空格和换行）
-- 样式功能不受影响
-- Light / Dark 模式均正常
-
----
-
-## 第五阶段：视觉精致化 ✅ 已完成
-
-> 目标：提升视觉细节和品牌一致性
-> 预计改动文件：3-5 个
-> **实际改动文件：3 个** | **完成日期：2026-05-30**
-
-### 5.1 暗色模式语法高亮验证
-
-**问题**：`main.css` 第 1141-1370 行定义了 Light 和 Dark 两套语法高亮色，但需要验证所有语言的高亮在 Dark 模式下的可读性。
-
-**方案**：
-- 在 Dark 模式下逐个检查各语法元素的颜色对比度
-- 使用 WebAIM 对比度检查器验证文字/背景对比度 >= 4.5:1（WCAG AA）
-- 重点检查：注释、字符串、关键字、函数名
-- 如发现不足，调整颜色值
-
-**涉及文件**：
-- 修改：`assets/css/main.css`（调整语法高亮色值）
-
-**验收标准**：
-- Dark 模式下所有语法元素清晰可读
-- 对比度符合 WCAG AA 标准
-- 代码块在两种主题下都有良好的视觉效果
-
----
-
-### 5.2 引用块装饰增强
-
-**问题**：当前引用块（blockquote）只有左边框和背景色，视觉效果较朴素。
-
-**方案**：
-- 在引用块左上角添加引号装饰（使用 CSS `::before` 伪元素）
-- 使用 Alice Blue 渐变色作为引号颜色
-- 保持简洁，不过度装饰
-
-**涉及文件**：
-- 修改：`assets/css/main.css`（增强 blockquote 样式）
-
-**验收标准**：
-- 引用块有引号装饰
-- Light / Dark 模式下效果协调
-- 不影响引用块内文字的可读性
-
----
-
-### 5.3 文章卡片微交互增强
-
-**问题**：文章卡片的悬停效果（`transform: translateY(-4px)`）已经不错，但可以添加更丰富的微交互。
-
-**方案**：
-- 添加点击时的缩放反馈（`transform: scale(0.98)` on `:active`）
-- 为卡片左侧的渐变条添加展开动画（悬停时从 4px 宽度渐变到更宽）
-- 标签悬停时添加轻微的缩放效果
-
-**涉及文件**：
-- 修改：`assets/css/main.css`（增强卡片交互样式）
-
-**验收标准**：
-- 点击卡片有按压反馈
-- 悬停时左侧渐变条有动画
-- 动画流畅不卡顿
-- `prefers-reduced-motion` 时禁用动画
-
----
-
-### 5.4 Footer 增强
-
-**问题**：当前 footer（`footer.html`）内容较简单，只有站点名、链接和版权信息。
-
-**方案**：
-- 添加站点统计信息（文章数量、分类数量、最后更新时间）
-- 添加 RSS 订阅链接（已有 feed.xml，但 footer 中未突出）
-- 保持简洁风格，不增加过多内容
-
-**涉及文件**：
-- 修改：`_includes/footer.html`（添加统计信息）
-- 修改：`assets/css/main.css`（调整 footer 样式）
-
-**验收标准**：
-- Footer 显示站点统计
-- RSS 链接可正常访问
-- 整体风格简洁协调
-
----
-
-### 5.5 Hero 区域装饰优化
-
-**问题**：Hero 区域使用 emoji 作为装饰元素（✨🌸），视觉上不够精致。
-
-**方案**：
-- 将 emoji 装饰替换为 CSS 渐变圆形或 SVG 图形
-- 或使用更精致的 CSS 动画元素（如浮动的渐变圆点）
-- 保持二次元/Alice Blue 的风格调性
-
-**涉及文件**：
-- 修改：`_layouts/home.html`（替换装饰元素）
-- 修改：`assets/css/main.css`（添加新装饰样式）
-
-**验收标准**：
-- 装饰元素视觉更精致
-- 动画流畅
-- Dark 模式下效果协调
-- 移动端隐藏（已有此逻辑）
-
----
-
-## 第六阶段：视觉与交互深度打磨 ✅ 已完成
-
-> 目标：通过精细化处理提升视觉品质和交互体验
-> 预计改动文件：5-8 个
-> **实际改动文件：4 个** | **完成日期：2026-05-30**
-
-### 6.1 色彩系统增强
-
-**问题**：当前色彩系统虽然完整，但缺乏层次感和视觉深度，渐变色、玻璃态效果等现代视觉元素应用不足。
-
-**方案**：
-- 增强渐变色应用：在 Hero 区域、卡片、按钮等元素使用微妙的渐变
-- 引入玻璃态效果（Glassmorphism）：为特定卡片添加背景模糊和半透明效果
-- 优化阴影系统：创建多层次阴影，增强元素立体感
-- 添加渐变边框效果：为重要元素（如精选文章卡片）添加渐变边框
-
-**涉及文件**：
-- 修改：`assets/css/main.scss`（添加渐变、玻璃态、阴影样式）
-- 修改：`_layouts/home.html`（为精选卡片添加渐变边框类）
-
-**验收标准**：
-- 渐变色应用自然，不显突兀
-- 玻璃态效果在 Light/Dark 模式下均正常
-- 阴影层次分明，增强视觉深度
-- 渐变边框不影响布局和性能
-
-### 6.2 排版层次优化
-
-**问题**：字体大小、行高、字间距等排版细节缺乏统一的比例系统，视觉层次不够清晰。
-
-**方案**：
-- 建立基于 Major Third（1.25）的字体大小比例系统
-- 优化行高和字间距，提升长文阅读体验
-- 使用 CSS 变量统一管理间距和排版参数
-- 为不同内容类型（标题、正文、代码、引用）定义专属排版样式
-
-**涉及文件**：
-- 修改：`assets/css/main.scss`（添加排版变量和样式）
-- 修改：`_layouts/single.html`（为文章内容添加排版类）
-
-**验收标准**：
-- 字体大小比例协调，视觉层次清晰
-- 行高和字间距优化后阅读体验提升
-- 排版在不同设备上保持一致
-- 代码块和引用块有专属排版样式
-
-### 6.3 图形元素精致化
-
-**问题**：图标、装饰图形、图片处理等视觉元素缺乏统一的精致化处理。
-
-**方案**：
-- 建立图标系统：统一图标尺寸、颜色和动画效果
-- 增强装饰图形：为 Hero 区域、分隔线等添加精致装饰
-- 优化图片处理：添加悬停效果、叠加层、滤镜等
-- 创建装饰性引号：为引用块添加艺术化引号装饰
-
-**涉及文件**：
-- 修改：`assets/css/main.scss`（添加图标、装饰图形、图片样式）
-- 修改：`_includes/navigation.html`（为导航图标添加统一样式）
-- 修改：`_layouts/home.html`（为 Hero 区域添加装饰图形）
-
-**验收标准**：
-- 图标系统统一，尺寸和颜色一致
-- 装饰图形精致，与 Alice Blue 主题协调
-- 图片悬停效果流畅，不影响性能
-- 装饰性引号增强引用块视觉效果
-
-### 6.4 动效设计升级
-
-**问题**：现有动效较为基础，缺乏丰富的微交互和页面过渡效果。
-
-**方案**：
-- 增强微交互动效：为按钮、卡片、标签等添加涟漪、缩放、阴影变化效果
-- 添加页面过渡动效：元素进入视口时的淡入、滑入效果
-- 优化滚动触发动画：使用 Intersection Observer 实现滚动触发动画
-- 添加 3D 效果：为特定卡片添加 3D 悬停效果
-
-**涉及文件**：
-- 修改：`assets/css/main.scss`（添加动效样式）
-- 修改：`assets/js/main.js`（添加 Intersection Observer 逻辑）
-
-**验收标准**：
-- 微交互动效流畅，不卡顿
-- 页面过渡动效自然，提升用户体验
-- 滚动触发动画性能良好
-- 3D 效果在支持设备上正常显示
-- `prefers-reduced-motion` 时禁用所有动画
-
-### 6.5 交互反馈完善
-
-**问题**：用户操作（点击、悬停、聚焦等）的视觉反馈不够丰富和明确。
-
-**方案**：
-- 增强状态反馈：为加载、成功、错误状态添加视觉指示
-- 优化操作反馈：为点击、长按、拖拽等操作添加即时反馈
-- 改进焦点状态：为键盘导航添加清晰的焦点环和动画
-- 添加智能悬停区域：为触摸设备优化悬停目标大小
-
-**涉及文件**：
-- 修改：`assets/css/main.scss`（添加状态反馈、操作反馈、焦点状态样式）
-- 修改：`assets/js/main.js`（添加智能悬停区域逻辑）
-
-**验收标准**：
-- 状态反馈清晰，用户能明确感知当前状态
-- 操作反馈即时，提升交互体验
-- 焦点状态明显，键盘导航无障碍
-- 智能悬停区域在触摸设备上工作正常
-
----
-
-## 清理与维护
-
-### 遗留文件清理 ✅ 已完成
-
-> **完成日期：2026-05-30**
-> 清理前：150 个源文件 | 清理后：34 个源文件 | 删除：116 个文件（-77%）
-> 构建速度：0.405s → 0.333s（-18%）
-
-以下文件来自 minimal-mistakes 主题，经逐一验证确认未被引用后已全部清理：
-
-**布局文件**（`_layouts/`，删除 11 个）：
-- ✅ `archive.html`, `archive-taxonomy.html`
-- ✅ `categories.html`, `category.html`
-- ✅ `collection.html`, `compress.html`
-- ✅ `posts.html`, `search.html`, `splash.html`
-- ✅ `tag.html`, `tags.html`
-
-**包含文件**（`_includes/`，删除 54 个）：
-- ✅ `analytics-providers/` 目录（4 个文件）
-- ✅ `comments-providers/` 目录（保留 `giscus.html`，删除 12 个文件）
-- ✅ `search/` 目录（4 个文件）
-- ✅ `head/`, `footer/` 子目录
-- ✅ 其他未引用的模板文件（34 个）
-
-**SCSS 文件**（删除整个 `_sass/` 目录，68 个文件）：
-- ✅ `_sass/minimal-mistakes.scss` 入口文件
-- ✅ `_sass/minimal-mistakes/` 整个目录树（含 vendor 库：susy, breakpoint, magnific-popup）
-
-**JS 文件**（删除 14 个）：
-- ✅ `assets/js/plugins/`（6 个 jQuery 插件）
-- ✅ `assets/js/vendor/jquery/`（jQuery 3.6.0）
-- ✅ `assets/js/lunr/`（Lunr 搜索库，4 个文件）
-- ✅ `assets/js/main.min.js`, `main.min.js.map`, `_main.js`
-
-**根目录配置文件**（删除 3 个）：
-- ✅ `minimal-mistakes-jekyll.gemspec`
-- ✅ `staticman.yml`
-- ✅ `.travis.yml`
-
-**配置清理**：
-- ✅ `_config.yml` 移除 `assets/js/vendor` 引用
-- ✅ `_config.yml` 移除 `minimal-mistakes-jekyll.gemspec` 排除项
-
-**清理后保留的文件**：
+**需删除的文件**：
 
 ```
-_layouts/          → default.html, home.html, single.html（3 个）
-_includes/         → skip-links.html, navigation.html, footer.html
-                     comments-providers/giscus.html（4 个）
-assets/css/        → main.scss（1 个，自包含设计系统）
-assets/js/         → main.js（1 个）
+_includes/feature_row.html          # MM 遗留，空文件
+_includes/figure.html               # MM 遗留，空文件
+_includes/gallery.html              # MM 遗留，空文件
+_includes/group-by-array.html       # MM 遗留，空文件
+_includes/nav_list.html             # MM 遗留，空文件
+_includes/video.html                # MM 遗留，空文件
+_includes/copyright.js              # MM 遗留，空文件
+_data/navigation.yml                # 未被引用
+package.json                        # MM 遗留，需重写或删除
+```
+
+**需精简的文件**：
+
+```
+_data/ui-text.yml                   # 2184 行 → 精简为仅保留 skip-links 需要的字段
+```
+
+### 3.2 CSS 模块化拆分方案
+
+将 3900 行的单文件拆分为模块化 SCSS：
+
+```
+_sass/
+├── _variables.scss       # CSS 变量系统（~150 行）
+│                         #   色彩、字体、圆角、阴影、渐变、动画变量
+├── _base.scss            # 字体声明 + 重置样式（~100 行）
+├── _layout.scss          # 页面布局（导航、英雄区、页脚）（~400 行）
+├── _components.scss      # UI 组件（卡片、按钮、标签、徽章）（~800 行）
+├── _post.scss            # 文章详情页样式（~500 行）
+├── _code.scss            # 代码块 + 语法高亮（~400 行）
+├── _search.scss          # 搜索功能样式（~200 行）
+├── _animations.scss      # 动画与过渡（~300 行）
+├── _responsive.scss      # 响应式断点（~400 行）
+└── _print.scss           # 打印样式（~50 行）
+
+assets/css/
+└── main.scss             # 入口文件，@use 引入各模块
+```
+
+### 3.3 .gitignore 补充
+
+```gitignore
+# 补充项
+.env
+.env.local
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+```
+
+### 3.4 整理后的目标结构
+
+```
+eganchiyu.github.io/
+├── _config.yml
+├── _layouts/              # 3 个布局
+├── _includes/             # 7 个组件（清理后）
+├── _posts/                # 博文
+├── _sass/                 # 10 个 SCSS 模块（新建）
+├── assets/
+│   ├── css/main.scss      # 入口文件
+│   ├── js/main.js         # 主脚本
+│   ├── fonts/             # 本地字体
+│   └── images/            # 图片资源
+├── pages/                 # 独立页面
+├── scripts/               # 工具脚本
+├── docs/                  # 项目文档
+└── .github/workflows/     # CI/CD
 ```
 
 ---
 
-## 验收标准
+## 四、技术文档更新计划
 
-每个阶段完成后，需通过以下检查：
+### 4.1 需更新的文档
 
-### 功能检查
+| 文档 | 更新内容 | 优先级 |
+|------|----------|--------|
+| `docs/README.md` | 更新项目概述、本地开发指南、部署流程 | 高 |
+| `docs/ARCHITECTURE.md` | 更新文件结构图、模块关系、技术栈信息 | 高 |
+| `docs/components.md` | 补充新增互动组件文档 | 中 |
+| `docs/javascript.md` | 更新 JS 模块清单（13 个）及 API 说明 | 中 |
+| `docs/styling.md` | 补充渐变、阴影、动画、玻璃态系统文档 | 中 |
+| `.trae/rules/project.md` | 更新文件结构、补充 Giscus 说明、更新 CSS 变量文档 | 高 |
+
+### 4.2 需新增的文档
+
+| 文档 | 内容 | 优先级 |
+|------|------|--------|
+| `docs/INTERACTIVE-FEATURES.md` | 互动功能使用指南（投票、测验、成就系统） | 中 |
+| `CHANGELOG.md` | 版本变更记录 | 低 |
+
+---
+
+## 五、开发规划：互动性功能增强
+
+### 产品愿景
+
+> **"让技术博客阅读不再是单向的信息接收，而是一场充满乐趣的互动探索之旅。"**
+
+通过评论互动、内容分享、趣味元素三大板块，将博客从"信息展示平台"升级为"互动社区入口"，显著提升用户停留时间、回访率和参与感。
+
+---
+
+### Phase 1：基础互动增强（P0 — 高优先级）
+
+> 目标：完善评论系统 + 实现内容分享 + 基础互动反馈
+> 预计工作量：中等（5-7 天）
+
+#### 1.1 评论系统优化
+
+**现状**：Giscus 已完整集成，评论数据存储在 GitHub Discussions 中。
+
+**优化内容**：
+
+| 项目 | 描述 | 实现方式 |
+|------|------|----------|
+| 样式定制 | 优化 Giscus 容器样式（圆角、阴影、与主题一致） | CSS 覆盖 Giscus 默认样式 |
+| 评论计数 | 文章卡片上显示评论数量 | Giscus API + JS 动态获取 |
+| 表情回应 | 展示文章的表情回应统计（👍 ❤️ 🚀 等） | Giscus reactions API |
+| 评论引导 | 首次访问时显示友好的评论引导提示 | Toast 组件 + localStorage 标记 |
+
+**涉及文件**：
+- 修改：`_includes/giscus.html`
+- 修改：`_includes/post-card.html`
+- 修改：`assets/css/main.scss`
+- 修改：`assets/js/main.js`
+
+**验收标准**：
+- Giscus 容器样式与博客主题一致
+- 文章卡片显示评论数量
+- 表情回应统计正确显示
+- 主题切换时评论区同步切换
+
+#### 1.2 内容分享功能
+
+**现状**：已有基础的 Twitter/Facebook/微博分享链接。
+
+**增强内容**：
+
+```javascript
+// 分享目标平台
+const ShareTargets = {
+  wechat:  { name: '微信',     icon: 'wechat',  method: 'qrcode' },
+  weibo:   { name: '微博',     icon: 'weibo',   method: 'url' },
+  x:       { name: 'X/Twitter', icon: 'x',       method: 'url' },
+  copy:    { name: '复制链接',  icon: 'link',    method: 'clipboard' },
+  native:  { name: '系统分享',  icon: 'share',   method: 'webshare' },
+  qr:      { name: '二维码',   icon: 'qrcode',  method: 'qrcode' }
+};
+```
+
+**实现细节**：
+- 文章底部添加分享按钮组（替换现有简单链接）
+- 微信分享：生成二维码（使用 Canvas API 绘制）
+- 系统分享：优先使用 Web Share API（移动端原生体验）
+- 复制链接：使用 `navigator.clipboard` + Toast 提示
+- 分享面板：Glassmorphism 风格弹窗，带动画效果
+- 分享统计：localStorage 记录分享次数，成就系统联动
+
+**涉及文件**：
+- 修改：`_layouts/single.html`
+- 修改：`assets/js/main.js`
+- 修改：`assets/css/main.scss`
+
+**验收标准**：
+- 微信扫码可打开文章
+- 复制链接后显示 Toast 提示
+- 移动端可调用系统分享
+- 分享面板 Light/Dark 模式正常
+
+#### 1.3 文章点赞系统
+
+**实现方案**：纯前端方案（无后端依赖）
+
+```javascript
+// 数据结构（localStorage）
+{
+  "post_likes": {
+    "2026-05-30-raspberry-pi-setup": {
+      "count": 5,
+      "liked": true
+    }
+  }
+}
+```
+
+**交互设计**：
+- 文章底部显示点赞按钮（❤️ 心形图标）
+- 点击后心形爆炸动画（Canvas 粒子效果）
+- 计数器跳动动画（数字滚动）
+- 再次点击取消点赞
+- 文章卡片上显示点赞数
+
+**涉及文件**：
+- 修改：`_layouts/single.html`
+- 修改：`_includes/post-card.html`
+- 修改：`assets/js/main.js`
+- 修改：`assets/css/main.scss`
+
+**验收标准**：
+- 点赞后心形爆炸动画流畅
+- 刷新页面后点赞状态保持
+- 可取消点赞
+- Light/Dark 模式样式正常
+
+#### 1.4 阅读统计
+
+**实现内容**：
+- 文章详情页显示阅读时长（基于字数估算，中文 400 字/分钟）
+- 文章卡片显示阅读时长标签
+- 首页 Footer 显示站点总阅读时长
+
+**涉及文件**：
+- 修改：`_layouts/single.html`
+- 修改：`_includes/post-card.html`
+- 修改：`_includes/footer.html`
+- 修改：`assets/css/main.scss`
+
+**验收标准**：
+- 阅读时长显示准确
+- 文章卡片显示时长标签
+- Footer 统计数据正确
+
+---
+
+### Phase 2：趣味互动元素（P0 — 高优先级）
+
+> 目标：实现"好玩有趣"的核心体验
+> 预计工作量：较大（10-14 天）
+
+#### 2.1 文章投票/问卷
+
+**功能描述**：在文章末尾嵌入互动投票，增强读者参与感。
+
+**Front Matter 语法**：
+```yaml
+---
+poll:
+  question: "你更喜欢哪种编程语言？"
+  multiple: false  # 是否多选
+  options:
+    - text: "Python"
+      emoji: "🐍"
+    - text: "JavaScript"
+      emoji: "⚡"
+    - text: "Rust"
+      emoji: "🦀"
+    - text: "Go"
+      emoji: "🐹"
+---
+```
+
+**交互设计**：
+- 投票卡片：Glassmorphism 风格，圆角卡片
+- 选项按钮：带 emoji 的选项，悬停时涟漪效果
+- 投票后：实时显示结果（水平柱状图 + 百分比）
+- 动画：柱状图从 0 增长到目标值的动画
+- 存储：localStorage 记录投票状态，防止重复投票
+- 分享：投票结果可一键分享
+
+**组件结构**：
+```
+_includes/poll.html          # 投票组件模板
+assets/js/modules/poll.js    # 投票逻辑
+assets/css/_poll.scss        # 投票样式
+```
+
+**验收标准**：
+- 投票卡片与文章风格一致
+- 投票后即时显示结果动画
+- 刷新后投票状态保持
+- 可查看投票人数
+- Light/Dark 模式正常
+
+#### 2.2 知识小测验
+
+**功能描述**：文章末尾嵌入趣味测验，检验阅读效果。
+
+**Front Matter 语法**：
+```yaml
+---
+quiz:
+  - question: "SSH 默认端口号是？"
+    type: "single"           # single / multi / truefalse
+    options:
+      - text: "21"
+      - text: "22"
+      - text: "80"
+      - text: "443"
+    answer: 1                # 正确答案索引（单选）或数组（多选）
+    explanation: "SSH 默认使用 22 端口，FTP 使用 21，HTTP 使用 80，HTTPS 使用 443"
+
+  - question: "以下哪些是 HTTP 方法？"
+    type: "multi"
+    options:
+      - text: "GET"
+      - text: "PUSH"
+      - text: "POST"
+      - text: "FETCH"
+    answer: [0, 2]
+    explanation: "GET 和 POST 是标准 HTTP 方法，PUSH 和 FETCH 不是"
+---
+```
+
+**交互设计**：
+- 测验卡片：带进度条的问答卡片
+- 选择后：正确答案绿色高亮 + 解释弹出；错误答案红色 + 正确答案显示
+- 完成后：分数统计 + 评语（如"满分！你是 SSH 大师！"）
+- 动画：答对时 confetti 庆祝效果，答错时轻微抖动
+- 重做按钮：可重新开始测验
+
+**组件结构**：
+```
+_includes/quiz.html          # 测验组件模板
+assets/js/modules/quiz.js    # 测验逻辑
+assets/css/_quiz.scss        # 测验样式
+```
+
+**验收标准**：
+- 测验卡片与文章风格一致
+- 选择后即时反馈正确/错误
+- 显示详细解释
+- 完成后显示分数和评语
+- 可重新测验
+- Light/Dark 模式正常
+
+#### 2.3 成就徽章系统
+
+**功能描述**：通过阅读里程碑激励用户持续互动。
+
+**徽章列表**：
+
+| 徽章名称 | 触发条件 | 图标 | 难度 |
+|----------|----------|------|------|
+| 初来乍到 | 首次访问博客 | 👋 | ★ |
+| 暗夜精灵 | 首次切换暗色模式 | 🌙 | ★ |
+| 求知若渴 | 阅读 5 篇文章 | 📖 | ★★ |
+| 代码达人 | 复制代码块 10 次 | 💻 | ★★ |
+| 互动先锋 | 首次发表评论 | 💬 | ★★ |
+| 分享达人 | 首次分享文章 | 🔗 | ★★ |
+| 探索者 | 使用搜索功能 | 🔍 | ★★ |
+| 学富五车 | 阅读 15 篇文章 | 🎓 | ★★★ |
+| 全文通读 | 阅读进度达到 100% | 🏆 | ★★★ |
+| 投票达人 | 参与 5 次投票 | 🗳️ | ★★★ |
+| 测验满分 | 测验获得满分 | 🧠 | ★★★ |
+| 忠实读者 | 连续 7 天访问 | ⭐ | ★★★★ |
+| 博学多才 | 解锁 10 个徽章 | 👑 | ★★★★★ |
+
+**数据结构**（localStorage）：
+```javascript
+{
+  "achievements": {
+    "first_visit": { "unlocked": true, "date": "2026-05-30" },
+    "dark_mode": { "unlocked": true, "date": "2026-05-30" },
+    "read_5": { "unlocked": false, "progress": 3 }
+  },
+  "stats": {
+    "posts_read": 3,
+    "code_copies": 7,
+    "comments": 0,
+    "shares": 0,
+    "votes": 2,
+    "visit_days": ["2026-05-28", "2026-05-29", "2026-05-30"]
+  }
+}
+```
+
+**交互设计**：
+- 解锁弹窗：Glassmorphism 风格模态框，徽章图标放大 + 光晕动画
+- 成就墙：独立页面或侧边栏面板，展示所有徽章（已解锁/未解锁）
+- 进度条：未解锁徽章显示当前进度
+- 音效：解锁时播放简短音效（可选，尊重 `prefers-reduced-motion`）
+
+**组件结构**：
+```
+_includes/achievement-toast.html   # 解锁提示模板
+pages/achievements.html            # 成就墙页面
+assets/js/modules/achievements.js  # 成就逻辑
+assets/css/_achievements.scss      # 成就样式
+```
+
+**验收标准**：
+- 首次访问自动触发"初来乍到"徽章
+- 解锁弹窗动画流畅
+- 成就墙正确显示所有徽章状态
+- 进度条实时更新
+- Light/Dark 模式正常
+
+#### 2.4 代码 Playground
+
+**功能描述**：技术博文内嵌可运行代码编辑器，支持实时预览。
+
+**实现方案**：
+- 集成 Monaco Editor（VS Code 内核）或 CodeMirror 6
+- 支持语言：HTML/CSS/JavaScript
+- 实时预览：右侧 iframe 渲染结果
+- 代码高亮：复用 Monaco 内置主题，与博客主题联动
+
+**Front Matter 语法**：
+```yaml
+---
+playground:
+  - id: "demo-1"
+    title: "CSS 动画示例"
+    language: "html"
+    code: |
+      <div class="box"></div>
+      <style>
+        .box { width: 100px; height: 100px; background: var(--alice-500); }
+      </style>
+    height: "300px"
+---
+```
+
+**组件结构**：
+```
+_includes/playground.html          # Playground 容器
+assets/js/modules/playground.js    # Playground 逻辑（按需加载 Monaco）
+assets/css/_playground.scss        # Playground 样式
+```
+
+**验收标准**：
+- 代码编辑器正常加载
+- 修改代码后实时预览更新
+- 代码高亮与主题一致
+- 移动端可正常操作
+- 性能：Monaco 按需加载，不影响页面首屏
+
+#### 2.5 迷你小游戏
+
+**功能描述**：嵌入技术主题的趣味小游戏。
+
+**游戏列表**：
+
+| 游戏名称 | 描述 | 技术方案 |
+|----------|------|----------|
+| CSS 选择器挑战 | 根据提示写出正确的 CSS 选择器 | Canvas + 自定义逻辑 |
+| 代码打字练习 | 限时输入代码片段，计分排名 | Canvas + localStorage 排行榜 |
+| 终端猜数字 | 模拟终端界面的猜数字游戏 | 纯 JS + 终端 UI |
+
+**Front Matter 语法**：
+```yaml
+---
+game:
+  type: "css-selector"
+  title: "CSS 选择器挑战"
+  description: "测试你的 CSS 选择器技能！"
+---
+```
+
+**组件结构**：
+```
+_includes/game.html              # 游戏容器
+assets/js/games/
+├── css-selector.js              # CSS 选择器挑战
+├── typing-race.js               # 代码打字练习
+└── terminal-guess.js            # 终端猜数字
+assets/css/_games.scss           # 游戏样式
+```
+
+**验收标准**：
+- 游戏正常加载和运行
+- 计分系统正常
+- 排行榜（localStorage）正常显示
+- 响应式适配移动端
+- 不影响页面其他功能
+
+---
+
+### Phase 3：视觉与交互体验升级（P1 — 中优先级）
+
+> 目标：打造"精致有趣"的视觉体验
+> 预计工作量：中等（5-7 天）
+
+#### 3.1 阅读完成庆祝动画
+
+**功能描述**：文章阅读进度达到 100% 时触发庆祝动画。
+
+**实现方案**：
+- Canvas Confetti 粒子效果（彩色纸屑飘落）
+- 动画持续 3 秒，不阻塞用户操作
+- 尊重 `prefers-reduced-motion` 设置
+- 成就系统联动：触发"全文通读"徽章
+
+**涉及文件**：
+- 修改：`assets/js/main.js`（ReadingProgress 模块）
+- 修改：`assets/css/main.scss`
+
+**验收标准**：
+- 阅读完成后触发庆祝动画
+- 动画流畅，不阻塞页面操作
+- 减少动画模式下不触发
+- 仅首次触发（localStorage 标记）
+
+#### 3.2 骨架屏加载
+
+**功能描述**：页面加载时显示骨架屏占位，提升感知性能。
+
+**实现方案**：
+- 文章列表页：卡片骨架屏（图片占位 + 文字行占位）
+- 文章详情页：标题 + 段落骨架屏
+- CSS 动画：渐变闪烁效果
+- JS 控制：内容加载完成后淡出骨架屏
+
+**涉及文件**：
+- 修改：`_layouts/home.html`
+- 修改：`_layouts/single.html`
+- 修改：`assets/css/main.scss`
+
+**验收标准**：
+- 页面加载时显示骨架屏
+- 内容加载完成后平滑过渡
+- 骨架屏与实际内容布局一致
+- 不影响 SEO（内容仍可被爬虫读取）
+
+#### 3.3 打字机效果
+
+**功能描述**：文章标题打字机动画，增加趣味性。
+
+**实现方案**：
+- JS 逐字显示标题，带闪烁光标
+- 打字速度：50ms/字符
+- 完成后光标闪烁 3 次后消失
+- 仅首次访问触发（localStorage 标记）
+- 尊重 `prefers-reduced-motion`
+
+**涉及文件**：
+- 修改：`_layouts/single.html`
+- 修改：`assets/js/main.js`
+
+**验收标准**：
+- 标题逐字显示动画流畅
+- 光标闪烁效果正常
+- 减少动画模式下直接显示完整标题
+- 不影响标题 SEO（原始标题仍在 HTML 中）
+
+#### 3.4 季节主题色变化
+
+**功能描述**：根据当前季节自动调整主题色调，增加新鲜感。
+
+**季节配色方案**：
+
+| 季节 | 月份 | 色调调整 |
+|------|------|----------|
+| 春季 | 3-5 月 | 樱花粉点缀（`--accent-pink` 加重） |
+| 夏季 | 6-8 月 | 清凉青绿（`--accent-teal` 加重） |
+| 秋季 | 9-11 月 | 温暖桃色（`--accent-peach` 加重） |
+| 冬季 | 12-2 月 | 薰衣草紫（`--accent-lavender` 加重） |
+
+**实现方案**：
+- JS 检测当前月份，动态调整 CSS 变量
+- 变化幅度微妙，不影响整体 Alice Blue 风格
+- 可通过设置关闭（尊重用户偏好）
+
+**涉及文件**：
+- 修改：`assets/js/main.js`
+
+**验收标准**：
+- 不同季节主题色有微妙变化
+- 变化自然，不影响可读性
+- Light/Dark 模式均正常
+
+#### 3.5 3D 卡片悬停效果增强
+
+**功能描述**：为文章卡片添加更丰富的 3D 悬停效果。
+
+**实现方案**：
+- CSS `perspective` + `transform: rotateX() rotateY()`
+- 鼠标位置跟踪，卡片跟随倾斜
+- 阴影随倾斜角度变化
+- 仅桌面端启用（触摸设备使用简单提升效果）
+
+**涉及文件**：
+- 修改：`assets/js/main.js`
+- 修改：`assets/css/main.scss`
+
+**验收标准**：
+- 桌面端卡片 3D 倾斜效果流畅
+- 阴影跟随变化
+- 触摸设备使用简单悬停效果
+- 动画 60fps，无卡顿
+
+---
+
+### Phase 4：技术债务清理与文档完善（P2 — 低优先级）
+
+> 目标：修复已知问题，完善文档体系
+> 预计工作量：中等（3-5 天）
+
+#### 4.1 Bug 修复
+
+| # | 问题 | 修复方案 |
+|---|------|----------|
+| 1 | Toast CSS 类名不匹配 | 统一为 `.toast.show` |
+| 2 | 搜索 XSS 风险 | 使用 `textContent` 或转义 HTML 实体 |
+| 3 | LightboxManager 硬编码路径 | 添加图片存在性检查 |
+| 4 | CSS 重复定义 | 合并重复规则 |
+| 5 | 硬编码颜色值 | 替换为 CSS 变量 |
+| 6 | `!important` 使用 | 提高选择器特异性 |
+
+#### 4.2 CSS 模块化重构
+
+按照第三节方案拆分 CSS 为 10 个 SCSS 模块。
+
+#### 4.3 博文文件名规范化
+
+统一 10 篇不符合规范的博文文件名：
+- 格式：`YYYY-MM-DD-slug.md`
+- 使用英文小写，单词间用连字符分隔
+
+#### 4.4 文档更新
+
+按照第四节方案更新所有技术文档。
+
+---
+
+## 六、视觉设计与交互体验优化
+
+### 6.1 设计原则
+
+| 原则 | 描述 | 应用场景 |
+|------|------|----------|
+| **微妙而精致** | 动画和效果应微妙，不喧宾夺主 | 悬停效果、过渡动画 |
+| **即时反馈** | 用户操作应有即时视觉反馈 | 点赞、投票、分享 |
+| **渐进增强** | 核心功能不依赖 JS，增强功能渐进加载 | 骨架屏、Playground |
+| **尊重偏好** | 尊重减少动画、暗色模式等用户偏好 | 所有动画和主题 |
+| **一致性强** | 所有组件遵循统一的设计语言 | 颜色、圆角、阴影 |
+
+### 6.2 互动组件设计规范
+
+**Glassmorphism 卡片规范**：
+```scss
+.interactive-card {
+  background: var(--color-glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-lg);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+}
+```
+
+**按钮反馈规范**：
+```scss
+.btn-interactive {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, var(--color-ripple) 10%, transparent 10.01%);
+    transform: scale(10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+  }
+
+  &:active::after {
+    transform: scale(0);
+    opacity: 0.3;
+    transition: 0s;
+  }
+}
+```
+
+**动画时长规范**：
+| 类型 | 时长 | 缓动函数 |
+|------|------|----------|
+| 微交互 | 150ms | `ease-out` |
+| 状态切换 | 250ms | `ease-in-out` |
+| 页面过渡 | 350ms | `cubic-bezier(0.4, 0, 0.2, 1)` |
+| 庆祝动画 | 2000-3000ms | `ease-out` |
+
+---
+
+## 七、功能优先级与资源分配
+
+### 7.1 优先级矩阵
+
+```
+影响力 ↑
+       │
+  高   │  [P0] 评论优化    [P0] 投票系统
+       │  [P0] 分享功能    [P0] 测验系统
+       │  [P0] 点赞系统    [P0] 成就徽章
+       │
+  中   │  [P1] 庆祝动画    [P1] 3D 卡片
+       │  [P1] 骨架屏      [P1] 季节主题
+       │  [P1] 打字机效果
+       │
+  低   │  [P2] Bug 修复    [P2] CSS 模块化
+       │  [P2] 文档更新    [P2] 文件名规范
+       │
+       └──────────────────────────────────→
+              低           中           高
+                      实现难度
+```
+
+### 7.2 资源分配建议
+
+| 资源类型 | 分配说明 |
+|----------|----------|
+| **前端开发** | 主要资源，所有功能均涉及 JS/CSS 开发 |
+| **UI/UX 设计** | 互动组件设计、动画设计、成就徽章图标设计 |
+| **内容编辑** | 投票/测验内容编写、Front Matter 更新 |
+| **测试验证** | 跨浏览器测试、移动端测试、无障碍测试 |
+| **文档维护** | 技术文档更新、用户手册编写 |
+
+### 7.3 功能依赖关系
+
+```
+评论优化 ──→ 评论计数（文章卡片）
+分享功能 ──→ 分享统计（成就系统）
+点赞系统 ──→ 点赞数（文章卡片）──→ 成就系统
+投票系统 ──→ 投票统计（成就系统）
+测验系统 ──→ 测验分数（成就系统）
+成就徽章 ←── 所有互动功能的统计数据
+```
+
+---
+
+## 八、时间节点规划
+
+### 8.1 总体时间线
+
+```
+2026-05-30 ──────────────────────────────────────────────── 2026-07-15
+    │                                                          │
+    ├── Phase 1 (基础互动) ──────── 2026-05-30 ~ 2026-06-08  ─┤
+    │   ├─ 评论系统优化 (2天)
+    │   ├─ 内容分享功能 (2天)
+    │   ├─ 文章点赞系统 (1天)
+    │   └─ 阅读统计 (1天)
+    │
+    ├── Phase 2 (趣味元素) ──────── 2026-06-09 ~ 2026-06-22 ─┤
+    │   ├─ 投票系统 (3天)
+    │   ├─ 测验系统 (3天)
+    │   ├─ 成就徽章 (3天)
+    │   ├─ 代码 Playground (3天)
+    │   └─ 迷你小游戏 (2天)
+    │
+    ├── Phase 3 (视觉体验) ──────── 2026-06-23 ~ 2026-06-30 ─┤
+    │   ├─ 庆祝动画 (1天)
+    │   ├─ 骨架屏 (1天)
+    │   ├─ 打字机效果 (0.5天)
+    │   ├─ 季节主题 (0.5天)
+    │   └─ 3D 卡片增强 (1天)
+    │
+    └── Phase 4 (清理完善) ──────── 2026-07-01 ~ 2026-07-08 ─┤
+        ├─ Bug 修复 (1天)
+        ├─ CSS 模块化 (2天)
+        ├─ 文件名规范化 (0.5天)
+        └─ 文档更新 (1天)
+```
+
+### 8.2 里程碑
+
+| 里程碑 | 日期 | 交付物 |
+|--------|------|--------|
+| M1：基础互动上线 | 2026-06-08 | 评论优化 + 分享 + 点赞 + 阅读统计 |
+| M2：趣味元素上线 | 2026-06-22 | 投票 + 测验 + 成就 + Playground + 小游戏 |
+| M3：视觉体验上线 | 2026-06-30 | 庆祝动画 + 骨架屏 + 打字机 + 季节主题 + 3D 卡片 |
+| M4：项目完善 | 2026-07-08 | Bug 修复 + CSS 模块化 + 文档完善 |
+
+---
+
+## 九、风险评估
+
+### 9.1 技术风险
+
+| 风险 | 可能性 | 影响 | 缓解措施 |
+|------|--------|------|----------|
+| **Monaco Editor 体积过大** | 高 | 中 | 使用 CDN 按需加载，或降级为 CodeMirror 6 |
+| **Giscus API 限流** | 中 | 低 | 添加请求缓存，减少 API 调用频率 |
+| **localStorage 容量限制** | 低 | 中 | 数据压缩，定期清理过期数据 |
+| **Canvas 动画性能问题** | 中 | 中 | 降低粒子数量，使用 `requestAnimationFrame`，提供关闭选项 |
+| **移动端触摸事件冲突** | 中 | 中 | 充分测试触摸设备，使用 `touch-action` 控制 |
+| **浏览器兼容性** | 低 | 低 | 使用 feature detection，提供 fallback |
+
+### 9.2 产品风险
+
+| 风险 | 可能性 | 影响 | 缓解措施 |
+|------|--------|------|----------|
+| **功能过多导致页面臃肿** | 中 | 高 | 渐进加载，非核心功能延迟初始化 |
+| **互动元素干扰阅读** | 中 | 高 | 控制动画频率，提供"简洁模式"开关 |
+| **成就系统过于复杂** | 低 | 中 | 简化徽章逻辑，聚焦核心成就 |
+| **小游戏维护成本高** | 中 | 中 | 优先实现 1 个游戏，验证效果后再扩展 |
+| **用户隐私担忧** | 低 | 高 | 明确说明数据存储在本地，不上传服务器 |
+
+### 9.3 性能风险
+
+| 风险 | 监控指标 | 阈值 | 缓解措施 |
+|------|----------|------|----------|
+| JS 文件体积膨胀 | main.js 文件大小 | < 100KB (gzip) | 代码分割，按需加载 |
+| 首屏加载时间 | LCP (Largest Contentful Paint) | < 2.5s | 骨架屏，延迟加载非关键资源 |
+| 交互响应延迟 | FID (First Input Delay) | < 100ms | 事件委托，避免主线程阻塞 |
+| 布局偏移 | CLS (Cumulative Layout Shift) | < 0.1 | 骨架屏预留空间，图片尺寸声明 |
+
+---
+
+## 十、验收标准
+
+### 10.1 通用验收标准（适用于所有阶段）
+
+#### 功能检查
 - [ ] 所有新增功能正常工作
 - [ ] 现有功能未受影响
 - [ ] 所有链接可正常跳转
+- [ ] 表单提交和数据存储正常
 
-### 主题检查
+#### 主题检查
 - [ ] Light 模式显示正常
 - [ ] Dark 模式显示正常
-- [ ] 主题切换功能正常
+- [ ] 主题切换时所有组件同步切换
+- [ ] 新增组件使用 CSS 变量（无硬编码颜色）
 
-### 响应式检查
-- [ ] 桌面端（> 900px）布局正确
-- [ ] 平板端（768-900px）布局正确
+#### 响应式检查
+- [ ] 桌面端（> 1200px）布局正确
+- [ ] 平板端（768-1200px）布局正确
 - [ ] 移动端（< 768px）布局正确
 - [ ] 小屏手机（< 480px）布局正确
+- [ ] 触摸设备交互正常
 
-### 性能检查
-- [ ] 页面加载速度无明显下降
+#### 性能检查
+- [ ] LCP < 2.5s
+- [ ] FID < 100ms
+- [ ] CLS < 0.1
 - [ ] 动画流畅（60fps）
 - [ ] 无控制台错误
+- [ ] JS 文件大小 < 100KB (gzip)
 
-### 无障碍检查
+#### 无障碍检查
 - [ ] 键盘可操作所有交互元素
-- [ ] `prefers-reduced-motion` 生效
+- [ ] `prefers-reduced-motion` 生效（禁用动画）
+- [ ] `prefers-color-scheme` 跟随系统
 - [ ] 图片有 alt 文本
-- [ ] 颜色对比度符合 WCAG AA
+- [ ] 颜色对比度符合 WCAG AA（4.5:1）
+- [ ] ARIA 标签正确使用
 
-### 构建检查
+#### 构建检查
 - [ ] `bundle exec jekyll build` 无错误
 - [ ] `bundle exec jekyll serve` 本地预览正常
 - [ ] 无死链接
+- [ ] GitHub Pages 部署成功
+
+### 10.2 各阶段专项验收标准
+
+#### Phase 1 验收标准
+- [ ] Giscus 评论区样式与博客主题一致
+- [ ] 文章卡片显示评论数量
+- [ ] 分享面板支持微信/微博/X/复制链接/系统分享
+- [ ] 微信扫码可打开文章
+- [ ] 点赞动画流畅（心形爆炸 + 计数跳动）
+- [ ] 点赞状态刷新后保持
+- [ ] 阅读时长显示准确
+
+#### Phase 2 验收标准
+- [ ] 投票卡片样式与文章风格一致
+- [ ] 投票后实时显示结果动画
+- [ ] 测验选择后即时反馈正确/错误
+- [ ] 测验完成后显示分数和评语
+- [ ] 成就解锁弹窗动画流畅
+- [ ] 成就墙正确显示所有徽章状态
+- [ ] Playground 代码编辑器正常加载和运行
+- [ ] Playground 实时预览正常工作
+- [ ] 小游戏正常运行，计分系统正常
+
+#### Phase 3 验收标准
+- [ ] 阅读完成庆祝动画流畅
+- [ ] 骨架屏与实际内容布局一致
+- [ ] 打字机效果动画流畅
+- [ ] 季节主题色变化自然
+- [ ] 3D 卡片悬停效果流畅（60fps）
+
+#### Phase 4 验收标准
+- [ ] 所有已知 Bug 已修复
+- [ ] CSS 模块化拆分完成
+- [ ] 博文文件名规范统一
+- [ ] 所有技术文档已更新
+- [ ] 代码审查通过
 
 ---
 
-> 本计划为迭代式开发，各阶段可独立实施。建议按阶段顺序推进，每完成一个阶段进行一次全面验证后再进入下一阶段。
+## 附录：历史开发阶段
+
+> 以下为第一至第六阶段的历史记录，已完成。
+
+<details>
+<summary>点击展开历史阶段详情</summary>
+
+### 第一阶段：基础体验补全 ✅
+- 完成日期：2026-05-29
+- 改动文件：13 个
+- 内容：404 页面、Favicon、面包屑导航、上下篇导航、OG 标签、返回顶部、Skip Links、robots.txt、内联样式迁移
+
+### 第二阶段：交互体验增强 ✅
+- 完成日期：2026-05-29
+- 改动文件：6 个
+- 内容：阅读进度条、文章目录 TOC、搜索功能、图片灯箱、移动端菜单优化、表格响应式
+
+### 第三阶段：内容发现与社区 ✅
+- 完成日期：2026-05-29
+- 改动文件：8 个
+- 内容：首页双列网格、精选/置顶文章、Giscus 评论系统、关于我页面、文章封面图
+
+### 第四阶段：性能与 SEO 优化 ✅
+- 完成日期：2026-05-29
+- 改动文件：7 个
+- 内容：MathJax 策略确认、字体本地托管、JSON-LD 结构化数据、图片压缩（57MB→1.3MB）、CSS 压缩
+
+### 第五阶段：视觉精致化 ✅
+- 完成日期：2026-05-30
+- 改动文件：3 个
+- 内容：暗色模式语法高亮验证、引用块装饰增强、卡片微交互、Footer 增强、Hero 装饰优化
+
+### 第六阶段：视觉与交互深度打磨 ✅
+- 完成日期：2026-05-30
+- 改动文件：4 个
+- 内容：色彩系统增强、排版层次优化、图形元素精致化、动效设计升级、交互反馈完善
+
+### 遗留文件清理 ✅
+- 完成日期：2026-05-30
+- 清理前：150 个源文件 → 清理后：34 个源文件
+- 删除：116 个文件（-77%）
+- 构建速度：0.405s → 0.333s（-18%）
+
+</details>
+
+---
+
+> 本计划为迭代式开发，各阶段可独立实施。建议按阶段顺序推进，每完成一个阶段进行全面验证后再进入下一阶段。
+> 所有新增功能必须遵循项目的设计系统规范，使用 CSS 变量，支持 Light/Dark 双模式，通过无障碍检查。

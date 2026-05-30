@@ -3784,7 +3784,7 @@ button:focus-visible {
   gap: 0.5rem;
 }
 
-.toast.visible {
+.toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
