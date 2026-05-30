@@ -698,18 +698,38 @@ img {
   z-index: 0;
 }
 
+.decoration::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--alice-300), var(--accent-lavender));
+  filter: blur(1px);
+}
+
 .decoration-1 {
   top: 20%;
   right: 10%;
-  font-size: 2rem;
+  width: 80px;
+  height: 80px;
   animation: float 4s ease-in-out infinite;
+}
+
+.decoration-1::before {
+  width: 100%;
+  height: 100%;
 }
 
 .decoration-2 {
   bottom: 30%;
   left: 5%;
-  font-size: 1.5rem;
+  width: 60px;
+  height: 60px;
   animation: float 3s ease-in-out infinite 1s;
+}
+
+.decoration-2::before {
+  width: 100%;
+  height: 100%;
 }
 
 [data-theme="dark"] .decoration {
@@ -869,7 +889,7 @@ img {
   height: 100%;
   background: linear-gradient(to bottom, var(--alice-300), var(--accent-lavender));
   opacity: 0;
-  transition: opacity 0.3s var(--smooth);
+  transition: opacity 0.3s var(--smooth), width 0.3s var(--smooth);
 }
 
 .post-card:hover {
@@ -880,6 +900,12 @@ img {
 
 .post-card:hover::before {
   opacity: 1;
+  width: 6px;
+}
+
+.post-card:active {
+  transform: translateY(-2px) scale(0.98);
+  box-shadow: var(--shadow-card);
 }
 
 /* ---------- 文章卡片封面图 ---------- */
@@ -997,11 +1023,13 @@ img {
   font-size: 0.75rem;
   border-radius: var(--radius-sm);
   transition: all var(--transition-base) var(--smooth);
+  transform: scale(1);
 }
 
 .tag:hover {
   background: var(--alice-500);
   color: white;
+  transform: scale(1.05);
 }
 
 .read-time {
@@ -1150,6 +1178,22 @@ img {
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   color: var(--text-secondary);
   font-style: italic;
+  position: relative;
+}
+
+.post-content blockquote::before {
+  content: "❝";
+  position: absolute;
+  top: -0.5rem;
+  left: 0.5rem;
+  font-size: 2rem;
+  background: linear-gradient(135deg, var(--alice-400), var(--accent-lavender));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: normal;
+  line-height: 1;
+  opacity: 0.6;
 }
 
 .post-content code {
@@ -1885,6 +1929,22 @@ pre.highlight::-webkit-scrollbar-track,
 
 .footer-copyright a:hover {
   color: var(--alice-500);
+}
+
+.footer-stats {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 1rem;
+  line-height: 1.6;
+}
+
+.footer-stats p {
+  margin-bottom: 0.25rem;
+}
+
+.footer-stats p:last-child {
+  margin-bottom: 0;
 }
 
 .footer-heart {

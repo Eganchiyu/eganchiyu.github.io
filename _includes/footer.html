@@ -23,6 +23,11 @@
         <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
       </div>
 
+      <div class="footer-stats">
+        <p>站点统计：{{ site.posts.size }} 篇文章 · {{ site.categories.size }} 个分类</p>
+        <p>最后更新：{{ site.time | date: "%Y-%m-%d" }}</p>
+      </div>
+
       <div class="footer-copyright">
         <p>&copy; {{ site.time | date: '%Y' }} {{ site.author.name }}.
            Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a>.
