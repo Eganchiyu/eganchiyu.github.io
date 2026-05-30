@@ -82,10 +82,10 @@ layout: default
 {% if featured_posts.size > 0 and paginator.page == 1 %}
 <section class="featured-section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header reveal">
       <h2 class="section-title">✨ 精选文章</h2>
     </div>
-    <div class="featured-grid">
+    <div class="featured-grid reveal-stagger">
       {% for post in featured_posts limit:2 %}
       <article class="featured-card">
         {% if post.cover_image %}
@@ -124,11 +124,11 @@ layout: default
 <!-- Posts Section -->
 <section class="posts-section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header reveal">
       <h2 class="section-title">最新文章</h2>
     </div>
     
-    <div class="posts-grid">
+    <div class="posts-grid reveal-stagger">
       {% for post in paginator.posts %}
       <article class="post-card">
         {% if post.cover_image %}

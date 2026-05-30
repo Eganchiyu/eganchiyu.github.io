@@ -9,12 +9,37 @@
 
 ### 计划
 - 深色模式图片适配（减少亮度）
-- 代码块语法高亮优化
-- 暗色模式语法高亮验证
-- 引用块装饰增强
-- 文章卡片微交互增强
-- Footer 增强
-- Hero 区域装饰优化
+
+## [2.6.0] - 2026-05-30
+
+### 新增
+- 多层次阴影系统（--shadow-xs/sm/elevated/glow/inner）
+- 渐变变量系统（--gradient-primary/subtle/warm/cool/surface/hero-bg）
+- 玻璃态效果工具类（.glass-card）
+- 渐变边框效果（精选文章卡片悬浮渐变边框）
+- 排版比例系统（Major Third 1.25，9 级字体大小 + 行高 + 字间距变量）
+- 滚动触发动画系统（.reveal/.reveal-left/.reveal-right/.reveal-scale/.reveal-stagger）
+- 涟漪效果模块（RippleManager）
+- Toast 通知系统（ToastManager，支持 success/error/info）
+- 焦点环样式（:focus-visible 键盘导航无障碍）
+- 触摸设备优化（@media (hover: none) 最小点击区域 44px）
+- 自定义滚动条样式（WebKit 浏览器）
+- 3D 卡片悬浮效果（头像卡片、文章卡片）
+- Hero 按钮光泽扫过动画
+- Hero 徽章呼吸发光动画
+- 文章封面图底部渐变叠加层
+- 标签渐变背景填充悬停效果
+
+### 变更
+- 导航栏添加玻璃态增强阴影
+- 精选文章卡片悬浮效果增强（translateY -6px + 渐变边框）
+- 文章卡片悬浮阴影升级为 --shadow-elevated
+- 图标系统统一添加 transition 和悬浮缩放
+- Hero 装饰元素添加发光阴影
+- 文章封面图添加渐变叠加层
+- 分享链接、相关文章、归档文章悬浮效果增强
+- DEVELOPMENT-PLAN.md 标记第六阶段为已完成
+- 同步更新 docs/styling.md 和 docs/javascript.md
 
 ## [2.5.0] - 2026-05-29
 

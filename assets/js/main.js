@@ -618,6 +618,94 @@
     }
   };
 
+  // ========== 涟漪效果 ==========
+  const RippleManager = {
+    init() {
+      this.bindRippleEvents();
+    },
+
+    bindRippleEvents() {
+      document.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-ripple]');
+        if (target) {
+          this.createRipple(e, target);
+        }
+      });
+    },
+
+    createRipple(event, element) {
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      element.appendChild(ripple);
+
+      const rect = element.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = event.clientX - rect.left - size / 2;
+      const y = event.clientY - rect.top - size / 2;
+
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+
+      setTimeout(() => ripple.remove(), 600);
+    }
+  };
+
+  // ========== 滚动显示动画 ==========
+  const ScrollReveal = {
+    init() {
+      this.elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-stagger');
+      if (this.elements.length === 0) return;
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            this.observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      this.elements.forEach(el => this.observer.observe(el));
+    }
+  };
+
+  // ========== Toast 通知 ==========
+  const ToastManager = {
+    container: null,
+
+    init() {
+      this.container = document.createElement('div');
+      this.container.className = 'toast-container';
+      document.body.appendChild(this.container);
+    },
+
+    show(message, type = 'info', duration = 3000) {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      this.container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add('show');
+      });
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    },
+
+    success(message, duration) { this.show(message, 'success', duration); },
+    error(message, duration) { this.show(message, 'error', duration); },
+    info(message, duration) { this.show(message, 'info', duration); }
+  };
+
   // ========== 初始化 ==========
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -630,6 +718,9 @@
     TOCManager.init();
     SearchManager.init();
     LightboxManager.init();
+    RippleManager.init();
+    ScrollReveal.init();
+    ToastManager.init();
   });
 
 })();

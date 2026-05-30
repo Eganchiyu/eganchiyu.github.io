@@ -3083,3 +3083,819 @@ mjx-container svg {
     transform: none;
   }
 }
+
+/* ========== 第六阶段：视觉与交互深度打磨 ========== */
+
+/* ---------- 6.1 色彩系统增强 ---------- */
+
+/* 多层次阴影系统 */
+:root {
+  --shadow-xs: 0 1px 2px rgba(43, 141, 214, 0.04);
+  --shadow-sm: 0 2px 8px rgba(43, 141, 214, 0.06);
+  --shadow-elevated: 0 20px 60px rgba(43, 141, 214, 0.12), 0 8px 20px rgba(43, 141, 214, 0.08);
+  --shadow-glow: 0 0 20px rgba(43, 141, 214, 0.15), 0 0 60px rgba(43, 141, 214, 0.05);
+  --shadow-inner: inset 0 2px 4px rgba(43, 141, 214, 0.06);
+
+  --gradient-primary: linear-gradient(135deg, var(--alice-400) 0%, var(--accent-lavender) 100%);
+  --gradient-subtle: linear-gradient(135deg, var(--alice-50) 0%, rgba(184, 169, 232, 0.08) 100%);
+  --gradient-warm: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-peach) 100%);
+  --gradient-cool: linear-gradient(135deg, var(--alice-300) 0%, var(--accent-teal) 100%);
+  --gradient-surface: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+  --gradient-hero-bg: linear-gradient(135deg, var(--alice-50) 0%, #f8f4ff 30%, var(--alice-50) 60%, #f0f0ff 100%);
+}
+
+[data-theme="dark"] {
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(43, 141, 214, 0.1), 0 0 60px rgba(43, 141, 214, 0.04);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  --gradient-primary: linear-gradient(135deg, var(--alice-400) 0%, var(--accent-lavender) 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(43, 141, 214, 0.06) 0%, rgba(184, 169, 232, 0.04) 100%);
+  --gradient-surface: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+  --gradient-hero-bg: linear-gradient(135deg, #0f172a 0%, #1a1530 50%, #0f172a 100%);
+}
+
+/* 玻璃态效果 */
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .glass-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(100, 160, 220, 0.1);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* 为导航栏应用玻璃态增强 */
+.navbar {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2), var(--shadow-xs);
+}
+
+[data-theme="dark"] .navbar {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02), var(--shadow-xs);
+}
+
+/* 渐变边框效果 */
+.gradient-border {
+  position: relative;
+  border: none !important;
+}
+
+.gradient-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--alice-300), var(--accent-lavender), var(--accent-teal));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--smooth);
+}
+
+.gradient-border:hover::after {
+  opacity: 1;
+}
+
+/* 精选文章卡片渐变边框 */
+.featured-card {
+  position: relative;
+  border: 1px solid var(--border-color);
+  transition: all 0.4s var(--smooth);
+}
+
+.featured-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--alice-400), var(--accent-lavender), var(--accent-pink));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--smooth);
+  z-index: 1;
+}
+
+.featured-card:hover::after {
+  opacity: 1;
+}
+
+.featured-card:hover {
+  border-color: transparent;
+  box-shadow: var(--shadow-elevated);
+  transform: translateY(-6px);
+}
+
+/* Hero 区域渐变增强 */
+.hero::before {
+  background: radial-gradient(circle, rgba(189, 224, 255, 0.15) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .hero::before {
+  background: radial-gradient(circle, rgba(43, 141, 214, 0.1) 0%, transparent 70%);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(184, 169, 232, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .hero::after {
+  background: radial-gradient(circle, rgba(184, 169, 232, 0.04) 0%, transparent 70%);
+}
+
+/* 卡片悬浮增强 */
+.post-card:hover {
+  box-shadow: var(--shadow-elevated);
+}
+
+.post-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, transparent 60%, rgba(43, 141, 214, 0.03) 100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--smooth);
+}
+
+.post-card:hover::after {
+  opacity: 1;
+}
+
+/* 头像卡片 3D 悬浮效果 */
+.avatar-card {
+  transition: all 0.4s var(--smooth);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.avatar-card:hover {
+  transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: var(--shadow-elevated), var(--shadow-glow);
+}
+
+/* Hero 按钮增强 */
+.hero-link {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.hero-link:hover::before {
+  left: 100%;
+}
+
+.hero-link:hover {
+  box-shadow: var(--shadow-elevated);
+}
+
+/* ---------- 6.2 排版层次优化 ---------- */
+
+/* Major Third (1.25) 字体比例系统 */
+:root {
+  --font-size-xs: 0.64rem;
+  --font-size-sm: 0.8rem;
+  --font-size-base: 1rem;
+  --font-size-md: 1.125rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.563rem;
+  --font-size-2xl: 1.953rem;
+  --font-size-3xl: 2.441rem;
+  --font-size-4xl: 3.052rem;
+
+  --leading-tight: 1.3;
+  --leading-snug: 1.5;
+  --leading-normal: 1.7;
+  --leading-relaxed: 1.9;
+  --leading-loose: 2.2;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.05em;
+}
+
+/* 标题排版层次 */
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+}
+
+.hero-name {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+.post-header .post-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+.post-content {
+  font-size: var(--font-size-base);
+  line-height: var(--leading-relaxed);
+}
+
+.post-content h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-snug);
+  margin-top: 3rem;
+}
+
+.post-content h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-snug);
+}
+
+.post-content h4 {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-snug);
+}
+
+.post-content p {
+  margin-bottom: 1.5rem;
+  line-height: var(--leading-relaxed);
+}
+
+.post-content blockquote {
+  line-height: var(--leading-relaxed);
+  font-size: var(--font-size-md);
+}
+
+.post-content pre code {
+  font-size: 0.875rem;
+  line-height: var(--leading-normal);
+}
+
+.post-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-snug);
+}
+
+.featured-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-snug);
+}
+
+.taxonomy-title,
+.archive-title {
+  font-size: var(--font-size-2xl);
+  letter-spacing: var(--tracking-tight);
+}
+
+@media (max-width: 768px) {
+  .hero-name {
+    font-size: var(--font-size-2xl);
+  }
+
+  .post-header .post-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .post-content {
+    font-size: 0.95rem;
+  }
+
+  .post-content h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .post-content h3 {
+    font-size: var(--font-size-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-name {
+    font-size: var(--font-size-xl);
+  }
+
+  .post-header .post-title {
+    font-size: var(--font-size-lg);
+  }
+}
+
+/* ---------- 6.3 图形元素精致化 ---------- */
+
+/* 图标系统统一 */
+.nav-link svg,
+.search-toggle svg,
+.hero-link svg,
+.hero-location svg,
+.back-to-top svg {
+  transition: all 0.3s var(--smooth);
+}
+
+.search-toggle:hover svg,
+.hero-link:hover svg {
+  transform: scale(1.1);
+}
+
+.hero-location svg {
+  transition: transform 0.3s var(--smooth);
+}
+
+.hero-location:hover svg {
+  transform: translateY(-2px);
+}
+
+/* Hero 装饰元素增强 */
+.decoration {
+  transition: transform 0.6s var(--smooth);
+}
+
+.decoration-1::before {
+  background: linear-gradient(135deg, var(--alice-300), var(--accent-lavender));
+  box-shadow: 0 0 30px rgba(184, 169, 232, 0.2);
+}
+
+.decoration-2::before {
+  background: linear-gradient(135deg, var(--accent-teal), var(--alice-300));
+  box-shadow: 0 0 30px rgba(125, 211, 192, 0.2);
+}
+
+[data-theme="dark"] .decoration-1::before {
+  box-shadow: 0 0 30px rgba(184, 169, 232, 0.1);
+}
+
+[data-theme="dark"] .decoration-2::before {
+  box-shadow: 0 0 30px rgba(125, 211, 192, 0.1);
+}
+
+/* 分隔线装饰增强 */
+.section-title::before {
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px rgba(43, 141, 214, 0.2);
+}
+
+/* 图片处理增强 */
+.post-content img {
+  border: 1px solid var(--border-color);
+}
+
+.post-content img:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--alice-300);
+}
+
+/* 文章封面图增强 */
+.post-cover-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.post-cover-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.15), transparent);
+  pointer-events: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* 标签悬停效果增强 */
+.tag {
+  position: relative;
+  overflow: hidden;
+}
+
+.tag::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity 0.3s var(--smooth);
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.tag:hover::before {
+  opacity: 1;
+}
+
+.tag:hover {
+  color: white;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(43, 141, 214, 0.25);
+}
+
+/* ---------- 6.4 动效设计升级 ---------- */
+
+/* 按钮涟漪效果 */
+.hero-link,
+.pagination-btn,
+.share-link,
+.code-copy-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* 滚动触发动画 */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s var(--smooth), transform 0.6s var(--smooth);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.6s var(--smooth), transform 0.6s var(--smooth);
+}
+
+.reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.6s var(--smooth), transform 0.6s var(--smooth);
+}
+
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.6s var(--smooth), transform 0.6s var(--smooth);
+}
+
+.reveal-scale.revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 交错动画延迟 */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s var(--smooth), transform 0.5s var(--smooth);
+}
+
+.reveal-stagger.revealed > *:nth-child(1) { transition-delay: 0.05s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(2) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(3) { transition-delay: 0.15s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(4) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(5) { transition-delay: 0.25s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(6) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(7) { transition-delay: 0.35s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(8) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(9) { transition-delay: 0.45s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.revealed > *:nth-child(10) { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
+
+/* 3D 卡片效果 */
+.post-card {
+  transform-style: preserve-3d;
+  transition: all 0.4s var(--smooth);
+}
+
+.post-card:hover {
+  transform: translateY(-6px) rotateX(1deg);
+}
+
+/* 按钮悬浮增强动画 */
+.hero-link:hover,
+.pagination-btn:hover {
+  transform: translateY(-3px);
+}
+
+.hero-link:active,
+.pagination-btn:active {
+  transform: translateY(-1px) scale(0.98);
+  transition-duration: 0.1s;
+}
+
+/* 分享链接悬浮 */
+.share-link {
+  transition: all 0.3s var(--smooth);
+}
+
+.share-link:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card);
+}
+
+/* 相关文章悬浮增强 */
+.related-item {
+  transition: all 0.3s var(--smooth);
+}
+
+.related-item:hover {
+  transform: translateX(8px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 归档文章悬浮增强 */
+.archive-post {
+  transition: all 0.3s var(--smooth);
+}
+
+.archive-post:hover {
+  transform: translateX(8px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Hero 徽章呼吸动画增强 */
+.hero-badge {
+  animation: badge-glow 3s ease-in-out infinite;
+}
+
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(43, 141, 214, 0); }
+  50% { box-shadow: 0 0 12px rgba(43, 141, 214, 0.12); }
+}
+
+/* ---------- 6.5 交互反馈完善 ---------- */
+
+/* 焦点环样式 - 无障碍键盘导航 */
+:focus-visible {
+  outline: 2px solid var(--alice-500);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--alice-500);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(43, 141, 214, 0.15);
+}
+
+.search-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 导航链接焦点状态 */
+.nav-link:focus-visible,
+.mobile-link:focus-visible {
+  outline: 2px solid var(--alice-500);
+  outline-offset: -2px;
+  background: var(--alice-50);
+}
+
+[data-theme="dark"] .nav-link:focus-visible,
+[data-theme="dark"] .mobile-link:focus-visible {
+  background: rgba(43, 141, 214, 0.1);
+}
+
+/* 按钮焦点状态 */
+.hero-link:focus-visible,
+.pagination-btn:focus-visible,
+.share-link:focus-visible,
+.code-copy-btn:focus-visible,
+.back-to-top:focus-visible {
+  outline: 2px solid var(--alice-500);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(43, 141, 214, 0.15), var(--shadow-card);
+}
+
+/* 文章链接焦点状态 */
+.post-title a:focus-visible,
+.featured-title a:focus-visible,
+.archive-post-title a:focus-visible {
+  outline: 2px solid var(--alice-500);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+/* 卡片焦点状态 */
+.post-card:focus-within,
+.featured-card:focus-within {
+  border-color: var(--alice-400);
+  box-shadow: var(--shadow-card), 0 0 0 3px rgba(43, 141, 214, 0.1);
+}
+
+/* 加载状态指示器 */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--alice-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Toast 通知 */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.4s var(--smooth);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.toast-success {
+  border-left: 3px solid var(--accent-teal);
+}
+
+.toast-error {
+  border-left: 3px solid #f87171;
+}
+
+.toast-info {
+  border-left: 3px solid var(--alice-500);
+}
+
+/* 触摸设备优化 */
+@media (hover: none) {
+  .post-card:hover,
+  .featured-card:hover,
+  .nav-item:hover,
+  .archive-post:hover {
+    transform: none;
+    box-shadow: var(--shadow-card);
+  }
+
+  .post-card:active,
+  .featured-card:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
+
+  .hero-link,
+  .pagination-btn,
+  .share-link,
+  .back-to-top {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .tag {
+    padding: 0.35rem 0.65rem;
+  }
+
+  .search-toggle,
+  .theme-toggle,
+  .menu-toggle {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color-strong);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--alice-300);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(100, 160, 220, 0.2);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 160, 220, 0.35);
+}
+
+/* 减少动画模式下禁用所有新增动效 */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .reveal-stagger > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .ripple-effect,
+  .hero-badge {
+    animation: none;
+  }
+
+  .featured-card:hover,
+  .post-card:hover,
+  .avatar-card:hover {
+    transform: none;
+  }
+
+  .featured-card::after,
+  .gradient-border::after {
+    transition: none;
+  }
+}

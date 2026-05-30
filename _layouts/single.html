@@ -83,7 +83,7 @@ layout: default
     <!-- Post Footer -->
     <footer class="post-footer-section">
       <!-- Share -->
-      <div class="share-section">
+      <div class="share-section reveal">
         <h3>📤 分享文章</h3>
         <div class="share-links">
           <a href="https://twitter.com/intent/tweet?url={{ page.url | absolute_url | uri_escape }}&text={{ page.title | uri_escape }}" 
@@ -103,7 +103,7 @@ layout: default
       
       <!-- Related Posts -->
       {% if site.related_posts.size > 0 %}
-      <div class="related-posts">
+      <div class="related-posts reveal">
         <h3>📚 相关文章</h3>
         <div class="related-grid">
           {% for related in site.related_posts limit:3 %}
@@ -125,7 +125,7 @@ layout: default
       {% endif %}
       
       <!-- Post Navigation -->
-      <nav class="post-navigation" aria-label="文章导航">
+      <nav class="post-navigation reveal" aria-label="文章导航">
         {% if page.previous %}
         <a href="{{ page.previous.url | relative_url }}" class="nav-item prev">
           <span class="nav-label">← 上一篇</span>
