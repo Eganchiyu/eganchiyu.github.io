@@ -4546,14 +4546,8 @@ mjx-container svg {
 .post-card,
 .featured-card {
   transform-style: preserve-3d;
-  transition: transform 0.3s var(--smooth), box-shadow 0.3s var(--smooth);
-  will-change: transform, box-shadow;
-}
-
-.post-card:hover,
-.featured-card:hover {
-  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale3d(1.02, 1.02, 1.02);
-  box-shadow: 4px 4px 30px rgba(0, 0, 0, 0.15);
+  will-change: transform;
+  transition: transform 0.15s ease-out;
 }
 
 /* 按钮悬浮增强动画 */
