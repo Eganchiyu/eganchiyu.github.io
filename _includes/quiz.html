@@ -1,0 +1,50 @@
+{% if page.quiz %}
+<div class="quiz-container" id="quiz-{{ include.id | default: 'default' }}">
+  <div class="quiz-card">
+    <div class="quiz-header">
+      <h3 class="quiz-title">📝 知识小测验</h3>
+      <span class="quiz-progress">0/{{ page.quiz.size }}</span>
+    </div>
+
+    <div class="quiz-questions">
+      {% for question in page.quiz %}
+      <div class="quiz-question" data-index="{{ forloop.index0 }}" data-type="{{ question.type }}" {% if forloop.index0 > 0 %}style="display: none;"{% endif %}>
+        <div class="quiz-question-header">
+          <span class="quiz-question-number">{{ forloop.index }}/{{ page.quiz.size }}</span>
+          <p class="quiz-question-text">{{ question.question }}</p>
+        </div>
+
+        <div class="quiz-options">
+          {% for option in question.options %}
+          <button class="quiz-option" data-index="{{ forloop.index0 }}">
+            <span class="quiz-option-letter">{{ "ABCDEFGH" | slice: forloop.index0, 1 }}</span>
+            <span class="quiz-option-text">{{ option.text }}</span>
+            <span class="quiz-option-icon"></span>
+          </button>
+          {% endfor %}
+        </div>
+
+        <div class="quiz-explanation" style="display: none;">
+          <div class="quiz-explanation-content">
+            <span class="quiz-explanation-icon"></span>
+            <p class="quiz-explanation-text">{{ question.explanation }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="quiz-footer">
+      <button class="quiz-next" style="display: none;">下一题</button>
+      <div class="quiz-result" style="display: none;">
+        <div class="quiz-score">
+          <span class="quiz-score-number">0</span>
+          <span class="quiz-score-total">/{{ page.quiz.size }}</span>
+        </div>
+        <p class="quiz-result-text"></p>
+        <button class="quiz-restart">重新测验</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}

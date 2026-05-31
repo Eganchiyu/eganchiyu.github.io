@@ -1,0 +1,32 @@
+{% if page.poll %}
+<div class="poll-container" id="poll-{{ include.id | default: 'default' }}">
+  <div class="poll-card">
+    <div class="poll-header">
+      <h3 class="poll-question">{{ page.poll.question }}</h3>
+      {% if page.poll.multiple %}
+      <span class="poll-badge">多选</span>
+      {% endif %}
+    </div>
+
+    <div class="poll-options">
+      {% for option in page.poll.options %}
+      <button class="poll-option" data-index="{{ forloop.index0 }}" {% if page.poll.multiple %}data-multiple="true"{% endif %}>
+        {% if option.emoji %}
+        <span class="poll-option-emoji">{{ option.emoji }}</span>
+        {% endif %}
+        <span class="poll-option-text">{{ option.text }}</span>
+        <div class="poll-option-bar">
+          <div class="poll-option-fill"></div>
+        </div>
+        <span class="poll-option-percent">0%</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <div class="poll-footer">
+      <span class="poll-total">0 票</span>
+      <button class="poll-submit" disabled>投票</button>
+    </div>
+  </div>
+</div>
+{% endif %}

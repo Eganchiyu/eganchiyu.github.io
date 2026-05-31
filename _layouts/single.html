@@ -79,6 +79,16 @@ layout: default
       <nav class="toc-mobile-nav" id="tocMobileNav"></nav>
     </div>
     {% endif %}
+
+    <!-- Poll -->
+    {% if page.poll %}
+    {% include poll.html id="article-poll" %}
+    {% endif %}
+
+    <!-- Quiz -->
+    {% if page.quiz %}
+    {% include quiz.html id="article-quiz" %}
+    {% endif %}
     
     <!-- Post Footer -->
     <footer class="post-footer-section">

@@ -1076,6 +1076,481 @@
     }
   };
 
+  // ========== 投票管理器 ==========
+  const PollManager = {
+    init() {
+      this.polls = document.querySelectorAll('.poll-container');
+      this.polls.forEach(poll => this.setupPoll(poll));
+    },
+
+    setupPoll(pollEl) {
+      const pollId = pollEl.id;
+      const options = pollEl.querySelectorAll('.poll-option');
+      const submitBtn = pollEl.querySelector('.poll-submit');
+      const totalEl = pollEl.querySelector('.poll-total');
+      const isMultiple = options[0]?.dataset.multiple === 'true';
+
+      const storageKey = `poll_${pollId}`;
+      const votesKey = `poll_votes_${pollId}`;
+
+      const savedVotes = JSON.parse(localStorage.getItem(votesKey) || '{}');
+      const hasVoted = localStorage.getItem(storageKey);
+
+      if (hasVoted) {
+        this.showResults(pollEl, savedVotes);
+        return;
+      }
+
+      let selectedIndices = [];
+
+      options.forEach((option, index) => {
+        option.addEventListener('click', () => {
+          if (hasVoted) return;
+
+          if (isMultiple) {
+            if (option.classList.contains('selected')) {
+              option.classList.remove('selected');
+              selectedIndices = selectedIndices.filter(i => i !== index);
+            } else {
+              option.classList.add('selected');
+              selectedIndices.push(index);
+            }
+          } else {
+            options.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            selectedIndices = [index];
+          }
+
+          submitBtn.disabled = selectedIndices.length === 0;
+        });
+      });
+
+      submitBtn.addEventListener('click', () => {
+        if (selectedIndices.length === 0) return;
+
+        selectedIndices.forEach(index => {
+          savedVotes[index] = (savedVotes[index] || 0) + 1;
+        });
+
+        localStorage.setItem(votesKey, JSON.stringify(savedVotes));
+        localStorage.setItem(storageKey, JSON.stringify(selectedIndices));
+
+        this.showResults(pollEl, savedVotes);
+        ToastManager.success('投票成功！');
+      });
+    },
+
+    showResults(pollEl, votes) {
+      const options = pollEl.querySelectorAll('.poll-option');
+      const submitBtn = pollEl.querySelector('.poll-submit');
+      const totalEl = pollEl.querySelector('.poll-total');
+
+      const totalVotes = Object.values(votes).reduce((sum, count) => sum + count, 0);
+      totalEl.textContent = `${totalVotes} 票`;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '已投票';
+
+      options.forEach((option, index) => {
+        const count = votes[index] || 0;
+        const percent = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+        const fill = option.querySelector('.poll-option-fill');
+        const percentEl = option.querySelector('.poll-option-percent');
+
+        option.classList.add('voted');
+        percentEl.textContent = `${percent}%`;
+
+        setTimeout(() => {
+          fill.style.width = `${percent}%`;
+        }, 100);
+      });
+    }
+  };
+
+  // ========== 成就管理器 ==========
+  const AchievementManager = {
+    ACHIEVEMENTS: {
+      first_visit: { icon: '👋', name: '初来乍到', desc: '首次访问博客', max: 1 },
+      dark_mode: { icon: '🌙', name: '暗夜精灵', desc: '首次切换暗色模式', max: 1 },
+      read_5: { icon: '📖', name: '求知若渴', desc: '阅读 5 篇文章', max: 5 },
+      code_copy: { icon: '💻', name: '代码达人', desc: '复制代码块 10 次', max: 10 },
+      first_comment: { icon: '💬', name: '互动先锋', desc: '首次发表评论', max: 1 },
+      first_share: { icon: '🔗', name: '分享达人', desc: '首次分享文章', max: 1 },
+      search: { icon: '🔍', name: '探索者', desc: '使用搜索功能', max: 1 },
+      read_15: { icon: '🎓', name: '学富五车', desc: '阅读 15 篇文章', max: 15 },
+      full_read: { icon: '🏆', name: '全文通读', desc: '阅读进度达到 100%', max: 1 },
+      vote_5: { icon: '🗳️', name: '投票达人', desc: '参与 5 次投票', max: 5 },
+      quiz_perfect: { icon: '🧠', name: '测验满分', desc: '测验获得满分', max: 1 },
+      loyal: { icon: '⭐', name: '忠实读者', desc: '连续 7 天访问', max: 7 },
+      master: { icon: '👑', name: '博学多才', desc: '解锁 10 个徽章', max: 10 }
+    },
+
+    init() {
+      this.loadState();
+      this.setupUI();
+      this.checkFirstVisit();
+      this.trackVisit();
+    },
+
+    loadState() {
+      const saved = localStorage.getItem('achievements');
+      this.state = saved ? JSON.parse(saved) : { unlocked: {}, stats: {} };
+    },
+
+    saveState() {
+      localStorage.setItem('achievements', JSON.stringify(this.state));
+    },
+
+    unlock(id) {
+      if (this.state.unlocked[id]) return false;
+
+      this.state.unlocked[id] = { date: new Date().toISOString() };
+      this.saveState();
+
+      const achievement = this.ACHIEVEMENTS[id];
+      if (achievement) {
+        this.showToast(achievement);
+      }
+
+      this.updateBadge();
+      return true;
+    },
+
+    showToast(achievement) {
+      const toast = document.getElementById('achievementToast');
+      if (!toast) return;
+
+      const icon = toast.querySelector('.achievement-toast-icon');
+      const name = toast.querySelector('.achievement-toast-name');
+
+      icon.textContent = achievement.icon;
+      name.textContent = achievement.name;
+
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+
+      const closeBtn = toast.querySelector('.achievement-toast-close');
+      closeBtn.onclick = () => toast.classList.remove('show');
+    },
+
+    setupUI() {
+      const btn = document.createElement('button');
+      btn.className = 'achievements-btn';
+      btn.innerHTML = '🏆<span class="badge-count" style="display:none">0</span>';
+      btn.onclick = () => this.showModal();
+      document.body.appendChild(btn);
+
+      const modal = document.createElement('div');
+      modal.className = 'achievements-modal';
+      modal.innerHTML = `
+        <div class="achievements-panel">
+          <div class="achievements-header">
+            <h3 class="achievements-title">🏆 成就墙</h3>
+            <button class="achievements-close">✕</button>
+          </div>
+          <div class="achievements-grid"></div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      modal.querySelector('.achievements-close').onclick = () => modal.classList.remove('active');
+      modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+      this.updateBadge();
+    },
+
+    showModal() {
+      const modal = document.querySelector('.achievements-modal');
+      const grid = modal.querySelector('.achievements-grid');
+      grid.innerHTML = '';
+
+      Object.entries(this.ACHIEVEMENTS).forEach(([id, achievement]) => {
+        const unlocked = !!this.state.unlocked[id];
+        const item = document.createElement('div');
+        item.className = `achievement-item ${unlocked ? 'unlocked' : 'locked'}`;
+        item.innerHTML = `
+          <span class="achievement-icon">${achievement.icon}</span>
+          <span class="achievement-name">${achievement.name}</span>
+          <span class="achievement-desc">${achievement.desc}</span>
+        `;
+        grid.appendChild(item);
+      });
+
+      modal.classList.add('active');
+    },
+
+    updateBadge() {
+      const badge = document.querySelector('.achievements-btn .badge-count');
+      if (!badge) return;
+
+      const count = Object.keys(this.state.unlocked).length;
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    },
+
+    checkFirstVisit() {
+      this.unlock('first_visit');
+    },
+
+    trackVisit() {
+      const today = new Date().toISOString().split('T')[0];
+      if (!this.state.stats.visitDays) this.state.stats.visitDays = [];
+      
+      if (!this.state.stats.visitDays.includes(today)) {
+        this.state.stats.visitDays.push(today);
+        if (this.state.stats.visitDays.length >= 7) {
+          this.unlock('loyal');
+        }
+        this.saveState();
+      }
+    },
+
+    incrementStat(stat, amount = 1) {
+      if (!this.state.stats[stat]) this.state.stats[stat] = 0;
+      this.state.stats[stat] += amount;
+      this.saveState();
+      this.checkStatAchievements(stat);
+    },
+
+    checkStatAchievements(stat) {
+      const value = this.state.stats[stat];
+      if (stat === 'postsRead' && value >= 5) this.unlock('read_5');
+      if (stat === 'postsRead' && value >= 15) this.unlock('read_15');
+      if (stat === 'codeCopies' && value >= 10) this.unlock('code_copy');
+      if (stat === 'votes' && value >= 5) this.unlock('vote_5');
+
+      const totalUnlocked = Object.keys(this.state.unlocked).length;
+      if (totalUnlocked >= 10) this.unlock('master');
+    }
+  };
+
+  // ========== 测验管理器 ==========
+  const QuizManager = {
+    init() {
+      this.quizzes = document.querySelectorAll('.quiz-container');
+      this.quizzes.forEach(quiz => this.setupQuiz(quiz));
+    },
+
+    setupQuiz(quizEl) {
+      const quizId = quizEl.id;
+      const questions = quizEl.querySelectorAll('.quiz-question');
+      const nextBtn = quizEl.querySelector('.quiz-next');
+      const resultDiv = quizEl.querySelector('.quiz-result');
+      const restartBtn = quizEl.querySelector('.quiz-restart');
+      const progressEl = quizEl.querySelector('.quiz-progress');
+      const scoreNumber = quizEl.querySelector('.quiz-score-number');
+      const resultText = quizEl.querySelector('.quiz-result-text');
+
+      let currentQuestion = 0;
+      let score = 0;
+      const totalQuestions = questions.length;
+
+      const answers = [];
+      questions.forEach(q => {
+        const type = q.dataset.type;
+        const answerAttr = q.dataset.answer;
+        let answer;
+        if (type === 'multi') {
+          answer = JSON.parse(answerAttr || '[]');
+        } else {
+          answer = parseInt(answerAttr);
+        }
+        answers.push({ type, answer });
+      });
+
+      const storageKey = `quiz_${quizId}`;
+      const hasCompleted = localStorage.getItem(storageKey);
+
+      if (hasCompleted) {
+        const savedResult = JSON.parse(hasCompleted);
+        this.showFinalResult(quizEl, savedResult.score, totalQuestions);
+        return;
+      }
+
+      questions.forEach((question, qIndex) => {
+        const options = question.querySelectorAll('.quiz-option');
+        options.forEach((option, oIndex) => {
+          option.addEventListener('click', () => {
+            if (option.classList.contains('correct') || option.classList.contains('wrong')) {
+              return;
+            }
+
+            const isCorrect = this.checkAnswer(qIndex, oIndex, answers);
+
+            options.forEach(opt => {
+              const optIndex = parseInt(opt.dataset.index);
+              if (optIndex === answers[qIndex].answer || 
+                  (Array.isArray(answers[qIndex].answer) && answers[qIndex].answer.includes(optIndex))) {
+                opt.classList.add('correct');
+              }
+            });
+
+            if (!isCorrect) {
+              option.classList.add('wrong');
+            } else {
+              score++;
+            }
+
+            const explanation = question.querySelector('.quiz-explanation');
+            if (explanation) {
+              explanation.style.display = 'block';
+              explanation.classList.add(isCorrect ? 'correct' : 'wrong');
+            }
+
+            options.forEach(opt => {
+              opt.style.cursor = 'default';
+              opt.style.pointerEvents = 'none';
+            });
+
+            if (currentQuestion < totalQuestions - 1) {
+              nextBtn.style.display = 'block';
+            } else {
+              setTimeout(() => {
+                this.showFinalResult(quizEl, score, totalQuestions);
+                localStorage.setItem(storageKey, JSON.stringify({ score, total: totalQuestions }));
+              }, 1000);
+            }
+          });
+        });
+      });
+
+      nextBtn.addEventListener('click', () => {
+        questions[currentQuestion].style.display = 'none';
+        currentQuestion++;
+        questions[currentQuestion].style.display = 'block';
+        progressEl.textContent = `${currentQuestion + 1}/${totalQuestions}`;
+        nextBtn.style.display = 'none';
+      });
+
+      restartBtn.addEventListener('click', () => {
+        localStorage.removeItem(storageKey);
+        currentQuestion = 0;
+        score = 0;
+
+        questions.forEach(q => {
+          q.style.display = 'none';
+          q.querySelectorAll('.quiz-option').forEach(opt => {
+            opt.classList.remove('correct', 'wrong', 'selected');
+            opt.style.cursor = 'pointer';
+            opt.style.pointerEvents = 'auto';
+          });
+          const explanation = q.querySelector('.quiz-explanation');
+          if (explanation) {
+            explanation.style.display = 'none';
+            explanation.classList.remove('correct', 'wrong');
+          }
+        });
+
+        questions[0].style.display = 'block';
+        progressEl.textContent = `1/${totalQuestions}`;
+        nextBtn.style.display = 'none';
+        resultDiv.style.display = 'none';
+        quizEl.querySelector('.quiz-header').style.display = 'flex';
+        quizEl.querySelector('.quiz-questions').style.display = 'block';
+      });
+    },
+
+    checkAnswer(questionIndex, selectedOption, answers) {
+      const answer = answers[questionIndex];
+      if (answer.type === 'multi') {
+        return answer.answer.includes(selectedOption);
+      }
+      return answer.answer === selectedOption;
+    },
+
+    showFinalResult(quizEl, score, total) {
+      const questions = quizEl.querySelector('.quiz-questions');
+      const nextBtn = quizEl.querySelector('.quiz-next');
+      const resultDiv = quizEl.querySelector('.quiz-result');
+      const scoreNumber = quizEl.querySelector('.quiz-score-number');
+      const resultText = quizEl.querySelector('.quiz-result-text');
+      const progressEl = quizEl.querySelector('.quiz-progress');
+
+      questions.style.display = 'none';
+      nextBtn.style.display = 'none';
+      resultDiv.style.display = 'block';
+      progressEl.style.display = 'none';
+
+      scoreNumber.textContent = score;
+
+      const percent = Math.round((score / total) * 100);
+      if (percent === 100) {
+        resultText.textContent = '🎉 满分！你真是太棒了！';
+      } else if (percent >= 80) {
+        resultText.textContent = '👏 优秀！你对这个主题很熟悉！';
+      } else if (percent >= 60) {
+        resultText.textContent = '👍 不错！继续加油！';
+      } else if (percent >= 40) {
+        resultText.textContent = '📖 还需要多学习哦！';
+      } else {
+        resultText.textContent = '💪 别灰心，再试一次吧！';
+      }
+    }
+  };
+
+  // ========== 统计数据管理器 ==========
+  const StatsManager = {
+    stats: null,
+
+    async init() {
+      try {
+        const response = await fetch('/assets/data/stats.json');
+        if (response.ok) {
+          this.stats = await response.json();
+          this.updateGlobalStats();
+          this.updatePostStats();
+        }
+      } catch (error) {
+        console.log('Stats not available:', error);
+      }
+    },
+
+    updateGlobalStats() {
+      if (!this.stats) return;
+
+      const footerStats = document.querySelector('.footer-stats');
+      if (!footerStats) return;
+
+      const totalComments = this.stats.global.totalComments;
+      const totalReactions = this.stats.global.totalReactions;
+
+      if (totalComments > 0 || totalReactions > 0) {
+        const statsText = footerStats.querySelector('p:first-child');
+        if (statsText) {
+          statsText.textContent += ` · ${totalComments} 条评论 · ${totalReactions} 次互动`;
+        }
+      }
+    },
+
+    updatePostStats() {
+      if (!this.stats) return;
+
+      const pageTitle = document.querySelector('.post-title')?.textContent?.trim();
+      if (!pageTitle) return;
+
+      const postStats = this.stats.posts[pageTitle];
+      if (!postStats) return;
+
+      // 更新点赞按钮显示全局数据
+      const likeCount = document.getElementById('likeCount');
+      if (likeCount && postStats.reactions) {
+        const globalLikes = postStats.reactions['THUMBSUP'] || 0;
+        const localLikes = LikeManager.count || 0;
+        likeCount.textContent = Math.max(globalLikes, localLikes);
+      }
+
+      // 更新评论数显示
+      const commentCount = document.querySelector('.comment-count');
+      if (commentCount && postStats.comments) {
+        commentCount.textContent = `${postStats.comments} 条评论`;
+      }
+    },
+
+    getPostStats(title) {
+      return this.stats?.posts[title] || null;
+    }
+  };
+
   // ========== 初始化 ==========
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -1094,6 +1569,10 @@
     CommentManager.init();
     ShareManager.init();
     LikeManager.init();
+    PollManager.init();
+    QuizManager.init();
+    AchievementManager.init();
+    StatsManager.init();
   });
 
 })();
