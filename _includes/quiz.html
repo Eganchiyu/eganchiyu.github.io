@@ -8,7 +8,7 @@
 
     <div class="quiz-questions">
       {% for question in page.quiz %}
-      <div class="quiz-question" data-index="{{ forloop.index0 }}" data-type="{{ question.type }}" data-answer="{{ question.answer }}" {% if forloop.index0 > 0 %}style="display: none;"{% endif %}>
+      <div class="quiz-question" data-index="{{ forloop.index0 }}" data-type="{{ question.type }}" data-answer="{{ question.answer | jsonify }}" {% if forloop.index0 > 0 %}style="display: none;"{% endif %}>
         <div class="quiz-question-header">
           <span class="quiz-question-number">{{ forloop.index }}/{{ page.quiz.size }}</span>
           <p class="quiz-question-text">{{ question.question }}</p>
