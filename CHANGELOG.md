@@ -16,6 +16,13 @@
 - 知识小测验：单选/多选/判断题、即时反馈、分数统计
 - 成就徽章系统：13种徽章、成就墙、进度追踪、解锁通知
 - GitHub Actions 统计：每小时自动更新全局互动数据
+- 代码 Playground：Monaco Editor 集成、HTML/CSS/JS 实时预览、Light/Dark 主题
+- 迷你游戏：CSS 选择器挑战（10关）、代码打字练习（60秒）、终端猜数字
+- 阅读完成庆祝动画：Canvas Confetti 粒子效果、成就系统联动
+- 骨架屏加载：首页文章列表骨架屏、渐隐渐显过渡效果
+- 打字机效果：文章标题逐字显示、光标闪烁、首次访问触发
+- 季节主题色变化：四季配色方案（春/夏/秋/冬）、CSS 变量动态更新
+- 3D 卡片悬停效果：鼠标跟踪倾斜、动态阴影、触摸设备自动跳过
 
 ### 修复
 - 修复 Toast 通知 CSS 类名不匹配问题（`.toast.visible` → `.toast.show`）
@@ -24,8 +31,16 @@
 - 修复 LightboxManager 硬编码路径（添加图片存在性检查，防止 404）
 - 修复硬编码颜色值（添加 `--color-error` 变量替换硬编码红色）
 
+### 文档
+- 更新 `docs/javascript.md` 补充 12 个新增 JS 模块文档
+- 更新 `docs/components.md` 补充 Playground、Game、Poll、Quiz 组件文档
+- 更新 `docs/styling.md` 补充渐变、阴影、动画、玻璃态、季节主题系统文档
+- 更新 `docs/ARCHITECTURE.md` 更新目录结构和模块清单
+- 更新 `docs/DEVELOPMENT-PLAN.md` 更新任务状态
+
 ### 计划
-- 深色模式图片适配（减少亮度）
+- CSS 模块化重构（将 5800+ 行单文件拆分为 10 个 SCSS 模块）
+- 博文文件名规范化（影响已有 URL，需谨慎评估）
 
 ## [2.7.0] - 2026-05-30
 

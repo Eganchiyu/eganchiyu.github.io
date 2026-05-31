@@ -127,8 +127,64 @@ layout: default
     <div class="section-header reveal">
       <h2 class="section-title">最新文章</h2>
     </div>
-    
-    <div class="posts-grid reveal-stagger">
+
+    <!-- Skeleton Screen -->
+    <div class="skeleton-grid" id="skeletonGrid">
+      <div class="skeleton-card">
+        <div class="skeleton-cover"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line medium"></div>
+        </div>
+        <div class="skeleton-title"></div>
+        <div class="skeleton-excerpt">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-cover"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line medium"></div>
+        </div>
+        <div class="skeleton-title"></div>
+        <div class="skeleton-excerpt">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-cover"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line medium"></div>
+        </div>
+        <div class="skeleton-title"></div>
+        <div class="skeleton-excerpt">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-cover"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line medium"></div>
+        </div>
+        <div class="skeleton-title"></div>
+        <div class="skeleton-excerpt">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="posts-grid reveal-stagger" id="postsGrid" style="display: none;">
       {% for post in paginator.posts %}
       <article class="post-card">
         {% if post.cover_image %}

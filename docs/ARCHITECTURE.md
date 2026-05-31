@@ -1,50 +1,77 @@
 # 项目架构文档
 
-> 最后更新: 2026-05-30
+> 最后更新: 2026-05-31
+
+## 技术栈
+
+| 分类 | 技术 | 说明 |
+|------|------|------|
+| 静态生成器 | Jekyll 4.4 | 核心构建工具 |
+| 运行环境 | Ruby 3.3 + Bundler | 依赖管理 |
+| 前端主题 | 自定义 Alice Blue 主题 | 支持 Light/Dark 双模式 |
+| 代码编辑器 | Monaco Editor | 代码 Playground 组件 |
+| 评论系统 | Giscus | 基于 GitHub Discussions |
+| 托管平台 | GitHub Pages | CI/CD 自动部署 |
+| 样式 | SCSS | 主样式表 5800+ 行 |
+| 脚本 | 原生 JS（模块化） | 25 个功能模块 |
 
 ## 目录结构
 
 ```
 eganchiyu.github.io/
-├── _config.yml              # Jekyll 全局配置
-├── _data/                   # 数据文件
-│   ├── navigation.yml       # 导航菜单配置
-│   └── ui-text.yml          # 多语言 UI 文本
-├── _includes/               # 可复用模板片段
-│   ├── navigation.html      # 导航栏（桌面 + 移动端）
-│   ├── footer.html          # 页脚
-│   ├── skip-links.html      # 无障碍跳过链接
-│   └── comments-providers/  # 评论系统
-│       └── giscus.html      # Giscus 评论组件
-├── _layouts/                # 页面布局模板
-│   ├── default.html         # 基础骨架（所有页面继承）
-│   ├── home.html            # 首页布局
-│   └── single.html          # 文章页布局
-├── _posts/                  # 博客文章（Markdown）
+├── _config.yml                    # Jekyll 主配置
+├── _layouts/                      # 页面布局模板（3 个）
+│   ├── default.html               # 基础骨架（所有页面继承）
+│   ├── home.html                  # 首页布局
+│   └── single.html                # 文章页布局
+├── _includes/                     # 可复用组件（14 个）
+│   ├── navigation.html            # 导航栏（桌面 + 移动端）
+│   ├── footer.html                # 页脚
+│   ├── skip-links.html            # 无障碍跳过链接
+│   ├── head-seo.html              # SEO 元标签
+│   ├── head-custom.html           # 自定义 head 内容
+│   ├── post-card.html             # 文章卡片组件
+│   ├── toc.html                   # 文章目录
+│   ├── comments-providers/
+│   │   └── giscus.html            # Giscus 评论组件
+│   ├── poll.html                  # 投票组件
+│   ├── quiz.html                  # 测验组件
+│   ├── playground.html            # 代码 Playground 组件
+│   ├── game.html                  # 迷你游戏组件
+│   ├── achievement-toast.html     # 成就通知组件
+│   └── copyright.js               # 版权声明脚本
+├── _posts/                        # 博文（18 篇 Markdown）
 ├── assets/
 │   ├── css/
-│   │   └── main.scss        # 主样式表（含设计系统 + 双主题）
-│   ├── fonts/               # 本地字体（Inter + JetBrains Mono）
-│   ├── images/
-│   │   ├── avatar.png       # 头像图片
-│   │   ├── favicon.svg      # SVG Favicon
-│   │   └── thumbs/          # 压缩缩略图
-│   └── js/
-│       └── main.js          # 主交互脚本
-├── about.md                 # 关于我页面
-├── categories.html          # 分类页
-├── tags.html                # 标签页
-├── year-archive.html        # 时间线归档页
-├── index.html               # 首页入口
-├── 404.html                 # 自定义 404 页面
-├── robots.txt               # SEO 爬虫配置
-├── search.json              # 搜索索引（Liquid 模板）
-├── CHANGELOG.md             # 变更日志
-├── Gemfile                  # Ruby 依赖
-└── docs/                    # 项目文档
-    ├── README.md            # 文档入口
-    ├── ARCHITECTURE.md      # 本文件
-    └── ...                  # 其他模块文档
+│   │   └── main.scss              # 主样式表（5800+ 行，含设计系统 + 双主题）
+│   ├── js/
+│   │   └── main.js                # 主交互脚本（2600+ 行，25 个模块）
+│   ├── fonts/                     # 本地字体（Inter + JetBrains Mono）
+│   ├── images/                    # 图片资源（原图 + thumbs/ 压缩缩略图）
+│   └── data/
+│       └── stats.json             # 统计数据
+├── scripts/                       # 工具脚本
+│   ├── fetch-stats.js             # 统计数据获取脚本
+│   └── generate_thumbs.py         # 缩略图生成脚本
+├── docs/                          # 项目文档
+├── about.md                       # 关于我页面
+├── categories.html                # 分类页
+├── tags.html                      # 标签页
+├── year-archive.html              # 时间线归档页
+├── index.html                     # 首页入口
+├── feed.xml                       # RSS 订阅源
+├── 404.html                       # 自定义 404 页面
+├── robots.txt                     # SEO 爬虫配置
+├── search.json                    # 搜索索引（Liquid 模板）
+├── CHANGELOG.md                   # 变更日志
+├── Gemfile                        # Ruby 依赖
+├── Gemfile.lock                   # 依赖锁定
+├── package.json                   # Node.js 依赖（工具脚本）
+├── Rakefile                       # Rake 任务定义
+├── localhost-build.cmd            # 本地开发启动脚本
+└── .github/
+    └── workflows/
+        └── build.yml              # CI/CD 部署工作流
 ```
 
 ## 设计系统
@@ -76,47 +103,28 @@ eganchiyu.github.io/
 
 ## 文件职责
 
-### `_layouts/default.html`
+### `_includes/` 可复用组件
 
-所有页面的基础骨架。职责：
-- HTML 结构（head/body）
-- 字体加载（Google Fonts）
-- 主题初始化脚本（防止闪烁）
-- 引入 navigation、footer、main.js
+| 组件 | 职责 |
+|------|------|
+| `navigation.html` | 导航栏（桌面端链接 + 移动端汉堡菜单 + 搜索按钮 + 主题切换） |
+| `footer.html` | 页脚内容 |
+| `skip-links.html` | 无障碍跳过链接 |
+| `head-seo.html` | SEO 元标签（Open Graph、Twitter Cards 等） |
+| `head-custom.html` | 自定义 head 内容钩子 |
+| `post-card.html` | 文章卡片组件（封面图 + 标题 + 摘要 + 元信息） |
+| `toc.html` | 文章目录（桌面端右侧固定，移动端可折叠） |
+| `giscus.html` | Giscus 评论组件 |
+| `poll.html` | 投票组件 |
+| `quiz.html` | 测验组件 |
+| `playground.html` | 代码 Playground 组件 |
+| `game.html` | 迷你游戏组件 |
+| `achievement-toast.html` | 成就通知组件 |
+| `copyright.js` | 版权声明脚本 |
 
-### `_layouts/home.html`
+### `assets/css/main.scss`
 
-首页布局。职责：
-- Hero 区域（头像卡片 + 个人简介）
-- 精选文章区域（`featured: true` 标记，仅第一页显示）
-- 文章卡片列表（瀑布流布局，支持封面图）
-- 分页导航
-
-### `_layouts/single.html`
-
-文章页布局。职责：
-- 阅读进度条
-- 面包屑导航
-- 文章头部（标题 + 元信息 + 标签）
-- 文章封面图（可选）
-- 文章目录 TOC（桌面端右侧固定，移动端可折叠）
-- 文章内容渲染
-- 分享链接
-- 相关文章推荐
-- Giscus 评论区
-- 上一篇 / 下一篇导航
-
-### `_includes/navigation.html`
-
-导航栏组件。职责：
-- 桌面端导航链接（首页、分类、标签、归档、关于、GitHub）
-- 移动端汉堡菜单
-- 搜索按钮（打开搜索模态框）
-- 主题切换按钮
-
-### `assets/css/main.css`
-
-主样式表。职责：
+主样式表（5800+ 行）。职责：
 - CSS 变量定义（Light/Dark 双主题）
 - 全局样式重置
 - 组件样式（导航、卡片、文章、精选、评论区等）
@@ -126,17 +134,44 @@ eganchiyu.github.io/
 
 ### `assets/js/main.js`
 
-主交互脚本（~580 行）。职责：
-- ThemeManager — 主题切换（localStorage 持久化）+ Giscus 主题同步
-- MobileMenu — 移动端菜单开关
-- NavbarScroll — 导航栏滚动阴影
-- SmoothScroll — 平滑滚动
-- CodeBlockManager — 代码块复制按钮
-- BackToTop — 返回顶部按钮
-- ReadingProgress — 阅读进度条
-- TOCManager — 文章目录
-- SearchManager — 搜索功能
-- LightboxManager — 图片灯箱
+主交互脚本（2600+ 行，25 个模块）。职责：
+
+| 模块 | 功能 |
+|------|------|
+| ThemeManager | 主题切换（localStorage 持久化）+ Giscus 主题同步 |
+| MobileMenu | 移动端菜单开关 |
+| NavbarScroll | 导航栏滚动阴影 |
+| SmoothScroll | 平滑滚动 |
+| CodeBlockManager | 代码块复制按钮 |
+| BackToTop | 返回顶部按钮 |
+| ReadingProgress | 阅读进度条 |
+| TOCManager | 文章目录 |
+| SearchManager | 搜索功能 |
+| LightboxManager | 图片灯箱 |
+| RippleManager | 波纹效果 |
+| ScrollReveal | 滚动显示动画 |
+| ToastManager | 消息提示 |
+| CommentManager | 评论区管理 |
+| ShareManager | 分享功能 |
+| LikeManager | 点赞功能 |
+| PollManager | 投票管理 |
+| QuizManager | 测验管理 |
+| AchievementManager | 成就系统 |
+| PlaygroundManager | 代码 Playground |
+| GameManager | 迷你游戏 |
+| SkeletonManager | 骨架屏加载 |
+| TypewriterManager | 打字机效果 |
+| Card3DManager | 3D 卡片效果 |
+| StatsManager | 统计数据 |
+
+### 独立页面（根目录）
+
+| 页面 | 用途 |
+|------|------|
+| `about.md` | 关于我页面 |
+| `categories.html` | 分类聚合页 |
+| `tags.html` | 标签聚合页 |
+| `year-archive.html` | 时间线归档页 |
 
 ## 主题切换机制
 

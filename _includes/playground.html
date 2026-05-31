@@ -1,0 +1,67 @@
+{% if page.playground %}
+{% for demo in page.playground %}
+<div class="playground-container" id="playground-{{ demo.id }}" data-language="{{ demo.language | default: 'html' }}">
+  <div class="playground-header">
+    <div class="playground-title">
+      <span class="playground-icon">🎮</span>
+      <span>{{ demo.title | default: '代码演示' }}</span>
+    </div>
+    <div class="playground-tabs">
+      <button class="playground-tab active" data-tab="editor">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+        代码
+      </button>
+      <button class="playground-tab" data-tab="preview">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        预览
+      </button>
+      <button class="playground-tab" data-tab="split">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="12" y1="3" x2="12" y2="21"/>
+        </svg>
+        分屏
+      </button>
+    </div>
+    <div class="playground-actions">
+      <button class="playground-btn playground-run" title="运行代码">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        运行
+      </button>
+      <button class="playground-btn playground-reset" title="重置代码">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+      </button>
+      <button class="playground-btn playground-copy" title="复制代码">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="playground-body">
+    <div class="playground-editor-wrapper">
+      <div class="playground-editor" id="editor-{{ demo.id }}" data-default-code="{{ demo.code | xml_escape }}"></div>
+    </div>
+    <div class="playground-preview-wrapper">
+      <iframe class="playground-preview" id="preview-{{ demo.id }}" sandbox="allow-scripts allow-modals" {% if demo.height %}style="height: {{ demo.height }}"{% endif %}></iframe>
+    </div>
+  </div>
+  <div class="playground-footer">
+    <span class="playground-language">{{ demo.language | default: 'html' | upcase }}</span>
+    <span class="playground-status"></span>
+  </div>
+</div>
+{% endfor %}
+{% endif %}

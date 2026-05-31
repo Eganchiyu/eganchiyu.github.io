@@ -1,6 +1,6 @@
 # 组件文档
 
-> 项目包含 2 个全局组件（导航、页脚）和 3 个独立页面组件（分类、标签、归档）。
+> 项目包含 2 个全局组件（导航、页脚）、3 个独立页面组件（分类、标签、归档）和 5 个互动组件（Playground、游戏、投票、测验、成就通知）。
 
 ---
 
@@ -287,20 +287,222 @@
 
 ---
 
-## 4. poll.html — 投票组件
+## 4. playground.html — 代码 Playground 组件
+
+**文件路径**: `_includes/playground.html`
+**引用方式**: 在 `single.html` 中通过 `{% include playground.html %}` 引入
+**触发条件**: 文章 Front Matter 中包含 `playground` 配置
+
+### 4.1 功能
+
+- 提供内嵌的代码编辑器和实时预览
+- 支持 HTML、CSS、JS 三种语言模式
+- 三种视图模式：编辑、预览、分屏
+- 支持运行、重置、复制代码操作
+- 代码通过 iframe sandbox 安全运行
+
+### 4.2 Front Matter 配置
+
+```yaml
+playground:
+  - id: "demo1"
+    title: "CSS 动画演示"
+    language: "html"       # html | css | js
+    code: |
+      <div class="box"></div>
+      <style>
+        .box { width: 100px; height: 100px; background: var(--alice-500); animation: spin 2s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+      </style>
+    height: "300px"        # 预览区域高度（可选）
+
+  - id: "demo2"
+    title: "JS 交互示例"
+    language: "js"
+    code: |
+      document.body.innerHTML = '<h1>Hello World!</h1>';
+```
+
+### 4.3 结构
+
+```
+<div class="playground-container">
+  └── Playground 头部 (.playground-header)
+       ├── 标题 (.playground-title)
+       │   ├── 图标 (🎮)
+       │   └── 标题文本
+       ├── 视图切换 (.playground-tabs)
+       │   ├── 编辑按钮 (.playground-tab[data-tab="editor"])
+       │   ├── 预览按钮 (.playground-tab[data-tab="preview"])
+       │   └── 分屏按钮 (.playground-tab[data-tab="split"])
+       └── 操作按钮 (.playground-actions)
+           ├── 运行 (.playground-run)
+           ├── 重置 (.playground-reset)
+           └── 复制 (.playground-copy)
+  └── Playground 主体 (.playground-body)
+       ├── 编辑器区域 (.playground-editor-wrapper)
+       │   └── 编辑器 (.playground-editor)
+       └── 预览区域 (.playground-preview-wrapper)
+           └── iframe (.playground-preview, sandbox="allow-scripts allow-modals")
+  └── Playground 底部 (.playground-footer)
+       ├── 语言标签 (.playground-language)
+       └── 运行状态 (.playground-status)
+```
+
+### 4.4 关键 CSS 类
+
+| 类名 | 用途 |
+|------|------|
+| `.playground-container` | 外层容器 |
+| `.playground-tab.active` | 当前激活的视图标签 |
+| `.playground-editor` | 代码编辑器 |
+| `.playground-preview` | 预览 iframe |
+| `.playground-run` | 运行按钮 |
+| `.playground-reset` | 重置按钮 |
+
+### 4.5 视图模式
+
+| 模式 | 行为 |
+|------|------|
+| `editor` | 只显示编辑器 |
+| `preview` | 只显示预览 |
+| `split` | 编辑器和预览左右分屏 |
+
+### 4.6 JavaScript
+
+由 `PlaygroundManager` 管理，详见 [JavaScript 文档](./javascript.md)。
+
+---
+
+## 5. game.html — 迷你游戏组件
+
+**文件路径**: `_includes/game.html`
+**引用方式**: 在 `single.html` 中通过 `{% include game.html %}` 引入
+**触发条件**: 文章 Front Matter 中包含 `game` 配置
+
+### 5.1 功能
+
+- 内置三种迷你游戏：CSS 选择器挑战、代码打字练习、终端猜数字
+- 实时计分系统，支持最高分记录
+- 游戏进度和得分通过 localStorage 持久化
+
+### 5.2 Front Matter 配置
+
+#### CSS 选择器挑战
+
+```yaml
+game:
+  type: "css-selector"
+  title: "CSS 选择器挑战"
+  description: "用 CSS 选择器选中高亮的 HTML 元素，共 10 关，越来越难！"
+```
+
+#### 代码打字练习
+
+```yaml
+game:
+  type: "typing-race"
+  title: "代码打字练习"
+  description: "60 秒内尽可能快地输入显示的代码，测试你的打字速度！"
+```
+
+#### 终端猜数字
+
+```yaml
+game:
+  type: "terminal-guess"
+  title: "终端猜数字"
+  description: "在终端中猜测 1-100 之间的数字，看看你能几次猜中！"
+```
+
+### 5.3 结构
+
+```
+<div class="game-container" id="game-{type}" data-type="{type}">
+  └── 游戏头部 (.game-header)
+       ├── 标题 (.game-title)
+       │   ├── 图标（根据 type 动态选择 🎯/⌨️/💻）
+       │   └── 标题文本
+       └── 得分 (.game-score)
+           ├── 标签 ("得分")
+           └── 分数值 (#gameScore)
+  └── 游戏主体 (.game-body)
+       └── [根据 type 渲染不同游戏界面]
+  └── 游戏底部 (.game-footer)
+       ├── 重新开始按钮 (.game-restart)
+       └── 最高分 (.game-highscore)
+```
+
+### 5.4 CSS 选择器挑战模式
+
+- 10 个递增难度的关卡
+- 显示 HTML 元素结构，高亮目标元素
+- 玩家输入 CSS 选择器（jQuery 风格 `$("")`）选中目标
+- 即时反馈正确/错误
+
+#### 关键 CSS 类
+
+| 类名 | 用途 |
+|------|------|
+| `.game-html-preview` | HTML 元素可视化预览 |
+| `.game-target-elements` | 目标高亮元素 |
+| `.game-input-wrapper` | 输入框（带 `$("")` 前后缀） |
+| `.game-feedback` | 正确/错误反馈 |
+| `.game-level` | 当前关卡信息 |
+
+### 5.5 代码打字练习模式
+
+- 60 秒倒计时
+- 显示待输入代码
+- 实时统计：正确字符、错误字符、准确率、WPM（每分钟字数）
+
+#### 关键 CSS 类
+
+| 类名 | 用途 |
+|------|------|
+| `.game-timer-value` | 倒计时秒数 |
+| `.game-code-display` | 待输入代码展示 |
+| `.game-typing-input` | 文本输入区 |
+| `.game-stat` | 统计项 |
+| `.game-start-btn` | 开始按钮 |
+
+### 5.6 终端猜数字模式
+
+- 模拟终端界面（红黄绿三点 + Terminal 标题栏）
+- 猜测 1-100 之间的数字
+- 显示"大了/小了"提示
+- 统计猜测次数，记录最佳成绩
+
+#### 关键 CSS 类
+
+| 类名 | 用途 |
+|------|------|
+| `.terminal-window` | 终端窗口容器 |
+| `.terminal-header` | 终端标题栏（含红黄绿三点） |
+| `.terminal-body` | 终端输出区域 |
+| `.terminal-input` | 数字输入框 |
+| `.game-terminal-stats` | 猜测次数和最佳记录 |
+
+### 5.7 JavaScript
+
+由 `GameManager` 管理，详见 [JavaScript 文档](./javascript.md)。
+
+---
+
+## 6. poll.html — 投票组件
 
 **文件路径**: `_includes/poll.html`
 **引用方式**: 在 `single.html` 中通过 `{% include poll.html id="article-poll" %}` 引入
 **触发条件**: 文章 Front Matter 中包含 `poll` 配置
 
-### 4.1 功能
+### 6.1 功能
 
 - 显示投票问题和选项
 - 支持单选和多选模式
 - 投票后显示结果动画（水平柱状图 + 百分比）
 - 使用 localStorage 存储投票状态，防止重复投票
 
-### 4.2 Front Matter 配置
+### 6.2 Front Matter 配置
 
 ```yaml
 poll:
@@ -315,7 +517,7 @@ poll:
       emoji: "🦀"
 ```
 
-### 4.3 结构
+### 6.3 结构
 
 ```
 <div class="poll-container">
@@ -334,7 +536,7 @@ poll:
            └── 提交按钮 (.poll-submit)
 ```
 
-### 4.4 关键 CSS 类
+### 6.4 关键 CSS 类
 
 | 类名 | 用途 |
 |------|------|
@@ -345,19 +547,19 @@ poll:
 | `.poll-option.voted` | 已投票状态 |
 | `.poll-option-bar` | 结果进度条 |
 
-### 4.5 JavaScript
+### 6.5 JavaScript
 
 由 `PollManager` 管理，详见 [JavaScript 文档](./javascript.md)。
 
 ---
 
-## 5. quiz.html — 测验组件
+## 7. quiz.html — 测验组件
 
 **文件路径**: `_includes/quiz.html`
 **引用方式**: 在 `single.html` 中通过 `{% include quiz.html id="article-quiz" %}` 引入
 **触发条件**: 文章 Front Matter 中包含 `quiz` 配置
 
-### 5.1 功能
+### 7.1 功能
 
 - 支持单选、多选、判断题
 - 即时反馈正确/错误
@@ -365,7 +567,7 @@ poll:
 - 分数统计和评语
 - 支持重新测验
 
-### 5.2 Front Matter 配置
+### 7.2 Front Matter 配置
 
 ```yaml
 quiz:
@@ -390,7 +592,7 @@ quiz:
     explanation: "GET 和 POST 是标准 HTTP 方法"
 ```
 
-### 5.3 结构
+### 7.3 结构
 
 ```
 <div class="quiz-container">
@@ -417,7 +619,7 @@ quiz:
                └── 重新测验按钮 (.quiz-restart)
 ```
 
-### 5.4 关键 CSS 类
+### 7.4 关键 CSS 类
 
 | 类名 | 用途 |
 |------|------|
@@ -428,25 +630,25 @@ quiz:
 | `.quiz-option.wrong` | 错误答案状态 |
 | `.quiz-explanation` | 解释区域 |
 
-### 5.5 JavaScript
+### 7.5 JavaScript
 
 由 `QuizManager` 管理，详见 [JavaScript 文档](./javascript.md)。
 
 ---
 
-## 6. achievement-toast.html — 成就通知组件
+## 8. achievement-toast.html — 成就通知组件
 
 **文件路径**: `_includes/achievement-toast.html`
 **引用方式**: 由 `AchievementManager` 动态创建
 
-### 6.1 功能
+### 8.1 功能
 
 - 显示成就解锁通知
 - 带弹跳动画的 Emoji
 - 自动消失（3秒）
 - 可手动关闭
 
-### 6.2 成就列表
+### 8.2 成就列表
 
 | 成就 | 图标 | 触发条件 |
 |------|------|----------|
@@ -464,10 +666,10 @@ quiz:
 | 忠实读者 | ⭐ | 连续 7 天访问 |
 | 博学多才 | 👑 | 解锁 10 个徽章 |
 
-### 6.3 成就墙
+### 8.3 成就墙
 
 点击页面右下角的 🏆 按钮打开成就墙，显示所有徽章的解锁状态。
 
-### 6.4 JavaScript
+### 8.4 JavaScript
 
 由 `AchievementManager` 管理，详见 [JavaScript 文档](./javascript.md)。

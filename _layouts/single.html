@@ -37,7 +37,7 @@ layout: default
         </span>
       </div>
       
-      <h1 class="post-title">{{ page.title }}</h1>
+      <h1 class="post-title" id="postTitle" data-original="{{ page.title }}">{{ page.title }}</h1>
       
       {% if page.cover_image %}
       <div class="post-cover-image">
@@ -78,6 +78,16 @@ layout: default
       </button>
       <nav class="toc-mobile-nav" id="tocMobileNav"></nav>
     </div>
+    {% endif %}
+
+    <!-- Playground -->
+    {% if page.playground %}
+    {% include playground.html %}
+    {% endif %}
+
+    <!-- Game -->
+    {% if page.game %}
+    {% include game.html %}
     {% endif %}
 
     <!-- Poll -->

@@ -39,6 +39,34 @@
         meta.content = theme === this.DARK ? '#0f172a' : '#f0f8ff';
       }
       this.updateGiscusTheme(theme);
+      this.updatePlaygroundTheme(theme);
+      this.applySeasonalTheme();
+    },
+
+    applySeasonalTheme() {
+      const season = this.getSeason();
+      const root = document.documentElement;
+
+      const seasonalColors = {
+        spring: { accent: '#f9a8d4', hover: '#f472b6' },
+        summer: { accent: '#5eead4', hover: '#2dd4bf' },
+        autumn: { accent: '#fdba74', hover: '#fb923c' },
+        winter: { accent: '#c4b5fd', hover: '#a78bfa' }
+      };
+
+      const colors = seasonalColors[season];
+      if (colors) {
+        root.style.setProperty('--season-accent', colors.accent);
+        root.style.setProperty('--season-hover', colors.hover);
+      }
+    },
+
+    getSeason() {
+      const month = new Date().getMonth() + 1;
+      if (month >= 3 && month <= 5) return 'spring';
+      if (month >= 6 && month <= 8) return 'summer';
+      if (month >= 9 && month <= 11) return 'autumn';
+      return 'winter';
     },
 
     updateGiscusTheme(theme) {
@@ -52,6 +80,12 @@
             }
           }
         }, 'https://giscus.app');
+      }
+    },
+
+    updatePlaygroundTheme(theme) {
+      if (typeof PlaygroundManager !== 'undefined' && PlaygroundManager.monacoLoaded) {
+        PlaygroundManager.updateTheme();
       }
     }
   };
@@ -301,6 +335,7 @@
       if (!this.progressBar) return;
 
       this.ticking = false;
+      this.hasCelebrated = false;
 
       window.addEventListener('scroll', () => {
         if (!this.ticking) {
@@ -318,6 +353,90 @@
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       this.progressBar.style.width = `${Math.min(progress, 100)}%`;
+
+      if (progress >= 100 && !this.hasCelebrated) {
+        this.hasCelebrated = true;
+        this.celebrateCompletion();
+      }
+    },
+
+    celebrateCompletion() {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        ToastManager.success('🎉 恭喜你读完了这篇文章！');
+        return;
+      }
+
+      const pageTitle = document.querySelector('.post-title')?.textContent?.trim();
+      if (pageTitle) {
+        const readPosts = JSON.parse(localStorage.getItem('read_posts') || '[]');
+        if (!readPosts.includes(pageTitle)) {
+          readPosts.push(pageTitle);
+          localStorage.setItem('read_posts', JSON.stringify(readPosts));
+        }
+      }
+
+      this.showConfetti();
+      ToastManager.success('🎉 恭喜你读完了这篇文章！');
+      AchievementManager.unlock('read_complete');
+    },
+
+    showConfetti() {
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+      document.body.appendChild(canvas);
+
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const confetti = [];
+      const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe', '#43e97b', '#fa709a', '#fee140'];
+
+      for (let i = 0; i < 100; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          w: Math.random() * 10 + 5,
+          h: Math.random() * 6 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speed: Math.random() * 3 + 2,
+          angle: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 0.2,
+          drift: (Math.random() - 0.5) * 2
+        });
+      }
+
+      let frame = 0;
+      const maxFrames = 180;
+
+      function animate() {
+        frame++;
+        if (frame > maxFrames) {
+          canvas.remove();
+          return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        confetti.forEach(c => {
+          c.y += c.speed;
+          c.x += c.drift;
+          c.angle += c.spin;
+
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.rotate(c.angle);
+          ctx.fillStyle = c.color;
+          ctx.globalAlpha = 1 - (frame / maxFrames);
+          ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+          ctx.restore();
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
     }
   };
 
@@ -1508,6 +1627,875 @@
     }
   };
 
+  // ========== 代码 Playground 管理器 ==========
+  const PlaygroundManager = {
+    editors: {},
+    monacoLoaded: false,
+    monacoLoading: false,
+
+    init() {
+      this.containers = document.querySelectorAll('.playground-container');
+      if (this.containers.length === 0) return;
+      this.loadMonaco();
+    },
+
+    loadMonaco() {
+      if (this.monacoLoaded || this.monacoLoading) return;
+      this.monacoLoading = true;
+
+      const configScript = document.createElement('script');
+      configScript.textContent = `
+        var require = { paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } };
+      `;
+      document.head.appendChild(configScript);
+
+      const loaderScript = document.createElement('script');
+      loaderScript.src = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js';
+      loaderScript.onload = () => {
+        window.require(['vs/editor/editor.main'], () => {
+          this.monacoLoaded = true;
+          this.monacoLoading = false;
+          this.initEditors();
+        });
+      };
+      document.head.appendChild(loaderScript);
+    },
+
+    initEditors() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const monacoTheme = currentTheme === 'dark' ? 'playground-dark' : 'playground-light';
+      this.defineThemes();
+
+      this.containers.forEach(container => {
+        const id = container.id.replace('playground-', '');
+        const editorEl = container.querySelector('.playground-editor');
+        const defaultCode = editorEl.dataset.defaultCode || this.getDefaultCode(container.dataset.language);
+
+        const editor = monaco.editor.create(editorEl, {
+          value: defaultCode,
+          language: container.dataset.language || 'html',
+          theme: monacoTheme,
+          minimap: { enabled: false },
+          fontSize: 14,
+          lineHeight: 22,
+          padding: { top: 16, bottom: 16 },
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+          tabSize: 2,
+          wordWrap: 'on',
+          scrollbar: {
+            verticalScrollbarSize: 8,
+            horizontalScrollbarSize: 8
+          }
+        });
+
+        this.editors[id] = editor;
+        this.setupContainer(container, id, editor);
+      });
+    },
+
+    defineThemes() {
+      monaco.editor.defineTheme('playground-light', {
+        base: 'vs',
+        inherit: true,
+        rules: [
+          { token: 'comment', foreground: '6a737d', fontStyle: 'italic' },
+          { token: 'keyword', foreground: 'd73a49' },
+          { token: 'string', foreground: '032f62' },
+          { token: 'number', foreground: '005cc5' },
+          { token: 'tag', foreground: '22863a' },
+          { token: 'attribute.name', foreground: '6f42c1' },
+          { token: 'attribute.value', foreground: '032f62' }
+        ],
+        colors: {
+          'editor.background': '#f6f8fa',
+          'editor.foreground': '#24292e',
+          'editor.lineHighlightBackground': '#f0f4f8',
+          'editorCursor.foreground': '#0969da',
+          'editor.selectionBackground': '#0969da20',
+          'editorLineNumber.foreground': '#8b949e',
+          'editorGutter.background': '#f6f8fa'
+        }
+      });
+
+      monaco.editor.defineTheme('playground-dark', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'comment', foreground: '8b949e', fontStyle: 'italic' },
+          { token: 'keyword', foreground: 'ff7b72' },
+          { token: 'string', foreground: 'a5d6ff' },
+          { token: 'number', foreground: '79c0ff' },
+          { token: 'tag', foreground: '7ee787' },
+          { token: 'attribute.name', foreground: 'd2a8ff' },
+          { token: 'attribute.value', foreground: 'a5d6ff' }
+        ],
+        colors: {
+          'editor.background': '#0d1117',
+          'editor.foreground': '#c9d1d9',
+          'editor.lineHighlightBackground': '#161b22',
+          'editorCursor.foreground': '#58a6ff',
+          'editor.selectionBackground': '#58a6ff20',
+          'editorLineNumber.foreground': '#484f58',
+          'editorGutter.background': '#0d1117'
+        }
+      });
+    },
+
+    getDefaultCode(language) {
+      const defaults = {
+        html: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>示例</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Hello World! 👋</h1>
+    <p>修改代码试试看！</p>
+  </div>
+</body>
+</html>`,
+        css: `.container {
+  display: flex;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.box {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.box:nth-child(1) { background: #667eea; }
+.box:nth-child(2) { background: #764ba2; }
+.box:nth-child(3) { background: #f093fb; }
+
+.box:hover {
+  transform: scale(1.1) rotate(5deg);
+}`,
+        javascript: `// 一个简单的动画示例
+const canvas = document.createElement('canvas');
+canvas.width = 400;
+canvas.height = 300;
+document.body.appendChild(canvas);
+
+const ctx = canvas.getContext('2d');
+let x = 0;
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.beginPath();
+  ctx.arc(x, 150, 30, 0, Math.PI * 2);
+  ctx.fillStyle = '#667eea';
+  ctx.fill();
+  
+  x = (x + 2) % canvas.width;
+  requestAnimationFrame(animate);
+}
+
+animate();`
+      };
+      return defaults[language] || defaults.html;
+    },
+
+    setupContainer(container, id, editor) {
+      const tabs = container.querySelectorAll('.playground-tab');
+      const runBtn = container.querySelector('.playground-run');
+      const resetBtn = container.querySelector('.playground-reset');
+      const copyBtn = container.querySelector('.playground-copy');
+      const preview = container.querySelector('.playground-preview');
+      const statusEl = container.querySelector('.playground-status');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          this.switchView(container, tab.dataset.tab);
+        });
+      });
+
+      runBtn.addEventListener('click', () => this.runCode(id));
+
+      resetBtn.addEventListener('click', () => {
+        const defaultCode = container.querySelector('.playground-editor').dataset.defaultCode;
+        editor.setValue(defaultCode || this.getDefaultCode(container.dataset.language));
+        this.runCode(id);
+      });
+
+      copyBtn.addEventListener('click', () => {
+        const code = editor.getValue();
+        navigator.clipboard.writeText(code).then(() => {
+          ToastManager.success('代码已复制！');
+        });
+      });
+
+      this.runCode(id);
+    },
+
+    switchView(container, view) {
+      const editorWrapper = container.querySelector('.playground-editor-wrapper');
+      const previewWrapper = container.querySelector('.playground-preview-wrapper');
+
+      container.classList.remove('view-editor', 'view-preview', 'view-split');
+      container.classList.add(`view-${view}`);
+    },
+
+    runCode(id) {
+      const editor = this.editors[id];
+      if (!editor) return;
+
+      const container = document.getElementById(`playground-${id}`);
+      const preview = container.querySelector('.playground-preview');
+      const statusEl = container.querySelector('.playground-status');
+      const language = container.dataset.language;
+      const code = editor.getValue();
+
+      statusEl.textContent = '运行中...';
+      statusEl.classList.add('running');
+
+      if (language === 'html') {
+        this.runHTML(preview, code);
+      } else if (language === 'css') {
+        this.runCSS(preview, code);
+      } else if (language === 'javascript') {
+        this.runJavaScript(preview, code);
+      }
+
+      setTimeout(() => {
+        statusEl.textContent = '已运行';
+        statusEl.classList.remove('running');
+      }, 300);
+    },
+
+    runHTML(preview, code) {
+      const doc = preview.contentDocument || preview.contentWindow.document;
+      doc.open();
+      doc.write(code);
+      doc.close();
+    },
+
+    runCSS(preview, cssCode) {
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+<style>
+${cssCode}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+</div>
+</body>
+</html>`;
+      this.runHTML(preview, html);
+    },
+
+    runJavaScript(preview, jsCode) {
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { margin: 0; font-family: sans-serif; }
+canvas { display: block; }
+</style>
+</head>
+<body>
+<script>
+try {
+  ${jsCode}
+} catch(e) {
+  document.body.innerHTML = '<div style="padding:20px;color:red;">' + e.message + '</div>';
+}
+</script>
+</body>
+</html>`;
+      this.runHTML(preview, html);
+    },
+
+    updateTheme() {
+      if (!this.monacoLoaded) return;
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const monacoTheme = currentTheme === 'dark' ? 'playground-dark' : 'playground-light';
+      Object.values(this.editors).forEach(editor => {
+        monaco.editor.setTheme(monacoTheme);
+      });
+    }
+  };
+
+  // ========== 游戏管理器 ==========
+  const GameManager = {
+    STORAGE_KEY: 'game_scores',
+
+    init() {
+      this.container = document.querySelector('.game-container');
+      if (!this.container) return;
+
+      this.type = this.container.dataset.type;
+      this.scoreEl = document.getElementById('gameScore');
+      this.highScoreEl = document.getElementById('highScore');
+      this.restartBtn = document.getElementById('gameRestart');
+
+      this.loadHighScore();
+      this.restartBtn?.addEventListener('click', () => this.restart());
+
+      switch (this.type) {
+        case 'css-selector':
+          this.initCssSelector();
+          break;
+        case 'typing-race':
+          this.initTypingRace();
+          break;
+        case 'terminal-guess':
+          this.initTerminalGuess();
+          break;
+      }
+    },
+
+    loadHighScore() {
+      const scores = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{}');
+      this.highScore = scores[this.type] || 0;
+      if (this.highScoreEl) {
+        this.highScoreEl.textContent = this.highScore;
+      }
+    },
+
+    saveHighScore(score) {
+      if (score > this.highScore) {
+        this.highScore = score;
+        const scores = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{}');
+        scores[this.type] = score;
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(scores));
+        if (this.highScoreEl) {
+          this.highScoreEl.textContent = score;
+        }
+        ToastManager.success('新纪录！');
+      }
+    },
+
+    updateScore(score) {
+      if (this.scoreEl) {
+        this.scoreEl.textContent = score;
+      }
+    },
+
+    restart() {
+      switch (this.type) {
+        case 'css-selector':
+          this.cssSelector.reset();
+          break;
+        case 'typing-race':
+          this.typingRace.reset();
+          break;
+        case 'terminal-guess':
+          this.terminalGuess.reset();
+          break;
+      }
+    },
+
+    // CSS 选择器挑战
+    initCssSelector() {
+      this.cssSelector = {
+        levels: [
+          { html: '<div class="box"><p>选中我</p></div>', target: 'p', hint: '选中段落元素' },
+          { html: '<div id="special">选中我</div>', target: '#special', hint: '选中 ID 为 special 的元素' },
+          { html: '<ul><li class="first">1</li><li>2</li><li>3</li></ul>', target: '.first', hint: '选中第一个列表项' },
+          { html: '<div><span>不要选我</span></div><p class="target">选中我</p>', target: '.target', hint: '选中 class 为 target 的元素' },
+          { html: '<article><h2>标题</h2><p>段落1</p><p>段落2</p></article>', target: 'article p', hint: '选中文章内的所有段落' },
+          { html: '<nav><a href="#">链接1</a><a href="#" class="active">链接2</a></nav>', target: 'a.active', hint: '选中激活状态的链接' },
+          { html: '<div class="parent"><div class="child">选中我</div></div>', target: '.parent > .child', hint: '选中直接子元素' },
+          { html: '<input type="text" placeholder="输入"><input type="password" placeholder="密码">', target: 'input[type="password"]', hint: '选中密码输入框' },
+          { html: '<ul><li>1</li><li>2</li><li>3</li></ul>', target: 'li:first-child', hint: '选中第一个 li 元素' },
+          { html: '<div><p>段落1</p><p>段落2</p><span>行内</span></div>', target: 'p + span', hint: '选中紧跟段落后的 span' }
+        ],
+        currentLevel: 0,
+        score: 0,
+        container: this.container,
+
+        init() {
+          this.previewEl = document.getElementById('htmlPreview');
+          this.targetEl = document.getElementById('targetElements');
+          this.inputEl = document.getElementById('cssInput');
+          this.submitBtn = document.getElementById('cssSubmit');
+          this.feedbackEl = document.getElementById('gameFeedback');
+          this.levelEl = document.getElementById('currentLevel');
+          this.totalEl = document.getElementById('totalLevels');
+
+          if (this.totalEl) this.totalEl.textContent = this.levels.length;
+
+          this.submitBtn?.addEventListener('click', () => this.checkAnswer());
+          this.inputEl?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.checkAnswer();
+          });
+
+          this.loadLevel();
+        },
+
+        loadLevel() {
+          const level = this.levels[this.currentLevel];
+          if (!level) {
+            this.complete();
+            return;
+          }
+
+          if (this.previewEl) this.previewEl.innerHTML = level.html;
+          if (this.targetEl) this.targetEl.innerHTML = `<code>${level.target}</code><span>${level.hint}</span>`;
+          if (this.levelEl) this.levelEl.textContent = this.currentLevel + 1;
+          if (this.inputEl) {
+            this.inputEl.value = '';
+            this.inputEl.focus();
+          }
+          if (this.feedbackEl) {
+            this.feedbackEl.textContent = '';
+            this.feedbackEl.className = 'game-feedback';
+          }
+
+          this.previewEl?.querySelectorAll('*').forEach(el => {
+            el.classList.remove('highlighted');
+          });
+        },
+
+        checkAnswer() {
+          const answer = this.inputEl?.value?.trim();
+          if (!answer) return;
+
+          const level = this.levels[this.currentLevel];
+          try {
+            const previewDoc = this.previewEl;
+            const selected = previewDoc.querySelectorAll(answer);
+            const target = previewDoc.querySelectorAll(level.target);
+
+            const isCorrect = selected.length === target.length &&
+              Array.from(selected).every(el => Array.from(target).includes(el));
+
+            if (isCorrect) {
+              this.score += 10;
+              this.updateScore(this.score);
+              if (this.feedbackEl) {
+                this.feedbackEl.textContent = '✅ 正确！';
+                this.feedbackEl.className = 'game-feedback success';
+              }
+              selected.forEach(el => el.classList.add('highlighted'));
+              setTimeout(() => {
+                this.currentLevel++;
+                this.loadLevel();
+              }, 1000);
+            } else {
+              if (this.feedbackEl) {
+                this.feedbackEl.textContent = `❌ 不正确，选中了 ${selected.length} 个元素，需要 ${target.length} 个`;
+                this.feedbackEl.className = 'game-feedback error';
+              }
+            }
+          } catch (e) {
+            if (this.feedbackEl) {
+              this.feedbackEl.textContent = '⚠️ 无效的选择器语法';
+              this.feedbackEl.className = 'game-feedback error';
+            }
+          }
+        },
+
+        complete() {
+          this.saveHighScore(this.score);
+          ToastManager.success(`游戏完成！得分：${this.score}`);
+        },
+
+        reset() {
+          this.currentLevel = 0;
+          this.score = 0;
+          this.updateScore(0);
+          this.loadLevel();
+        }
+      };
+
+      this.cssSelector.init();
+    },
+
+    // 代码打字练习
+    initTypingRace() {
+      this.typingRace = {
+        codeSnippets: [
+          'function hello() {\n  console.log("Hello World!");\n}',
+          'const sum = (a, b) => a + b;\nconsole.log(sum(1, 2));',
+          'for (let i = 0; i < 10; i++) {\n  console.log(i);\n}',
+          'const arr = [1, 2, 3];\narr.map(x => x * 2);',
+          'if (condition) {\n  return true;\n} else {\n  return false;\n}'
+        ],
+        currentSnippet: '',
+        isRunning: false,
+        startTime: null,
+        timerInterval: null,
+        correctChars: 0,
+        errorChars: 0,
+        currentIndex: 0,
+        timeLeft: 60,
+        container: this.container,
+
+        init() {
+          this.displayEl = document.getElementById('codeDisplay');
+          this.inputEl = document.getElementById('typingInput');
+          this.timerEl = document.getElementById('gameTimer');
+          this.correctEl = document.getElementById('correctChars');
+          this.errorEl = document.getElementById('errorChars');
+          this.accuracyEl = document.getElementById('accuracy');
+          this.wpmEl = document.getElementById('wpm');
+          this.startBtn = document.getElementById('typingStart');
+
+          this.startBtn?.addEventListener('click', () => this.start());
+          this.inputEl?.addEventListener('input', () => this.onInput());
+        },
+
+        start() {
+          this.currentSnippet = this.codeSnippets[Math.floor(Math.random() * this.codeSnippets.length)];
+          this.isRunning = true;
+          this.startTime = Date.now();
+          this.correctChars = 0;
+          this.errorChars = 0;
+          this.currentIndex = 0;
+          this.timeLeft = 60;
+
+          if (this.displayEl) this.displayEl.textContent = this.currentSnippet;
+          if (this.inputEl) {
+            this.inputEl.value = '';
+            this.inputEl.disabled = false;
+            this.inputEl.focus();
+          }
+          if (this.startBtn) this.startBtn.style.display = 'none';
+
+          this.updateStats();
+          this.startTimer();
+        },
+
+        startTimer() {
+          this.timerInterval = setInterval(() => {
+            this.timeLeft--;
+            if (this.timerEl) this.timerEl.textContent = this.timeLeft;
+
+            if (this.timeLeft <= 0) {
+              this.end();
+            }
+          }, 1000);
+        },
+
+        onInput() {
+          if (!this.isRunning) return;
+
+          const input = this.inputEl?.value || '';
+          this.currentIndex = input.length;
+
+          this.correctChars = 0;
+          this.errorChars = 0;
+
+          for (let i = 0; i < input.length; i++) {
+            if (input[i] === this.currentSnippet[i]) {
+              this.correctChars++;
+            } else {
+              this.errorChars++;
+            }
+          }
+
+          this.updateStats();
+
+          if (input === this.currentSnippet) {
+            this.end();
+          }
+        },
+
+        updateStats() {
+          if (this.correctEl) this.correctEl.textContent = this.correctChars;
+          if (this.errorEl) this.errorEl.textContent = this.errorChars;
+
+          const total = this.correctChars + this.errorChars;
+          const accuracy = total > 0 ? Math.round((this.correctChars / total) * 100) : 100;
+          if (this.accuracyEl) this.accuracyEl.textContent = `${accuracy}%`;
+
+          const timeElapsed = (Date.now() - this.startTime) / 1000 / 60;
+          const wpm = timeElapsed > 0 ? Math.round((this.correctChars / 5) / timeElapsed) : 0;
+          if (this.wpmEl) this.wpmEl.textContent = wpm;
+        },
+
+        end() {
+          this.isRunning = false;
+          clearInterval(this.timerInterval);
+
+          if (this.inputEl) this.inputEl.disabled = true;
+          if (this.startBtn) {
+            this.startBtn.style.display = 'block';
+            this.startBtn.textContent = '再来一次';
+          }
+
+          const score = this.correctChars * 10 - this.errorChars * 5;
+          this.saveHighScore(Math.max(0, score));
+          ToastManager.success(`练习完成！得分：${Math.max(0, score)}`);
+        },
+
+        reset() {
+          this.isRunning = false;
+          clearInterval(this.timerInterval);
+          this.correctChars = 0;
+          this.errorChars = 0;
+          this.currentIndex = 0;
+          this.timeLeft = 60;
+
+          if (this.displayEl) this.displayEl.textContent = '点击"开始练习"开始';
+          if (this.inputEl) {
+            this.inputEl.value = '';
+            this.inputEl.disabled = true;
+          }
+          if (this.timerEl) this.timerEl.textContent = '60';
+          if (this.startBtn) {
+            this.startBtn.style.display = 'block';
+            this.startBtn.textContent = '开始练习';
+          }
+          this.updateStats();
+        }
+      };
+
+      this.typingRace.init();
+    },
+
+    // 终端猜数字
+    initTerminalGuess() {
+      this.terminalGuess = {
+        target: 0,
+        guessCount: 0,
+        bestRecord: parseInt(localStorage.getItem('terminal_guess_best') || '999'),
+        container: this.container,
+
+        init() {
+          this.bodyEl = document.getElementById('terminalBody');
+          this.inputEl = document.getElementById('terminalInput');
+          this.submitBtn = document.getElementById('terminalSubmit');
+          this.restartBtn = document.getElementById('terminalRestart');
+          this.guessCountEl = document.getElementById('guessCount');
+          this.bestRecordEl = document.getElementById('bestRecord');
+
+          if (this.bestRecordEl) {
+            this.bestRecordEl.textContent = this.bestRecord < 999 ? this.bestRecord : '-';
+          }
+
+          this.submitBtn?.addEventListener('click', () => this.guess());
+          this.inputEl?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.guess();
+          });
+          this.restartBtn?.addEventListener('click', () => this.reset());
+
+          this.reset();
+        },
+
+        reset() {
+          this.target = Math.floor(Math.random() * 100) + 1;
+          this.guessCount = 0;
+
+          if (this.bodyEl) {
+            this.bodyEl.innerHTML = `
+              <div class="terminal-line system">欢迎来到猜数字游戏！</div>
+              <div class="terminal-line system">我想了一个 1-100 之间的数字，你能猜到吗？</div>
+              <div class="terminal-line system">输入你的猜测，然后按回车或点击"猜"按钮。</div>
+            `;
+          }
+          if (this.inputEl) {
+            this.inputEl.value = '';
+            this.inputEl.focus();
+          }
+          if (this.guessCountEl) this.guessCountEl.textContent = '0';
+        },
+
+        guess() {
+          const input = this.inputEl?.value?.trim();
+          if (!input) return;
+
+          const num = parseInt(input);
+          if (isNaN(num) || num < 1 || num > 100) {
+            this.addLine('请输入 1-100 之间的数字', 'error');
+            return;
+          }
+
+          this.guessCount++;
+          if (this.guessCountEl) this.guessCountEl.textContent = this.guessCount;
+
+          if (num === this.target) {
+            this.addLine(`🎉 恭喜你猜对了！答案就是 ${this.target}`, 'success');
+            this.addLine(`你总共猜了 ${this.guessCount} 次`, 'system');
+
+            if (this.guessCount < this.bestRecord) {
+              this.bestRecord = this.guessCount;
+              localStorage.setItem('terminal_guess_best', this.bestRecord);
+              if (this.bestRecordEl) this.bestRecordEl.textContent = this.bestRecord;
+              this.addLine('🏆 新纪录！', 'success');
+            }
+
+            const score = Math.max(0, 100 - this.guessCount * 5);
+            this.saveHighScore(score);
+            ToastManager.success(`游戏完成！得分：${score}`);
+          } else if (num < this.target) {
+            this.addLine(`⬆️ ${num} 太小了，再大一点`, 'user');
+          } else {
+            this.addLine(`⬇️ ${num} 太大了，再小一点`, 'user');
+          }
+
+          if (this.inputEl) {
+            this.inputEl.value = '';
+            this.inputEl.focus();
+          }
+        },
+
+        addLine(text, type = 'system') {
+          if (!this.bodyEl) return;
+
+          const line = document.createElement('div');
+          line.className = `terminal-line ${type}`;
+          line.textContent = text;
+          this.bodyEl.appendChild(line);
+          this.bodyEl.scrollTop = this.bodyEl.scrollHeight;
+        }
+      };
+
+      this.terminalGuess.init();
+    },
+
+    updateScore(score) {
+      if (this.scoreEl) {
+        this.scoreEl.textContent = score;
+      }
+    }
+  };
+
+  // ========== 骨架屏管理器 ==========
+  const SkeletonManager = {
+    init() {
+      this.skeletonGrid = document.getElementById('skeletonGrid');
+      this.postsGrid = document.getElementById('postsGrid');
+
+      if (!this.skeletonGrid || !this.postsGrid) return;
+
+      setTimeout(() => this.showContent(), 500);
+    },
+
+    showContent() {
+      this.skeletonGrid.style.opacity = '0';
+      this.skeletonGrid.style.transition = 'opacity 0.3s ease';
+
+      setTimeout(() => {
+        this.skeletonGrid.style.display = 'none';
+        this.postsGrid.style.display = 'grid';
+        this.postsGrid.style.opacity = '0';
+        this.postsGrid.style.transition = 'opacity 0.3s ease';
+
+        setTimeout(() => {
+          this.postsGrid.style.opacity = '1';
+          ScrollReveal.init();
+        }, 50);
+      }, 300);
+    }
+  };
+
+  // ========== 打字机效果管理器 ==========
+  const TypewriterManager = {
+    STORAGE_KEY: 'typewriter_shown',
+
+    init() {
+      this.titleEl = document.getElementById('postTitle');
+      if (!this.titleEl) return;
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) return;
+
+      const postId = window.location.pathname;
+      const shownPosts = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+      if (shownPosts.includes(postId)) return;
+
+      shownPosts.push(postId);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(shownPosts));
+
+      this.originalText = this.titleEl.dataset.original || this.titleEl.textContent;
+      this.titleEl.textContent = '';
+      this.titleEl.classList.add('typewriter-active');
+
+      this.currentIndex = 0;
+      this.type();
+    },
+
+    type() {
+      if (this.currentIndex < this.originalText.length) {
+        this.titleEl.textContent = this.originalText.substring(0, this.currentIndex + 1);
+        this.currentIndex++;
+        setTimeout(() => this.type(), 50);
+      } else {
+        this.blinkCursor();
+      }
+    },
+
+    blinkCursor() {
+      let blinks = 0;
+      const blinkInterval = setInterval(() => {
+        this.titleEl.classList.toggle('typewriter-cursor');
+        blinks++;
+        if (blinks >= 6) {
+          clearInterval(blinkInterval);
+          this.titleEl.classList.remove('typewriter-active', 'typewriter-cursor');
+        }
+      }, 500);
+    }
+  };
+
+  // ========== 3D 卡片效果管理器 ==========
+  const Card3DManager = {
+    init() {
+      if ('ontouchstart' in window) return;
+
+      this.cards = document.querySelectorAll('.post-card, .featured-card');
+      this.cards.forEach(card => this.setupCard(card));
+    },
+
+    setupCard(card) {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = (y - centerY) / 20;
+        const rotateY = (centerX - x) / 20;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        card.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 30px rgba(0, 0, 0, 0.15)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+        card.style.boxShadow = '';
+      });
+    }
+  };
+
   // ========== 统计数据管理器 ==========
   const StatsManager = {
     stats: null,
@@ -1594,6 +2582,11 @@
     PollManager.init();
     QuizManager.init();
     AchievementManager.init();
+    PlaygroundManager.init();
+    GameManager.init();
+    SkeletonManager.init();
+    TypewriterManager.init();
+    Card3DManager.init();
     StatsManager.init();
   });
 

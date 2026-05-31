@@ -1,0 +1,136 @@
+{% if page.game %}
+<div class="game-container" id="game-{{ page.game.type }}" data-type="{{ page.game.type }}">
+  <div class="game-header">
+    <div class="game-title">
+      <span class="game-icon">
+        {% case page.game.type %}
+        {% when 'css-selector' %}🎯
+        {% when 'typing-race' %}⌨️
+        {% when 'terminal-guess' %}💻
+        {% else %}🎮
+        {% endcase %}
+      </span>
+      <span>{{ page.game.title | default: '迷你游戏' }}</span>
+    </div>
+    <div class="game-score">
+      <span class="game-score-label">得分</span>
+      <span class="game-score-value" id="gameScore">0</span>
+    </div>
+  </div>
+
+  <div class="game-body">
+    <!-- CSS 选择器挑战 -->
+    {% if page.game.type == 'css-selector' %}
+    <div class="game-css-selector">
+      <div class="game-description">{{ page.game.description }}</div>
+      <div class="game-stage" id="gameStage">
+        <div class="game-html-preview" id="htmlPreview"></div>
+        <div class="game-target" id="gameTarget">
+          <p class="game-target-hint">请选中高亮的元素</p>
+          <div class="game-target-elements" id="targetElements"></div>
+        </div>
+      </div>
+      <div class="game-input-area">
+        <label class="game-input-label">输入 CSS 选择器：</label>
+        <div class="game-input-wrapper">
+          <span class="game-input-prefix">$("</span>
+          <input type="text" class="game-input" id="cssInput" placeholder="例如: .class, #id, tag" autocomplete="off">
+          <span class="game-input-suffix">")</span>
+          <button class="game-submit" id="cssSubmit">选中</button>
+        </div>
+      </div>
+      <div class="game-feedback" id="gameFeedback"></div>
+      <div class="game-level-info">
+        <span class="game-level">第 <span id="currentLevel">1</span> 关</span>
+        <span class="game-total-levels">共 <span id="totalLevels">10</span> 关</span>
+      </div>
+    </div>
+
+    <!-- 代码打字练习 -->
+    {% elsif page.game.type == 'typing-race' %}
+    <div class="game-typing-race">
+      <div class="game-description">{{ page.game.description }}</div>
+      <div class="game-timer">
+        <span class="game-timer-label">剩余时间</span>
+        <span class="game-timer-value" id="gameTimer">60</span>
+        <span class="game-timer-unit">秒</span>
+      </div>
+      <div class="game-code-display" id="codeDisplay"></div>
+      <div class="game-typing-area">
+        <textarea class="game-typing-input" id="typingInput" placeholder="在此输入代码..." disabled></textarea>
+      </div>
+      <div class="game-typing-stats">
+        <div class="game-stat">
+          <span class="game-stat-label">正确字符</span>
+          <span class="game-stat-value" id="correctChars">0</span>
+        </div>
+        <div class="game-stat">
+          <span class="game-stat-label">错误字符</span>
+          <span class="game-stat-value" id="errorChars">0</span>
+        </div>
+        <div class="game-stat">
+          <span class="game-stat-label">准确率</span>
+          <span class="game-stat-value" id="accuracy">100%</span>
+        </div>
+        <div class="game-stat">
+          <span class="game-stat-label">WPM</span>
+          <span class="game-stat-value" id="wpm">0</span>
+        </div>
+      </div>
+      <button class="game-start-btn" id="typingStart">开始练习</button>
+    </div>
+
+    <!-- 终端猜数字 -->
+    {% elsif page.game.type == 'terminal-guess' %}
+    <div class="game-terminal">
+      <div class="game-description">{{ page.game.description }}</div>
+      <div class="terminal-window">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">Terminal</span>
+        </div>
+        <div class="terminal-body" id="terminalBody">
+          <div class="terminal-line system">欢迎来到猜数字游戏！</div>
+          <div class="terminal-line system">我想了一个 1-100 之间的数字，你能猜到吗？</div>
+          <div class="terminal-line system">输入你的猜测，然后按回车或点击"猜"按钮。</div>
+        </div>
+        <div class="terminal-input-area">
+          <span class="terminal-prompt">$</span>
+          <input type="number" class="terminal-input" id="terminalInput" min="1" max="100" placeholder="输入数字...">
+          <button class="terminal-submit" id="terminalSubmit">猜</button>
+        </div>
+      </div>
+      <div class="game-terminal-stats">
+        <div class="game-stat">
+          <span class="game-stat-label">猜测次数</span>
+          <span class="game-stat-value" id="guessCount">0</span>
+        </div>
+        <div class="game-stat">
+          <span class="game-stat-label">最佳记录</span>
+          <span class="game-stat-value" id="bestRecord">-</span>
+        </div>
+      </div>
+      <button class="game-restart-btn" id="terminalRestart">重新开始</button>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="game-footer">
+    <button class="game-btn game-btn-secondary" id="gameRestart">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+      </svg>
+      重新开始
+    </button>
+    <div class="game-highscore">
+      <span class="game-highscore-label">最高分</span>
+      <span class="game-highscore-value" id="highScore">0</span>
+    </div>
+  </div>
+</div>
+{% endif %}

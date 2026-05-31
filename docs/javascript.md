@@ -1,7 +1,7 @@
 # 交互脚本文档
 
-> 主脚本文件: `assets/js/main.js`（~720 行）
-> 采用 IIFE 立即执行函数封装，包含 13 个功能模块。
+> 主脚本文件: `assets/js/main.js`（~2593 行）
+> 采用 IIFE 立即执行函数封装，包含 25 个功能模块。
 
 ---
 
@@ -24,6 +24,18 @@
   const RippleManager = { ... };      // 涟漪效果
   const ScrollReveal = { ... };       // 滚动显示动画
   const ToastManager = { ... };       // Toast 通知
+  const CommentManager = { ... };     // 评论管理
+  const ShareManager = { ... };       // 分享功能
+  const LikeManager = { ... };        // 点赞功能
+  const PollManager = { ... };        // 投票功能
+  const QuizManager = { ... };        // 测验功能
+  const AchievementManager = { ... }; // 成就系统
+  const PlaygroundManager = { ... };  // 代码 Playground
+  const GameManager = { ... };        // 迷你游戏
+  const SkeletonManager = { ... };    // 骨架屏
+  const TypewriterManager = { ... };  // 打字机效果
+  const Card3DManager = { ... };      // 3D 卡片效果
+  const StatsManager = { ... };       // 统计数据
 
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -39,6 +51,18 @@
     RippleManager.init();
     ScrollReveal.init();
     ToastManager.init();
+    CommentManager.init();
+    ShareManager.init();
+    LikeManager.init();
+    PollManager.init();
+    QuizManager.init();
+    AchievementManager.init();
+    PlaygroundManager.init();
+    GameManager.init();
+    SkeletonManager.init();
+    TypewriterManager.init();
+    Card3DManager.init();
+    StatsManager.init();
   });
 })();
 ```
@@ -289,19 +313,31 @@ init() {
 │   └── 渲染 footer.html
 │
 ├── DOMContentLoaded 事件触发
-│   ├── ThemeManager.init()       // 绑定主题按钮 + 确认主题
-│   ├── MobileMenu.init()         // 绑定菜单按钮 + 关闭逻辑
-│   ├── NavbarScroll.init()       // 绑定滚动监听
-│   ├── SmoothScroll.init()       // 绑定锚点链接
-│   ├── CodeBlockManager.init()   // 处理代码块复制按钮
-│   ├── BackToTop.init()          // 绑定返回顶部按钮
-│   ├── ReadingProgress.init()    // 绑定阅读进度条
-│   ├── TOCManager.init()         // 构建文章目录
-│   ├── SearchManager.init()      // 加载搜索数据 + 绑定事件
-│   ├── LightboxManager.init()    // 绑定图片灯箱
-│   ├── RippleManager.init()      // 绑定涟漪效果
-│   ├── ScrollReveal.init()       // 初始化滚动动画观察器
-│   └── ToastManager.init()       // 初始化 Toast 容器
+│   ├── ThemeManager.init()          // 绑定主题按钮 + 确认主题
+│   ├── MobileMenu.init()            // 绑定菜单按钮 + 关闭逻辑
+│   ├── NavbarScroll.init()          // 绑定滚动监听
+│   ├── SmoothScroll.init()          // 绑定锚点链接
+│   ├── CodeBlockManager.init()      // 处理代码块复制按钮
+│   ├── BackToTop.init()             // 绑定返回顶部按钮
+│   ├── ReadingProgress.init()       // 绑定阅读进度条 + 庆祝动画
+│   ├── TOCManager.init()            // 构建文章目录
+│   ├── SearchManager.init()         // 加载搜索数据 + 绑定事件
+│   ├── LightboxManager.init()       // 绑定图片灯箱
+│   ├── RippleManager.init()         // 绑定涟漪效果
+│   ├── ScrollReveal.init()          // 初始化滚动动画观察器
+│   ├── ToastManager.init()          // 初始化 Toast 容器
+│   ├── CommentManager.init()        // 初始化评论引导
+│   ├── ShareManager.init()          // 绑定分享按钮
+│   ├── LikeManager.init()           // 绑定点赞按钮
+│   ├── PollManager.init()           // 初始化投票组件
+│   ├── QuizManager.init()           // 初始化测验组件
+│   ├── AchievementManager.init()    // 初始化成就系统
+│   ├── PlaygroundManager.init()     // 加载 Monaco Editor + 初始化编辑器
+│   ├── GameManager.init()           // 初始化迷你游戏
+│   ├── SkeletonManager.init()       // 显示骨架屏 → 渐显内容
+│   ├── TypewriterManager.init()     // 初始化标题打字机效果
+│   ├── Card3DManager.init()         // 绑定卡片 3D 悬停效果
+│   └── StatsManager.init()          // 加载统计数据
 │
 └── main.js 使用 defer 加载，确保在 DOM 解析后执行
 ```
@@ -358,13 +394,25 @@ if (!this.navbar) return;  // NavbarScroll
 
 ### 功能
 
-在文章详情页显示阅读进度条。
+在文章详情页显示阅读进度条，读完全文时触发庆祝动画。
 
 ### 特性
 
 - 仅在 `single.html` 布局显示
 - 进度条宽度随滚动位置动态变化
 - 0% 在顶部，100% 在底部
+- 使用 `requestAnimationFrame` 节流
+- 遵守 `prefers-reduced-motion` 设置
+
+### 完成庆祝动画
+
+当阅读进度达到 100% 时触发：
+
+1. **Canvas 彩纸动画**：使用 Canvas 绘制 100 个彩色矩形纸片，从屏幕上方飘落，持续 180 帧后自动移除
+2. **Toast 通知**：显示"🎉 恭喜你读完了这篇文章！"
+3. **成就联动**：触发 `read_complete` 成就解锁
+4. **阅读记录**：将文章标题保存到 localStorage `read_posts` 数组
+5. **只触发一次**：`hasCelebrated` 标志防止重复播放
 
 ---
 
@@ -664,7 +712,202 @@ quiz:
 
 ---
 
-## 21. StatsManager — 统计数据管理器
+## 21. PlaygroundManager — 代码 Playground
+
+### 功能
+
+内嵌代码编辑器，支持 HTML/CSS/JavaScript 实时编辑和预览，基于 Monaco Editor（VS Code 同款编辑器引擎）。
+
+### 特性
+
+- 按需加载 Monaco Editor（CDN），仅在页面存在 `.playground-container` 时加载
+- 支持三种语言：HTML、CSS、JavaScript
+- 自定义 Light/Dark 两套编辑器主题，跟随站点主题自动切换
+- 三种视图模式：编辑器（editor）、预览（preview）、分屏（split）
+- 工具栏：运行、重置、复制代码按钮
+- HTML 代码直接写入 iframe；CSS 代码注入预设 HTML 模板；JavaScript 代码在 iframe 中执行并捕获错误
+- 每种语言提供内置默认代码模板
+- 与 ThemeManager 联动：主题切换时同步更新编辑器主题
+- 与 ToastManager 联动：复制代码成功时显示 Toast
+
+### DOM 结构
+
+| 选择器 | 元素 | 说明 |
+|--------|------|------|
+| `.playground-container` | `<div>` | Playground 容器（`id="playground-{id}"`） |
+| `.playground-editor` | `<div>` | Monaco Editor 挂载点（`data-default-code` 存储默认代码） |
+| `.playground-preview` | `<iframe>` | 代码预览 iframe |
+| `.playground-tab` | `<button>` | 视图切换标签（`data-tab="editor/preview/split"`） |
+| `.playground-run` | `<button>` | 运行按钮 |
+| `.playground-reset` | `<button>` | 重置按钮 |
+| `.playground-copy` | `<button>` | 复制按钮 |
+| `.playground-status` | `<span>` | 运行状态指示 |
+
+### Monaco Editor 配置
+
+```javascript
+{
+  minimap: { enabled: false },
+  fontSize: 14,
+  lineHeight: 22,
+  padding: { top: 16, bottom: 16 },
+  scrollBeyondLastLine: false,
+  automaticLayout: true,
+  tabSize: 2,
+  wordWrap: 'on',
+  scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 }
+}
+```
+
+---
+
+## 22. GameManager — 迷你游戏
+
+### 功能
+
+提供三种可嵌入文章的交互式小游戏。
+
+### 支持的游戏类型
+
+| 类型 | `data-type` | 说明 |
+|------|-------------|------|
+| CSS 选择器挑战 | `css-selector` | 输入 CSS 选择器选中目标元素 |
+| 代码打字练习 | `typing-race` | 60 秒内尽可能多地输入代码片段 |
+| 终端猜数字 | `terminal-guess` | 终端风格的 1-100 猜数字游戏 |
+
+### 通用特性
+
+- 最高分记录：localStorage 持久化（按游戏类型分别存储）
+- 分数系统：实时更新当前分数和最高分
+- 重启功能：支持重新开始游戏
+- 成就联动：与 ToastManager 集成，游戏完成时显示通知
+
+### CSS 选择器挑战
+
+- 10 个递进难度的关卡，从基础元素选择器到复合选择器
+- 实时 DOM 预览，正确选中时高亮目标元素
+- 每关显示提示信息
+- 输入无效选择器时显示语法错误提示
+- 答对 +10 分
+
+### 代码打字练习
+
+- 5 个 JavaScript 代码片段随机出现
+- 60 秒倒计时
+- 实时统计：正确字符数、错误字符数、准确率、WPM（每分钟字数）
+- 字符级实时对比：正确字符绿色，错误字符红色
+- 得分 = 正确字符 × 10 - 错误字符 × 5
+
+### 终端猜数字
+
+- 终端风格 UI，模拟命令行交互
+- 随机生成 1-100 的目标数字
+- 猜测后显示"太大"/"太小"提示
+- 记录猜测次数和最佳纪录
+- 得分 = max(0, 100 - 猜测次数 × 5)
+
+### DOM 结构
+
+| 选择器 | 元素 | 说明 |
+|--------|------|------|
+| `.game-container` | `<div>` | 游戏容器（`data-type` 指定游戏类型） |
+| `#gameScore` | `<span>` | 当前分数 |
+| `#highScore` | `<span>` | 最高分 |
+| `#gameRestart` | `<button>` | 重启按钮 |
+
+---
+
+## 23. SkeletonManager — 骨架屏
+
+### 功能
+
+在首页文章列表加载时显示骨架屏占位，内容就绪后平滑过渡。
+
+### 特性
+
+- DOM 加载完成后延迟 500ms 显示内容（模拟加载等待）
+- 骨架屏渐隐 → 内容渐显的过渡动画（各 300ms CSS transition）
+- 骨架屏隐藏后切换为 `display: none`
+- 内容显示后触发 `ScrollReveal.init()` 重新初始化滚动动画
+- 仅在首页（存在 `#skeletonGrid` 和 `#postsGrid`）生效
+
+### DOM 元素
+
+| ID | 元素 | 说明 |
+|----|------|------|
+| `skeletonGrid` | `<div>` | 骨架屏占位网格 |
+| `postsGrid` | `<div>` | 实际文章列表网格 |
+
+---
+
+## 24. TypewriterManager — 打字机效果
+
+### 功能
+
+文章标题逐字打出的打字机动画效果。
+
+### 特性
+
+- 仅在文章详情页生效（存在 `#postTitle` 元素）
+- 每篇文章首次访问时播放，后续访问跳过（localStorage 记录）
+- 遵守 `prefers-reduced-motion`：用户开启减弱动态效果时直接显示原文
+- 打字速度：每字符 50ms
+- 打字完成后光标闪烁 3 次（6 次切换，每次 500ms），然后移除动画类
+
+### 动画流程
+
+```
+1. 检查 prefers-reduced-motion → 如开启则跳过
+2. 检查 localStorage typewriter_shown 数组 → 如已访问则跳过
+3. 保存原始文本，清空标题内容
+4. 添加 typewriter-active 类
+5. 逐字添加字符（50ms 间隔）
+6. 打字完成 → 光标闪烁 3 次
+7. 移除 typewriter-active 和 typewriter-cursor 类
+```
+
+### 常量
+
+| 常量 | 值 | 用途 |
+|------|-----|------|
+| `STORAGE_KEY` | `'typewriter_shown'` | localStorage 存储键名，值为已访问路径数组 |
+
+---
+
+## 25. Card3DManager — 3D 卡片效果
+
+### 功能
+
+为文章卡片添加鼠标跟随的 3D 悬停效果。
+
+### 特性
+
+- 仅桌面端生效（检测 `ontouchstart`，触屏设备跳过）
+- 鼠标移动时根据光标位置计算旋转角度
+- 透视距离 1000px，最大旋转角 ±（卡片宽高 / 20）度
+- 悬停时轻微放大（scale3d 1.02）
+- 动态阴影：阴影偏移方向与旋转方向相反
+- 鼠标离开时平滑恢复原始状态
+
+### 目标元素
+
+| 选择器 | 说明 |
+|--------|------|
+| `.post-card` | 普通文章卡片 |
+| `.featured-card` | 精选文章卡片 |
+
+### 变换公式
+
+```javascript
+rotateX = (mouseY - centerY) / 20;  // 垂直旋转
+rotateY = (centerX - mouseX) / 20;  // 水平旋转
+transform: perspective(1000px) rotateX(rotateX) rotateY(rotateY) scale3d(1.02, 1.02, 1.02);
+boxShadow: ${-rotateY * 2}px ${rotateX * 2}px 30px rgba(0, 0, 0, 0.15);
+```
+
+---
+
+## 26. StatsManager — 统计数据管理器
 
 ### 功能
 

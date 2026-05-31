@@ -440,3 +440,228 @@ CSS 类 `.reveal`、`.reveal-left`、`.reveal-right`、`.reveal-scale`、`.revea
 ### 9.9 自定义滚动条
 
 WebKit 浏览器自定义滚动条：8px 宽度，圆角，主题跟随。
+
+---
+
+## 10. 高级设计系统
+
+### 10.1 渐变系统
+
+项目定义了 6 种预设渐变变量，覆盖主要视觉场景：
+
+| 变量 | Light 值 | Dark 值 | 用途 |
+|------|----------|---------|------|
+| `--gradient-primary` | `linear-gradient(135deg, var(--alice-400), var(--accent-lavender))` | 同 Light | 主渐变，用于标题、徽章、标签悬停 |
+| `--gradient-subtle` | `linear-gradient(135deg, var(--alice-50), rgba(184,169,232,0.08))` | `linear-gradient(135deg, rgba(43,141,214,0.06), rgba(184,169,232,0.04))` | 微妙背景渐变 |
+| `--gradient-warm` | `linear-gradient(135deg, var(--accent-pink), var(--accent-peach))` | 同 Light | 暖色渐变 |
+| `--gradient-cool` | `linear-gradient(135deg, var(--alice-300), var(--accent-teal))` | 同 Light | 冷色渐变 |
+| `--gradient-surface` | `linear-gradient(180deg, var(--bg-card), var(--bg-secondary))` | 同 Light | 卡片表面渐变 |
+| `--gradient-hero-bg` | `linear-gradient(135deg, var(--alice-50) 0%, #f8f4ff 30%, var(--alice-50) 60%, #f0f0ff 100%)` | `linear-gradient(135deg, #0f172a, #1a1530, #0f172a)` | Hero 区域背景 |
+
+**使用示例**：
+
+```css
+.hero-name {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tag:hover::before {
+  background: var(--gradient-primary);
+  opacity: 1;
+}
+```
+
+### 10.2 阴影系统
+
+6 级层次阴影 + 内阴影 + 发光阴影，形成完整的深度体系：
+
+| 变量 | Light 值 | Dark 值 | 层级 |
+|------|----------|---------|------|
+| `--shadow-xs` | `0 1px 2px rgba(43,141,214,0.04)` | `0 1px 2px rgba(0,0,0,0.2)` | 最轻 |
+| `--shadow-sm` | `0 2px 8px rgba(43,141,214,0.06)` | `0 2px 8px rgba(0,0,0,0.25)` | 小 |
+| `--shadow-card` | `0 8px 32px rgba(43,141,214,0.12)` | `0 8px 32px rgba(0,0,0,0.4)` | 卡片 |
+| `--shadow-hover` | `0 12px 40px rgba(43,141,214,0.18)` | `0 12px 40px rgba(0,0,0,0.5)` | 悬停 |
+| `--shadow-elevated` | `0 20px 60px rgba(43,141,214,0.12), 0 8px 20px rgba(43,141,214,0.08)` | `0 20px 60px rgba(0,0,0,0.4), 0 8px 20px rgba(0,0,0,0.3)` | 高层 |
+| `--shadow-glow` | `0 0 20px rgba(43,141,214,0.15), 0 0 60px rgba(43,141,214,0.05)` | `0 0 20px rgba(43,141,214,0.1), 0 0 60px rgba(43,141,214,0.04)` | 发光 |
+| `--shadow-inner` | `inset 0 2px 4px rgba(43,141,214,0.06)` | `inset 0 2px 4px rgba(0,0,0,0.2)` | 内阴影 |
+
+**层级递进规则**：
+- `xs` → `sm`：边框级阴影
+- `card` → `hover`：卡片悬浮反馈
+- `elevated`：弹窗、模态框
+- `glow`：强调、激活状态
+- `inner`：凹陷效果（输入框、代码块）
+
+### 10.3 动画系统
+
+#### 缓动函数
+
+| 变量 | 值 | 用途 |
+|------|-----|------|
+| `--smooth` | `cubic-bezier(0.4, 0, 0.2, 1)` | 通用平滑过渡（Material Design 标准） |
+| `--bounce` | `cubic-bezier(0.68, -0.55, 0.265, 1.55)` | 弹性效果，用于成就通知 |
+
+#### 过渡时间变量
+
+| 变量 | 值 | 用途 |
+|------|-----|------|
+| `--transition-fast` | `150ms ease` | 快速反馈（按钮、焦点） |
+| `--transition-base` | `250ms ease` | 标准过渡（导航、卡片） |
+
+#### 关键帧动画
+
+| 动画名 | 时长 | 效果 | 应用组件 |
+|--------|------|------|----------|
+| `pulse` | `2s ease-in-out infinite` | 呼吸脉冲 | `.hero-badge-dot` |
+| `float` | `3s ease-in-out infinite` | 上下浮动 | `.logo-icon` |
+| `ripple` | `0.6s linear` | 按钮涟漪 | `.ripple-effect` |
+| `fadeIn` | `0.5s ease` | 淡入上移 | `.comment-guide` |
+| `slideUp` | `0.3s ease` | 底部滑入 | `.share-panel-content` |
+| `badge-glow` | `3s ease-in-out infinite` | 徽章发光 | `.hero-badge` |
+| `achievementBounce` | `0.6s ease` | 成就弹跳 | `.achievement-toast-icon` |
+| `wip-pulse` | `2.4s ease-in-out infinite` | WIP 标签脉冲 | `.post-badge.wip` |
+| `lightbox-spin` | `0.8s linear infinite` | 加载旋转 | `.lightbox-spinner` |
+
+#### 滚动触发动画
+
+| CSS 类 | 初始状态 | 触发后 |
+|--------|----------|--------|
+| `.reveal` | `opacity:0; translateY(30px)` | `opacity:1; translateY(0)` |
+| `.reveal-left` | `opacity:0; translateX(-30px)` | `opacity:1; translateX(0)` |
+| `.reveal-right` | `opacity:0; translateX(30px)` | `opacity:1; translateX(0)` |
+| `.reveal-scale` | `opacity:0; scale(0.95)` | `opacity:1; scale(1)` |
+| `.reveal-stagger` | 子元素交错延迟 | 0.05s ~ 0.5s 递增 |
+
+### 10.4 玻璃态系统
+
+基于 `backdrop-filter` 实现毛玻璃效果：
+
+```css
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .glass-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(100, 160, 220, 0.1);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+```
+
+**应用场景**：
+
+| 组件 | backdrop-filter 值 | 说明 |
+|------|-------------------|------|
+| `.navbar` | `blur(20px) saturate(180%)` | 导航栏毛玻璃 |
+| `.mobile-menu` | `blur(20px)` | 移动端菜单 |
+| `.glass-card` | `blur(16px) saturate(180%)` | 通用玻璃卡片 |
+| `.hero-badge` | `blur(10px)` | Hero 徽章 |
+| `.share-panel` | `blur(4px)` | 分享面板遮罩 |
+
+### 10.5 季节主题色
+
+根据当前月份自动切换季节配色，通过 JavaScript 动态设置 CSS 变量：
+
+| 季节 | 月份 | `--season-accent` | `--season-hover` |
+|------|------|-------------------|------------------|
+| 春 (spring) | 3-5 月 | `#f9a8d4` (粉) | `#f472b6` |
+| 夏 (summer) | 6-8 月 | `#5eead4` (青) | `#2dd4bf` |
+| 秋 (autumn) | 9-11 月 | `#fdba74` (橙) | `#fb923c` |
+| 冬 (winter) | 12-2 月 | `#c4b5fd` (紫) | `#a78bfa` |
+
+**实现逻辑**（`assets/js/main.js`）：
+
+```javascript
+applySeasonalTheme() {
+  const month = new Date().getMonth() + 1;
+  let season = 'winter';
+  if (month >= 3 && month <= 5) season = 'spring';
+  if (month >= 6 && month <= 8) season = 'summer';
+  if (month >= 9 && month <= 11) season = 'autumn';
+
+  const colors = {
+    spring: { accent: '#f9a8d4', hover: '#f472b6' },
+    summer: { accent: '#5eead4', hover: '#2dd4bf' },
+    autumn: { accent: '#fdba74', hover: '#fb923c' },
+    winter: { accent: '#c4b5fd', hover: '#a78bfa' }
+  };
+
+  const root = document.documentElement;
+  root.style.setProperty('--season-accent', colors[season].accent);
+  root.style.setProperty('--season-hover', colors[season].hover);
+}
+```
+
+**使用方式**：
+
+```css
+.hero-badge-dot {
+  background: var(--season-accent);
+}
+```
+
+### 10.6 排版比例系统
+
+基于 Major Third (1.25) 比例的模块化字体系统：
+
+#### 字体大小
+
+| 变量 | 值 | 计算 | 用途 |
+|------|-----|------|------|
+| `--font-size-xs` | `0.64rem` | 1rem ÷ 1.25³ | 最小文字 |
+| `--font-size-sm` | `0.8rem` | 1rem ÷ 1.25 | 次要文字 |
+| `--font-size-base` | `1rem` | 基准 | 正文 |
+| `--font-size-md` | `1.125rem` | — | 大正文/引用 |
+| `--font-size-lg` | `1.25rem` | 1rem × 1.25 | h3 标题 |
+| `--font-size-xl` | `1.563rem` | 1rem × 1.25² | h2 标题 |
+| `--font-size-2xl` | `1.953rem` | 1rem × 1.25³ | 文章标题 |
+| `--font-size-3xl` | `2.441rem` | 1rem × 1.25⁴ | Hero 标题 |
+| `--font-size-4xl` | `3.052rem` | 1rem × 1.25⁵ | 最大标题 |
+
+#### 行高系统
+
+| 变量 | 值 | 用途 |
+|------|-----|------|
+| `--leading-tight` | `1.3` | 标题 |
+| `--leading-snug` | `1.5` | 副标题 |
+| `--leading-normal` | `1.7` | 正文基础 |
+| `--leading-relaxed` | `1.9` | 文章正文 |
+| `--leading-loose` | `2.2` | 大段落 |
+
+#### 字间距系统
+
+| 变量 | 值 | 用途 |
+|------|-----|------|
+| `--tracking-tight` | `-0.02em` | 大标题 |
+| `--tracking-normal` | `0` | 正文 |
+| `--tracking-wide` | `0.02em` | 小标题 |
+| `--tracking-wider` | `0.05em` | 标签、徽章 |
+
+**应用示例**：
+
+```css
+.hero-name {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+.post-content {
+  font-size: var(--font-size-base);
+  line-height: var(--leading-relaxed);
+}
+
+.post-content h2 {
+  font-size: var(--font-size-xl);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-snug);
+}
+```
