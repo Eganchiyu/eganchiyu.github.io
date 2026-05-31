@@ -722,6 +722,360 @@
     info(message, duration) { this.show(message, 'info', duration); }
   };
 
+  // ========== 评论系统管理器 ==========
+  const CommentManager = {
+    init() {
+      this.setupCommentGuide();
+    },
+
+    setupCommentGuide() {
+      const commentsSection = document.querySelector('.comments-section');
+      if (!commentsSection) return;
+
+      const guideDismissed = localStorage.getItem('comment_guide_dismissed');
+      if (guideDismissed) return;
+
+      const guide = document.createElement('div');
+      guide.className = 'comment-guide';
+      guide.innerHTML = `
+        <div class="comment-guide-icon">💬</div>
+        <div class="comment-guide-content">
+          <div class="comment-guide-title">欢迎参与讨论！</div>
+          <div class="comment-guide-text">登录 GitHub 账号即可评论，分享你的想法和建议</div>
+        </div>
+        <button class="comment-guide-close" aria-label="关闭引导">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      `;
+
+      const giscusContainer = commentsSection.querySelector('.giscus-comments');
+      if (giscusContainer) {
+        commentsSection.insertBefore(guide, giscusContainer);
+      } else {
+        commentsSection.appendChild(guide);
+      }
+
+      const closeBtn = guide.querySelector('.comment-guide-close');
+      closeBtn.addEventListener('click', () => {
+        guide.style.animation = 'fadeOut 0.3s ease forwards';
+        setTimeout(() => {
+          guide.remove();
+          localStorage.setItem('comment_guide_dismissed', 'true');
+        }, 300);
+      });
+    }
+  };
+
+  // ========== 分享管理器 ==========
+  const ShareManager = {
+    init() {
+      this.bindEvents();
+    },
+
+    bindEvents() {
+      document.querySelectorAll('[data-share]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const type = btn.dataset.share;
+          this.handleShare(type);
+        });
+      });
+
+      const panel = document.getElementById('sharePanel');
+      if (panel) {
+        const closeBtn = panel.querySelector('.share-panel-close');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => this.closeSharePanel());
+        }
+        panel.addEventListener('click', (e) => {
+          if (e.target === panel) this.closeSharePanel();
+        });
+      }
+    },
+
+    handleShare(type) {
+      const url = window.location.href;
+      const title = document.title;
+
+      switch (type) {
+        case 'wechat':
+          this.shareToWechat(url);
+          break;
+        case 'copy':
+          this.copyLink(url);
+          break;
+        case 'native':
+          this.nativeShare(url, title);
+          break;
+      }
+
+      this.trackShare(type);
+    },
+
+    shareToWechat(url) {
+      const panel = document.getElementById('sharePanel');
+      const canvas = document.getElementById('qrcodeCanvas');
+      if (!panel || !canvas) return;
+
+      this.generateQRCode(canvas, url);
+      panel.classList.add('active');
+    },
+
+    generateQRCode(canvas, url) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      ctx.clearRect(0, 0, size, size);
+
+      const moduleCount = 25;
+      const cellSize = size / moduleCount;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+
+      const pattern = this.createQRPattern(url);
+      ctx.fillStyle = '#000000';
+
+      for (let row = 0; row < moduleCount; row++) {
+        for (let col = 0; col < moduleCount; col++) {
+          if (pattern[row][col]) {
+            ctx.fillRect(
+              col * cellSize,
+              row * cellSize,
+              cellSize,
+              cellSize
+            );
+          }
+        }
+      }
+    },
+
+    createQRPattern(url) {
+      const size = 25;
+      const pattern = Array.from({ length: size }, () => Array(size).fill(false));
+
+      for (let i = 0; i < 7; i++) {
+        pattern[i][0] = true;
+        pattern[i][6] = true;
+        pattern[0][i] = true;
+        pattern[6][i] = true;
+      }
+      for (let i = 2; i < 5; i++) {
+        for (let j = 2; j < 5; j++) {
+          pattern[i][j] = true;
+        }
+      }
+
+      for (let i = 0; i < 7; i++) {
+        pattern[i][size - 7] = true;
+        pattern[i][size - 1] = true;
+        pattern[0][size - 7 + i] = true;
+        pattern[6][size - 7 + i] = true;
+      }
+      for (let i = 2; i < 5; i++) {
+        for (let j = size - 5; j < size - 2; j++) {
+          pattern[i][j] = true;
+        }
+      }
+
+      for (let i = size - 7; i < size; i++) {
+        pattern[i][0] = true;
+        pattern[i][6] = true;
+        pattern[size - 7][i - (size - 7)] = true;
+        pattern[size - 1][i - (size - 7)] = true;
+      }
+      for (let i = size - 5; i < size - 2; i++) {
+        for (let j = 2; j < 5; j++) {
+          pattern[i][j] = true;
+        }
+      }
+
+      let hash = 0;
+      for (let i = 0; i < url.length; i++) {
+        hash = ((hash << 5) - hash) + url.charCodeAt(i);
+        hash |= 0;
+      }
+
+      for (let row = 8; row < size - 8; row++) {
+        for (let col = 8; col < size - 8; col++) {
+          if (!pattern[row][col]) {
+            pattern[row][col] = ((hash + row * size + col) % 3) === 0;
+          }
+        }
+      }
+
+      return pattern;
+    },
+
+    closeSharePanel() {
+      const panel = document.getElementById('sharePanel');
+      if (panel) {
+        panel.classList.remove('active');
+      }
+    },
+
+    async copyLink(url) {
+      try {
+        await navigator.clipboard.writeText(url);
+        ToastManager.success('链接已复制到剪贴板');
+      } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        ToastManager.success('链接已复制到剪贴板');
+      }
+    },
+
+    async nativeShare(url, title) {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: title,
+            url: url
+          });
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            this.copyLink(url);
+          }
+        }
+      } else {
+        this.copyLink(url);
+      }
+    },
+
+    trackShare(type) {
+      const stats = JSON.parse(localStorage.getItem('share_stats') || '{}');
+      stats[type] = (stats[type] || 0) + 1;
+      stats.total = (stats.total || 0) + 1;
+      localStorage.setItem('share_stats', JSON.stringify(stats));
+    }
+  };
+
+  // ========== 点赞管理器 ==========
+  const LikeManager = {
+    init() {
+      this.button = document.getElementById('likeButton');
+      this.countEl = document.getElementById('likeCount');
+      this.canvas = document.getElementById('likeCanvas');
+
+      if (!this.button) return;
+
+      this.postId = this.button.dataset.postId;
+      this.loadLikeState();
+      this.bindEvents();
+    },
+
+    loadLikeState() {
+      const likes = JSON.parse(localStorage.getItem('post_likes') || '{}');
+      const data = likes[this.postId] || { count: 0, liked: false };
+
+      this.count = data.count;
+      this.liked = data.liked;
+
+      this.updateUI();
+    },
+
+    saveLikeState() {
+      const likes = JSON.parse(localStorage.getItem('post_likes') || '{}');
+      likes[this.postId] = {
+        count: this.count,
+        liked: this.liked
+      };
+      localStorage.setItem('post_likes', JSON.stringify(likes));
+    },
+
+    bindEvents() {
+      this.button.addEventListener('click', () => this.toggleLike());
+    },
+
+    toggleLike() {
+      if (this.liked) {
+        this.count--;
+        this.liked = false;
+      } else {
+        this.count++;
+        this.liked = true;
+        this.createParticles();
+      }
+
+      this.saveLikeState();
+      this.updateUI();
+      this.animateCount();
+    },
+
+    updateUI() {
+      this.countEl.textContent = this.count;
+      if (this.liked) {
+        this.button.classList.add('liked');
+      } else {
+        this.button.classList.remove('liked');
+      }
+    },
+
+    animateCount() {
+      this.countEl.classList.remove('like-count-animate');
+      void this.countEl.offsetWidth;
+      this.countEl.classList.add('like-count-animate');
+    },
+
+    createParticles() {
+      if (!this.canvas) return;
+
+      const ctx = this.canvas.getContext('2d');
+      const particles = [];
+      const colors = ['#e74c3c', '#ff6b6b', '#ff8e8e', '#ffb3b3', '#ffd8d8'];
+
+      for (let i = 0; i < 20; i++) {
+        particles.push({
+          x: this.canvas.width / 2,
+          y: this.canvas.height / 2,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8,
+          size: Math.random() * 6 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          decay: Math.random() * 0.02 + 0.02
+        });
+      }
+
+      const animate = () => {
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        let alive = false;
+        particles.forEach(p => {
+          if (p.alpha <= 0) return;
+
+          alive = true;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.1;
+          p.alpha -= p.decay;
+
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        if (alive) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+      };
+
+      animate();
+    }
+  };
+
   // ========== 初始化 ==========
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -737,6 +1091,9 @@
     RippleManager.init();
     ScrollReveal.init();
     ToastManager.init();
+    CommentManager.init();
+    ShareManager.init();
+    LikeManager.init();
   });
 
 })();

@@ -166,8 +166,8 @@ layout: default
           </div>
           <span class="read-time">
             {% assign words = post.content | number_of_words %}
-            {% assign read_time = words | divided_by: 250 | plus: 1 %}
-            📖 {{ read_time }} min
+            {% assign read_time = words | divided_by: 400 | plus: 1 %}
+            📖 {{ read_time }} 分钟
           </span>
         </div>
       </article>

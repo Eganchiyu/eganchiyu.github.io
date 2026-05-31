@@ -32,8 +32,8 @@ layout: default
         {% endif %}
         <span class="read-time">
           {% assign words = page.content | number_of_words %}
-          {% assign read_time = words | divided_by: 250 | plus: 1 %}
-          📖 {{ read_time }} min
+          {% assign read_time = words | divided_by: 400 | plus: 1 %}
+          📖 {{ read_time }} 分钟
         </span>
       </div>
       
@@ -86,18 +86,62 @@ layout: default
       <div class="share-section reveal">
         <h3>📤 分享文章</h3>
         <div class="share-links">
-          <a href="https://twitter.com/intent/tweet?url={{ page.url | absolute_url | uri_escape }}&text={{ page.title | uri_escape }}" 
-             target="_blank" rel="noopener" class="share-link">
-            Twitter
-          </a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u={{ page.url | absolute_url | uri_escape }}" 
-             target="_blank" rel="noopener" class="share-link">
-            Facebook
-          </a>
+          <button class="share-link" data-share="wechat" title="微信分享">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-7.062-6.122zm-2.18 2.768c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982z"/>
+            </svg>
+            微信
+          </button>
           <a href="https://service.weibo.com/share/share.php?url={{ page.url | absolute_url | uri_escape }}&title={{ page.title | uri_escape }}" 
-             target="_blank" rel="noopener" class="share-link">
+             target="_blank" rel="noopener" class="share-link" title="分享到微博">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10.098 20.323c-3.977.391-7.414-1.406-7.672-4.02-.259-2.609 2.759-5.047 6.74-5.441 3.979-.394 7.413 1.404 7.671 4.018.259 2.6-2.759 5.049-6.739 5.443zM9.05 17.219c-.384.616-1.208.884-1.829.602-.612-.279-.793-.991-.406-1.593.379-.595 1.176-.86 1.799-.584.631.28.82.979.436 1.575zm1.27-1.627c-.141.237-.449.353-.689.253-.236-.09-.307-.361-.158-.591.142-.234.453-.351.689-.243.236.1.303.363.158.581zm.176-2.719c-1.893-.493-4.033.45-4.857 2.118-.836 1.704-.026 3.591 1.886 4.21 1.983.642 4.318-.341 5.132-2.179.8-1.793-.201-3.642-2.161-4.149zm7.563-1.224c-.346-.105-.583-.176-.403-.636.396-1.001.436-1.863.006-2.477-.808-1.165-3.011-1.098-5.578-.031l.001-.001c-.463.194-.659.124-.774-.312-.234-.894-.978-1.405-1.987-1.477-2.108-.15-3.881 1.497-3.955 3.66-.077 2.178 1.57 4.097 3.678 4.28 2.18.189 4.073-1.363 4.218-3.453.061-.88-.16-1.38-.563-1.537-1.158-.453-2.377-.078-3.036.463-.216.179-.339.169-.456-.067-.246-.498-.611-.978-1.078-1.198-1.078-.507-2.453.166-3.07 1.5-.604 1.305-.188 2.777.921 3.361 1.132.597 2.567.211 3.355-.856.211-.287.185-.423-.056-.578-1.017-.661-1.644-1.455-1.445-2.358.158-.719.844-1.15 1.58-1.029.584.095 1.01.543 1.08 1.129.028.225-.03.339-.243.404-.583.177-.5.723.128.741.866.025 1.572-.269 2.077-.874.635-.761.862-1.781.564-2.572-.303-.804-1.112-1.186-2.089-1.049-1.003.141-1.824.846-2.147 1.772-.077.219-.194.275-.382.161-.754-.457-1.597-.666-2.499-.561-1.687.195-2.957 1.449-3.115 3.088-.162 1.677.865 3.262 2.517 3.887 1.7.643 3.641.167 4.861-1.079.936-.957 1.396-2.118 1.254-3.262-.059-.475-.451-.769-.921-.654-.467.115-.759.567-.65 1.033.083.356.131.724.075 1.091z"/>
+            </svg>
             微博
           </a>
+          <a href="https://twitter.com/intent/tweet?url={{ page.url | absolute_url | uri_escape }}&text={{ page.title | uri_escape }}" 
+             target="_blank" rel="noopener" class="share-link" title="分享到 X/Twitter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            X
+          </a>
+          <button class="share-link" data-share="copy" title="复制链接">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            复制链接
+          </button>
+          <button class="share-link" data-share="native" title="系统分享">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            分享
+          </button>
+        </div>
+      </div>
+
+      <!-- Share Panel Modal -->
+      <div class="share-panel" id="sharePanel">
+        <div class="share-panel-content">
+          <div class="share-panel-header">
+            <h3>分享到微信</h3>
+            <button class="share-panel-close" aria-label="关闭">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6 6 18"/>
+                <path d="m6 6 12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="share-panel-body">
+            <canvas id="qrcodeCanvas" width="200" height="200"></canvas>
+            <p class="share-panel-hint">使用微信扫一扫分享</p>
+          </div>
         </div>
       </div>
       
@@ -115,6 +159,15 @@ layout: default
         </div>
       </div>
       {% endif %}
+
+      <!-- Like -->
+      <div class="like-section reveal">
+        <button class="like-button" id="likeButton" data-post-id="{{ page.slug }}" aria-label="点赞">
+          <span class="like-icon">❤️</span>
+          <span class="like-count" id="likeCount">0</span>
+        </button>
+        <canvas id="likeCanvas" class="like-canvas"></canvas>
+      </div>
 
       <!-- Comments -->
       {% if page.comments != false %}

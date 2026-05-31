@@ -24,7 +24,13 @@
       </div>
 
       <div class="footer-stats">
-        <p>站点统计：{{ site.posts.size }} 篇文章 · {{ site.categories.size }} 个分类</p>
+        {% assign total_words = 0 %}
+        {% for post in site.posts %}
+          {% assign post_words = post.content | number_of_words %}
+          {% assign total_words = total_words | plus: post_words %}
+        {% endfor %}
+        {% assign total_read_time = total_words | divided_by: 400 %}
+        <p>站点统计：{{ site.posts.size }} 篇文章 · {{ site.categories.size }} 个分类 · 约 {{ total_read_time }} 分钟阅读</p>
         <p>最后更新：{{ site.time | date: "%Y-%m-%d" }}</p>
       </div>
 
