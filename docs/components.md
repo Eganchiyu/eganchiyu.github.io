@@ -284,3 +284,190 @@
 - 时间线竖线和圆点左移
 - 文章卡片改为纵向排列
 - 分类标签换行显示
+
+---
+
+## 4. poll.html — 投票组件
+
+**文件路径**: `_includes/poll.html`
+**引用方式**: 在 `single.html` 中通过 `{% include poll.html id="article-poll" %}` 引入
+**触发条件**: 文章 Front Matter 中包含 `poll` 配置
+
+### 4.1 功能
+
+- 显示投票问题和选项
+- 支持单选和多选模式
+- 投票后显示结果动画（水平柱状图 + 百分比）
+- 使用 localStorage 存储投票状态，防止重复投票
+
+### 4.2 Front Matter 配置
+
+```yaml
+poll:
+  question: "你更喜欢哪种编程语言？"
+  multiple: false  # false=单选, true=多选
+  options:
+    - text: "Python"
+      emoji: "🐍"
+    - text: "JavaScript"
+      emoji: "⚡"
+    - text: "Rust"
+      emoji: "🦀"
+```
+
+### 4.3 结构
+
+```
+<div class="poll-container">
+  └── <div class="poll-card">
+       ├── 投票头部 (.poll-header)
+       │   ├── 问题 (.poll-question)
+       │   └── 多选徽章 (.poll-badge) [可选]
+       ├── 选项列表 (.poll-options)
+       │   └── 选项按钮 (.poll-option)
+       │       ├── Emoji (.poll-option-emoji) [可选]
+       │       ├── 文本 (.poll-option-text)
+       │       ├── 进度条 (.poll-option-bar)
+       │       └── 百分比 (.poll-option-percent)
+       └── 投票底部 (.poll-footer)
+           ├── 总票数 (.poll-total)
+           └── 提交按钮 (.poll-submit)
+```
+
+### 4.4 关键 CSS 类
+
+| 类名 | 用途 |
+|------|------|
+| `.poll-container` | 外层容器 |
+| `.poll-card` | 投票卡片，毛玻璃效果 |
+| `.poll-option` | 选项按钮 |
+| `.poll-option.selected` | 选中状态 |
+| `.poll-option.voted` | 已投票状态 |
+| `.poll-option-bar` | 结果进度条 |
+
+### 4.5 JavaScript
+
+由 `PollManager` 管理，详见 [JavaScript 文档](./javascript.md)。
+
+---
+
+## 5. quiz.html — 测验组件
+
+**文件路径**: `_includes/quiz.html`
+**引用方式**: 在 `single.html` 中通过 `{% include quiz.html id="article-quiz" %}` 引入
+**触发条件**: 文章 Front Matter 中包含 `quiz` 配置
+
+### 5.1 功能
+
+- 支持单选、多选、判断题
+- 即时反馈正确/错误
+- 显示详细解释
+- 分数统计和评语
+- 支持重新测验
+
+### 5.2 Front Matter 配置
+
+```yaml
+quiz:
+  - question: "SSH 默认端口号是？"
+    type: "single"  # single=单选, multi=多选
+    options:
+      - text: "21"
+      - text: "22"
+      - text: "80"
+      - text: "443"
+    answer: 1  # 正确答案索引（从0开始）
+    explanation: "SSH 默认使用 22 端口"
+
+  - question: "以下哪些是 HTTP 方法？"
+    type: "multi"
+    options:
+      - text: "GET"
+      - text: "PUSH"
+      - text: "POST"
+      - text: "FETCH"
+    answer: [0, 2]  # 多选答案用数组
+    explanation: "GET 和 POST 是标准 HTTP 方法"
+```
+
+### 5.3 结构
+
+```
+<div class="quiz-container">
+  └── <div class="quiz-card">
+       ├── 测验头部 (.quiz-header)
+       │   ├── 标题 (.quiz-title)
+       │   └── 进度 (.quiz-progress)
+       ├── 问题列表 (.quiz-questions)
+       │   └── 问题 (.quiz-question)
+       │       ├── 问题头部 (.quiz-question-header)
+       │       │   ├── 问题编号 (.quiz-question-number)
+       │       │   └── 问题文本 (.quiz-question-text)
+       │       ├── 选项列表 (.quiz-options)
+       │       │   └── 选项按钮 (.quiz-option)
+       │       │       ├── 选项字母 (.quiz-option-letter)
+       │       │       ├── 选项文本 (.quiz-option-text)
+       │       │       └── 选项图标 (.quiz-option-icon)
+       │       └── 解释 (.quiz-explanation) [可选]
+       └── 测验底部 (.quiz-footer)
+           ├── 下一题按钮 (.quiz-next)
+           └── 结果区域 (.quiz-result)
+               ├── 分数 (.quiz-score)
+               ├── 评语 (.quiz-result-text)
+               └── 重新测验按钮 (.quiz-restart)
+```
+
+### 5.4 关键 CSS 类
+
+| 类名 | 用途 |
+|------|------|
+| `.quiz-container` | 外层容器 |
+| `.quiz-card` | 测验卡片 |
+| `.quiz-option` | 选项按钮 |
+| `.quiz-option.correct` | 正确答案状态 |
+| `.quiz-option.wrong` | 错误答案状态 |
+| `.quiz-explanation` | 解释区域 |
+
+### 5.5 JavaScript
+
+由 `QuizManager` 管理，详见 [JavaScript 文档](./javascript.md)。
+
+---
+
+## 6. achievement-toast.html — 成就通知组件
+
+**文件路径**: `_includes/achievement-toast.html`
+**引用方式**: 由 `AchievementManager` 动态创建
+
+### 6.1 功能
+
+- 显示成就解锁通知
+- 带弹跳动画的 Emoji
+- 自动消失（3秒）
+- 可手动关闭
+
+### 6.2 成就列表
+
+| 成就 | 图标 | 触发条件 |
+|------|------|----------|
+| 初来乍到 | 👋 | 首次访问博客 |
+| 暗夜精灵 | 🌙 | 切换暗色模式 |
+| 求知若渴 | 📖 | 阅读 5 篇文章 |
+| 代码达人 | 💻 | 复制代码 10 次 |
+| 互动先锋 | 💬 | 首次发表评论 |
+| 分享达人 | 🔗 | 首次分享文章 |
+| 探索者 | 🔍 | 使用搜索功能 |
+| 学富五车 | 🎓 | 阅读 15 篇文章 |
+| 全文通读 | 🏆 | 阅读进度 100% |
+| 投票达人 | 🗳️ | 投票 5 次 |
+| 测验满分 | 🧠 | 测验全部答对 |
+| 忠实读者 | ⭐ | 连续 7 天访问 |
+| 博学多才 | 👑 | 解锁 10 个徽章 |
+
+### 6.3 成就墙
+
+点击页面右下角的 🏆 按钮打开成就墙，显示所有徽章的解锁状态。
+
+### 6.4 JavaScript
+
+由 `AchievementManager` 管理，详见 [JavaScript 文档](./javascript.md)。

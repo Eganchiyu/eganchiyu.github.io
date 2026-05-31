@@ -321,3 +321,109 @@ defaults:
     values:
       layout: single
 ```
+
+---
+
+## Front Matter 完整配置
+
+### 基础字段
+
+```yaml
+---
+title: "文章标题"           # 必填
+date: 2026-05-30 12:00:00 +0800  # 必填
+categories: [分类名]        # 必填
+tags: [标签1, 标签2]        # 必填
+excerpt: "文章摘要"         # 可选，用于列表页和 SEO
+layout: single              # 可选，默认 single
+author: Eganchiyu           # 可选
+permalink: /custom/url/     # 可选，自定义永久链接
+---
+```
+
+### 功能开关
+
+```yaml
+---
+comments: true              # 是否显示评论（默认 true）
+toc: true                   # 是否显示目录（默认 true）
+featured: true              # 是否为精选文章
+wip: true                   # 是否为未完成文章
+cover_image: /assets/images/cover.jpg  # 封面图
+---
+```
+
+### 互动功能
+
+#### 投票系统
+
+```yaml
+---
+poll:
+  question: "你的问题"
+  multiple: false           # false=单选, true=多选
+  options:
+    - text: "选项1"
+      emoji: "😀"           # 可选
+    - text: "选项2"
+      emoji: "😎"
+---
+```
+
+#### 知识小测验
+
+```yaml
+---
+quiz:
+  - question: "问题1"
+    type: "single"          # single=单选, multi=多选
+    options:
+      - text: "选项A"
+      - text: "选项B"
+      - text: "选项C"
+    answer: 0               # 正确答案索引（从0开始）
+    explanation: "解释说明"
+
+  - question: "问题2"
+    type: "multi"
+    options:
+      - text: "选项A"
+      - text: "选项B"
+      - text: "选项C"
+    answer: [0, 2]          # 多选答案用数组
+    explanation: "解释说明"
+---
+```
+
+### 完整示例
+
+```yaml
+---
+title: "SSH 工作原理"
+date: 2026-01-26 12:00:00 +0800
+categories: [学习记录]
+tags: [SSH, 网络安全]
+excerpt: "SSH 的完整工作流程解析"
+cover_image: /assets/images/ssh-cover.jpg
+featured: true
+
+poll:
+  question: "你平时使用哪种方式连接 GitHub？"
+  multiple: false
+  options:
+    - text: "SSH 密钥"
+      emoji: "🔑"
+    - text: "HTTPS + Token"
+      emoji: "🔐"
+
+quiz:
+  - question: "SSH 默认端口号是？"
+    type: "single"
+    options:
+      - text: "21"
+      - text: "22"
+      - text: "80"
+    answer: 1
+    explanation: "SSH 默认使用 22 端口"
+---
+```
