@@ -1497,11 +1497,13 @@
         const response = await fetch('/assets/data/stats.json');
         if (response.ok) {
           this.stats = await response.json();
-          this.updateGlobalStats();
-          this.updatePostStats();
+          if (this.stats && this.stats.lastUpdated) {
+            this.updateGlobalStats();
+            this.updatePostStats();
+          }
         }
       } catch (error) {
-        console.log('Stats not available:', error);
+        // 静默处理，统计数据不可用时不显示错误
       }
     },
 
