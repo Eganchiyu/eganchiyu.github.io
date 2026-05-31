@@ -26,6 +26,9 @@
         const next = current === this.DARK ? this.LIGHT : this.DARK;
         this.apply(next);
         localStorage.setItem(this.STORAGE_KEY, next);
+        if (next === this.DARK) {
+          AchievementManager.unlock('dark_mode');
+        }
       });
     },
 
@@ -251,6 +254,7 @@
     showSuccess(btn) {
       btn.classList.add('copied');
       btn.innerHTML = `<span class="success-text">已复制!</span>`;
+      AchievementManager.incrementStat('codeCopies');
 
       setTimeout(() => {
         btn.classList.remove('copied');
@@ -486,6 +490,8 @@
         this.searchResults.innerHTML = '<div class="search-hint">搜索数据加载中...</div>';
         return;
       }
+
+      AchievementManager.unlock('search');
 
       const lowerQuery = query.toLowerCase();
       const results = this.searchData.filter(post => {
@@ -955,6 +961,8 @@
       stats[type] = (stats[type] || 0) + 1;
       stats.total = (stats.total || 0) + 1;
       localStorage.setItem('share_stats', JSON.stringify(stats));
+      AchievementManager.incrementStat('shares');
+      AchievementManager.unlock('first_share');
     }
   };
 
@@ -1137,6 +1145,7 @@
 
         this.showResults(pollEl, savedVotes);
         ToastManager.success('投票成功！');
+        AchievementManager.incrementStat('votes');
       });
     },
 
@@ -1415,6 +1424,10 @@
               setTimeout(() => {
                 this.showFinalResult(quizEl, score, totalQuestions);
                 localStorage.setItem(storageKey, JSON.stringify({ score, total: totalQuestions }));
+                AchievementManager.incrementStat('quizzes');
+                if (score === totalQuestions) {
+                  AchievementManager.unlock('quiz_perfect');
+                }
               }, 1000);
             }
           });
