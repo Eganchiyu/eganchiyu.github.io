@@ -771,7 +771,7 @@ img {
   content: '';
   width: 4px;
   height: 24px;
-  background: linear-gradient(to bottom, var(--alice-400), var(--accent-lavender));
+  background: linear-gradient(to bottom, var(--season-accent), var(--alice-400));
   border-radius: var(--radius-full);
 }
 
@@ -845,7 +845,7 @@ img {
 }
 
 .featured-title a:hover {
-  color: var(--alice-500);
+  color: var(--season-hover);
 }
 
 .featured-excerpt {
@@ -991,7 +991,7 @@ img {
 }
 
 .post-title a:hover {
-  color: var(--alice-500);
+  color: var(--season-hover);
 }
 
 .post-excerpt {
@@ -1031,7 +1031,7 @@ img {
 }
 
 .tag:hover {
-  background: var(--alice-500);
+  background: var(--season-accent);
   color: white;
   transform: scale(1.05);
 }
@@ -3559,7 +3559,7 @@ mjx-container svg {
   left: 0;
   width: 0%;
   height: 3px;
-  background: linear-gradient(90deg, var(--alice-400), var(--accent-lavender));
+  background: linear-gradient(90deg, var(--season-accent), var(--alice-400));
   z-index: 1000;
   transition: width 0.1s linear;
 }

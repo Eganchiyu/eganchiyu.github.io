@@ -2475,29 +2475,38 @@ try {
     },
 
     setupCard(card) {
-      let ticking = false;
+      let rafId = null;
+      let mouseX = 0;
+      let mouseY = 0;
+
+      const updateTransform = () => {
+        const rect = card.getBoundingClientRect();
+        const x = mouseX - rect.left;
+        const y = mouseY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * 3;
+        const rotateY = ((centerX - x) / centerX) * 3;
+
+        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        rafId = null;
+      };
 
       card.addEventListener('mousemove', (e) => {
-        if (ticking) return;
-        ticking = true;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
 
-        requestAnimationFrame(() => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-
-          const rotateX = ((y - centerY) / centerY) * 3;
-          const rotateY = ((centerX - x) / centerX) * 3;
-
-          card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-
-          ticking = false;
-        });
+        if (rafId === null) {
+          rafId = requestAnimationFrame(updateTransform);
+        }
       });
 
       card.addEventListener('mouseleave', () => {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
         card.style.transform = '';
       });
     }
