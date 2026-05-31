@@ -1,20 +1,81 @@
 ---
 title: SSH 的工作原理：从密钥交换到身份认证的完整通信机制
 excerpt: 一次从密码学与工程视角出发的 SSH 全流程拆解，理解它为何安全、为何稳定，以及为何适合 Git 与远程运维
+date: 2026-01-26 12:00:00 +0800
 
 categories: 
   -  学习记录
 
 tags:
-  -  博客
-  -  记录
-mins: 30
+  -  SSH
+  -  网络安全
+  -  密码学
+
 comments: true
-entries_layout: grid
 
-# header:
-#     teaser: 
+poll:
+  question: "你平时主要使用哪种方式连接 GitHub？"
+  multiple: false
+  options:
+    - text: "SSH 密钥"
+      emoji: "🔑"
+    - text: "HTTPS + Token"
+      emoji: "🔐"
+    - text: "GitHub CLI"
+      emoji: "💻"
+    - text: "还不太清楚"
+      emoji: "🤔"
 
+quiz:
+  - question: "SSH 默认使用哪个端口？"
+    type: "single"
+    options:
+      - text: "21"
+      - text: "22"
+      - text: "80"
+      - text: "443"
+    answer: 1
+    explanation: "SSH 默认使用 22 端口。21 是 FTP，80 是 HTTP，443 是 HTTPS。"
+
+  - question: "SSH 通信主要分为哪两个阶段？"
+    type: "single"
+    options:
+      - text: "握手和断开"
+      - text: "密钥交换和身份认证"
+      - text: "加密和解密"
+      - text: "请求和响应"
+    answer: 1
+    explanation: "SSH 通信主要分为两个阶段：首先是密钥交换（建立安全通道），然后是身份认证（验证用户身份）。"
+
+  - question: "Diffie-Hellman 密钥交换的安全性基于什么数学问题？"
+    type: "single"
+    options:
+      - text: "大数分解问题"
+      - text: "离散对数问题"
+      - text: "旅行商问题"
+      - text: "图着色问题"
+    answer: 1
+    explanation: "Diffie-Hellman 密钥交换的安全性基于离散对数问题，即已知 g、p、A 和 B，很难推算出私钥 a 和 b。"
+
+  - question: "以下哪些是 SSH 相比 HTTPS 的优势？"
+    type: "multi"
+    options:
+      - text: "无需证书颁发机构"
+      - text: "连接更稳定"
+      - text: "加密强度更高"
+      - text: "可以绕过某些网络限制"
+    answer: [0, 1, 3]
+    explanation: "SSH 基于密钥对认证，无需 CA；连接状态保持更好，更稳定；流量特征不同，可能绕过某些限制。但加密强度两者相当。"
+
+  - question: "SSH 的会话密钥具有前向安全性，这意味着什么？"
+    type: "single"
+    options:
+      - text: "密钥永远不会泄露"
+      - text: "即使私钥泄露，历史通信也不会被解密"
+      - text: "每次连接使用相同的密钥"
+      - text: "密钥可以在网络上传输"
+    answer: 1
+    explanation: "前向安全性意味着即使长期私钥泄露，过去会话的通信内容仍然安全，因为每次会话的密钥是独立生成的。"
 ---
 
 # 前言
