@@ -1362,9 +1362,16 @@
       const hasCompleted = localStorage.getItem(storageKey);
 
       if (hasCompleted) {
-        const savedResult = JSON.parse(hasCompleted);
-        this.showFinalResult(quizEl, savedResult.score, totalQuestions);
-        return;
+        try {
+          const savedResult = JSON.parse(hasCompleted);
+          if (savedResult && typeof savedResult.score === 'number') {
+            this.showFinalResult(quizEl, savedResult.score, totalQuestions);
+            return;
+          }
+        } catch (e) {
+          // 数据无效，清除它
+          localStorage.removeItem(storageKey);
+        }
       }
 
       questions.forEach((question, qIndex) => {
