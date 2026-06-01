@@ -195,6 +195,7 @@ body {
   background-attachment: fixed;
   min-height: 100vh;
   line-height: 1.7;
+  overflow-x: hidden;
   transition: background 0.3s var(--smooth), color 0.3s var(--smooth);
 }
 
@@ -1133,8 +1134,11 @@ img {
 
 .post-content {
   max-width: 720px;
+  min-width: 0;
   font-size: 1rem;
   line-height: 1.9;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .post-content h2 {
@@ -1694,6 +1698,8 @@ pre.highlight::-webkit-scrollbar-track,
 }
 
 .post-content img {
+  max-width: 100%;
+  height: auto;
   border-radius: var(--radius-lg);
   margin: 1.5rem 0;
   box-shadow: var(--shadow-soft);
