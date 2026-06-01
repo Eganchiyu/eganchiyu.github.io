@@ -793,12 +793,16 @@ img {
   overflow: hidden;
   transition: all 0.3s var(--smooth);
   backdrop-filter: blur(10px);
+  will-change: transform;
 }
 
 .featured-card:hover {
   border-color: var(--alice-300);
   box-shadow: var(--shadow-hover);
-  transform: translateY(-4px);
+}
+
+.featured-card.card-3d-active:hover {
+  transform: none;
 }
 
 .featured-cover {
@@ -888,6 +892,7 @@ img {
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
+  will-change: transform;
 }
 
 .post-card::before {
@@ -905,7 +910,10 @@ img {
 .post-card:hover {
   border-color: var(--alice-300);
   box-shadow: var(--shadow-hover);
-  transform: translateY(-4px);
+}
+
+.post-card.card-3d-active:hover {
+  transform: none;
 }
 
 .post-card:hover::before {
@@ -916,6 +924,10 @@ img {
 .post-card:active {
   transform: translateY(-2px) scale(0.98);
   box-shadow: var(--shadow-card);
+}
+
+.post-card.card-3d-active:active {
+  transform: none;
 }
 
 /* ---------- 文章卡片封面图 ---------- */
@@ -4125,7 +4137,14 @@ mjx-container svg {
 .featured-card:hover {
   border-color: transparent;
   box-shadow: var(--shadow-elevated);
-  transform: translateY(-6px);
+}
+
+/* 3D 精选卡片悬停状态 */
+.featured-card.card-3d-active {
+  border-color: transparent;
+  box-shadow: 
+    var(--shadow-elevated),
+    0 20px 40px rgba(43, 141, 214, 0.08);
 }
 
 .hero::after {
@@ -4149,18 +4168,25 @@ mjx-container svg {
   box-shadow: var(--shadow-elevated);
 }
 
+/* 3D 卡片光泽效果 */
 .post-card::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, transparent 60%, rgba(43, 141, 214, 0.03) 100%);
+  background: radial-gradient(
+    circle at var(--glare-x, 50%) var(--glare-y, 50%),
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.05) 35%,
+    transparent 65%
+  );
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s var(--smooth);
+  z-index: 1;
 }
 
-.post-card:hover::after {
+.post-card.card-3d-active::after {
   opacity: 1;
 }
 

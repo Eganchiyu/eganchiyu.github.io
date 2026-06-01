@@ -2467,47 +2467,52 @@ try {
 
   // ========== 3D 卡片效果管理器 ==========
   const Card3DManager = {
-    init() {
-      if ('ontouchstart' in window) return;
+    MAX_ROTATE: 2,
+    SCALE: 1.02,
+    PERSPECTIVE: 1000,
 
-      this.cards = document.querySelectorAll('.post-card, .featured-card');
-      this.cards.forEach(card => this.setupCard(card));
+    init() {
+      if ('ontouchstart' in window || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      document.querySelectorAll('.post-card, .featured-card').forEach(card => this.setupCard(card));
     },
 
     setupCard(card) {
       let rafId = null;
-      let mouseX = 0;
-      let mouseY = 0;
+      let isHovering = false;
 
-      const updateTransform = () => {
+      const animate = (mouseX, mouseY) => {
         const rect = card.getBoundingClientRect();
-        const x = mouseX - rect.left;
-        const y = mouseY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+        const x = (mouseX - rect.left) / rect.width;
+        const y = (mouseY - rect.top) / rect.height;
+        const rotateX = (0.5 - y) * this.MAX_ROTATE * 2;
+        const rotateY = (x - 0.5) * this.MAX_ROTATE * 2;
 
-        const rotateX = ((y - centerY) / centerY) * 3;
-        const rotateY = ((centerX - x) / centerX) * 3;
-
-        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        card.style.transform = `perspective(${this.PERSPECTIVE}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${this.SCALE},${this.SCALE},${this.SCALE})`;
+        card.style.setProperty('--glare-x', `${x * 100}%`);
+        card.style.setProperty('--glare-y', `${y * 100}%`);
+        card.style.boxShadow = `${-rotateY * 1.5}px ${rotateX * 1.5}px 30px rgba(0,0,0,0.12)`;
         rafId = null;
       };
 
-      card.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+      card.addEventListener('mouseenter', () => {
+        isHovering = true;
+        card.style.transition = 'transform 0.1s ease, box-shadow 0.1s ease';
+        card.classList.add('card-3d-active');
+      });
 
-        if (rafId === null) {
-          rafId = requestAnimationFrame(updateTransform);
-        }
+      card.addEventListener('mousemove', (e) => {
+        if (!isHovering || rafId) return;
+        rafId = requestAnimationFrame(() => animate(e.clientX, e.clientY));
       });
 
       card.addEventListener('mouseleave', () => {
-        if (rafId !== null) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
-        }
+        isHovering = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        card.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
         card.style.transform = '';
+        card.style.boxShadow = '';
+        card.classList.remove('card-3d-active');
       });
     }
   };
