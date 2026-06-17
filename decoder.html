@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔓 File Decoder</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #e0e0e0; font-family: 'Courier New', monospace; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .container { background: #111; border: 1px solid #222; border-radius: 12px; padding: 40px; max-width: 420px; width: 90%; }
+  h1 { font-size: 20px; margin-bottom: 24px; text-align: center; color: #888; }
+  .drop-zone { border: 2px dashed #333; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: #555; background: #1a1a1a; }
+  .drop-zone p { color: #555; font-size: 14px; }
+  input[type="text"] { width: 100%; padding: 10px 12px; background: #1a1a1a; border: 1px solid #222; border-radius: 6px; color: #e0e0e0; font-family: inherit; font-size: 14px; margin-bottom: 16px; outline: none; }
+  input[type="text"]:focus { border-color: #444; }
+  button { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 6px; color: #e0e0e0; font-family: inherit; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+  button:hover { background: #2a2a2a; }
+  button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .status { margin-top: 16px; font-size: 12px; color: #555; text-align: center; min-height: 18px; }
+  .file-name { font-size: 12px; color: #444; margin-bottom: 12px; text-align: center; word-break: break-all; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔓 File Decoder</h1>
+  <div class="drop-zone" id="dropZone">
+    <p>拖拽文件到这里<br>或点击选择</p>
+    <input type="file" id="fileInput" hidden>
+  </div>
+  <div class="file-name" id="fileName"></div>
+  <input type="text" id="keyInput" placeholder="输入解密密钥">
+  <button id="decodeBtn" disabled>解密</button>
+  <div class="status" id="status"></div>
+</div>
+<script>
+(function() {
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const keyInput = document.getElementById('keyInput');
+  const decodeBtn = document.getElementById('decodeBtn');
+  const status = document.getElementById('status');
+  const fileName = document.getElementById('fileName');
+  let fileData = null;
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+  keyInput.addEventListener('input', updateBtn);
+
+  function handleFile(f) {
+    if (!f) return;
+    fileName.textContent = f.name;
+    const reader = new FileReader();
+    reader.onload = e => { fileData = new Uint8Array(e.target.result); updateBtn(); };
+    reader.readAsArrayBuffer(f);
+  }
+
+  function updateBtn() {
+    decodeBtn.disabled = !(fileData && keyInput.value.trim());
+  }
+
+  decodeBtn.addEventListener('click', () => {
+    const key = keyInput.value.trim();
+    if (!fileData || !key) return;
+    status.textContent = '解密中...';
+    setTimeout(() => {
+      try {
+        const result = decode(fileData, key);
+        const blob = new Blob([result], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName.textContent.replace(/\.[^.]+$/, '') + '.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+        status.textContent = '✅ 完成';
+      } catch (e) {
+        status.textContent = '❌ 解密失败: ' + e.message;
+      }
+    }, 50);
+  });
+
+  function decode(raw, key) {
+    // 跳过 8 字节头部 (4 magic_mask + 4 size)
+    const magicMask = raw.slice(0, 4);
+    const data = new Uint8Array(raw.slice(8));
+    const keyBytes = new TextEncoder().encode(key);
+    const keyLen = keyBytes.length;
+
+    // 逆步骤 3: 相邻字节两两交换（自逆）
+    for (let i = 0; i < data.length - 1; i += 2) {
+      const tmp = data[i];
+      data[i] = data[i + 1];
+      data[i + 1] = tmp;
+    }
+
+    // 逆步骤 2: XOR
+    for (let i = 0; i < data.length; i++) {
+      data[i] ^= keyBytes[i % keyLen];
+    }
+
+    // 逆步骤 1: 恢复魔术头
+    for (let i = 0; i < Math.min(4, data.length); i++) {
+      data[i] ^= magicMask[i];
+    }
+
+    // 验证 PDF 头
+    const head = String.fromCharCode(data[0], data[1], data[2], data[3]);
+    if (head !== '%PDF') {
+      throw new Error('密钥错误或文件损坏');
+    }
+
+    return data;
+  }
+})();
+</script>
+</body>
+</html>
