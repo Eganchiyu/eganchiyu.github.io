@@ -26,11 +26,11 @@ async function fetchGraphQL(query, variables = {}) {
   return data.data;
 }
 
-async function fetchDiscussions(categorySlug) {
+async function fetchDiscussions() {
   const query = `
-    query($owner: String!, $name: String!, $categorySlug: String!) {
+    query($owner: String!, $name: String!) {
       repository(owner: $owner, name: $name) {
-        discussions(first: 100, categoryId: null) {
+        discussions(first: 100) {
           nodes {
             id
             title
