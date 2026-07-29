@@ -1,8 +1,40 @@
 {
-  "lastUpdated": null,
-  "posts": {},
+  "lastUpdated": "2026-07-29T04:42:17.912Z",
+  "posts": {
+    "从点灯到系统：ESP32 双灯环智能氛围灯完整工程实践 | Eganchiyu的Github Pages": {
+      "url": "https://github.com/Eganchiyu/eganchiyu.github.io/discussions/8",
+      "comments": 0,
+      "reactions": {
+        "total": 2,
+        "LAUGH": 1,
+        "HOORAY": 1
+      }
+    },
+    "2026年1月7日 日志 - Eganchiyu的Github Pages": {
+      "url": "https://github.com/Eganchiyu/eganchiyu.github.io/discussions/3",
+      "comments": 1,
+      "reactions": {
+        "total": 0
+      }
+    },
+    "ESP32 双灯氛围灯-更新星光模式（夜间） - Eganchiyu的Github Pages": {
+      "url": "https://github.com/Eganchiyu/eganchiyu.github.io/discussions/2",
+      "comments": 1,
+      "reactions": {
+        "total": 0
+      }
+    },
+    "Welcome to eganchiyu.github.io Discussions!": {
+      "url": "https://github.com/Eganchiyu/eganchiyu.github.io/discussions/1",
+      "comments": 0,
+      "reactions": {
+        "total": 0
+      }
+    }
+  },
+  "polls": {},
   "global": {
-    "totalComments": 0,
-    "totalReactions": 0
+    "totalComments": 2,
+    "totalReactions": 2
   }
 }
