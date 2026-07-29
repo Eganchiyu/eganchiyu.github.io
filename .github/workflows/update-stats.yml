@@ -2,8 +2,12 @@ name: Update Interaction Stats
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 每小时运行一次
+    - cron: '0 16 * * *'  # 每天 00:00 (UTC+8) 运行一次
   workflow_dispatch:  # 允许手动触发
+
+concurrency:
+  group: update-interaction-stats
+  cancel-in-progress: false
 
 jobs:
   update-stats:
