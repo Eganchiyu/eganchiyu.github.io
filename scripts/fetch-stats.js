@@ -41,18 +41,8 @@ async function fetchDiscussions() {
                 content
               }
             }
-            comments(first: 100) {
+            comments(first: 1) {
               totalCount
-              nodes {
-                id
-                body
-                reactions(first: 100) {
-                  totalCount
-                  nodes {
-                    content
-                  }
-                }
-              }
             }
           }
         }
