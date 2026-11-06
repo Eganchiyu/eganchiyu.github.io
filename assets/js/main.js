@@ -2591,7 +2591,7 @@ try {
     timers: [],
     activeCleanups: [],
 
-    // 24 个抽象人生羁绊与精神世界 Agent 词库
+    // 12 个抽象人生羁绊与精神世界 Agent 词库
     AGENTS_DATA: [
       { name: '亲情', color: '#f43f5e' },
       { name: '友情', color: '#0c8ce9' },
@@ -2603,21 +2603,18 @@ try {
       { name: '初心', color: '#3b82f6' },
       { name: '青春', color: '#14b8a6' },
       { name: '灵感', color: '#a855f7' },
-      { name: '深夜', color: '#6366f1' },
-      { name: '远方', color: '#0ea5e9' },
       { name: '代码', color: '#22c55e' },
-      { name: '回忆', color: '#fb7185' },
-      { name: '星光', color: '#eab308' },
-      { name: '微风', color: '#2dd4bf' },
-      { name: '勇气', color: '#f97316' },
-      { name: '自由', color: '#38bdf8' },
-      { name: '少年感', color: '#c084fc' },
-      { name: '山海', color: '#34d399' },
-      { name: '花火', color: '#f472b6' },
-      { name: '知己', color: '#60a5fa' },
-      { name: '顿悟', color: '#fbbf24' },
-      { name: '未来', color: '#818cf8' }
+      { name: '回忆', color: '#fb7185' }
     ],
+
+    // 四次方缓动函数 (Quartic Easing)
+    easeOutQuart(t) {
+      return 1 - Math.pow(1 - t, 4);
+    },
+
+    easeInOutQuart(t) {
+      return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+    },
 
     // 4 种 Figma 协作光标工具 SVG
     ICONS: {
@@ -2653,7 +2650,6 @@ try {
             window.location.href = '/?intro=1';
             return;
           }
-          window.scrollTo({ top: 0, behavior: 'smooth' });
           this.start(true);
         });
       }
@@ -2682,56 +2678,62 @@ try {
 
     collectTargets() {
       const tasks = [];
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
 
-      const addIfVisible = (el, type, metaLabel) => {
+      const addTarget = (el, type, metaLabel) => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
         if (rect.width < 4 || rect.height < 4) return;
-        // 仅收集首屏视口范围内可见的元素（不自动滚屏）
-        if (rect.top > vh - 20 || rect.bottom < 0) return;
         tasks.push({ el, type, metaLabel });
       };
 
       // 1. 导航栏核心元素
-      addIfVisible(document.querySelector('.navbar .logo'), 'place', 'Logo');
+      addTarget(document.querySelector('.navbar .logo'), 'place', 'Logo');
       document.querySelectorAll('.navbar .nav-link').forEach((link, idx) => {
-        addIfVisible(link, 'place', `Nav-${idx + 1}`);
+        addTarget(link, 'place', `Nav-${idx + 1}`);
       });
-      addIfVisible(document.getElementById('swarmReplayBtn'), 'place', 'Action');
-      addIfVisible(document.getElementById('searchToggle'), 'place', 'Search');
-      addIfVisible(document.getElementById('themeToggle'), 'place', 'Theme');
-      addIfVisible(document.getElementById('menuToggle'), 'place', 'Menu');
+      addTarget(document.getElementById('swarmReplayBtn'), 'place', 'Action');
+      addTarget(document.getElementById('searchToggle'), 'place', 'Search');
+      addTarget(document.getElementById('themeToggle'), 'place', 'Theme');
+      addTarget(document.getElementById('menuToggle'), 'place', 'Menu');
 
       // 2. Hero 左侧个人介绍区域
-      addIfVisible(document.querySelector('.hero-badge'), 'box', 'Badge');
-      addIfVisible(document.querySelector('.hero-greeting'), 'type', 'Greeting');
-      addIfVisible(document.querySelector('.hero-name'), 'type', 'Heading');
-      addIfVisible(document.querySelector('.hero-description'), 'type', 'Bio');
-      addIfVisible(document.querySelector('.hero-location'), 'place', 'Location');
+      addTarget(document.querySelector('.hero-badge'), 'box', 'Badge');
+      addTarget(document.querySelector('.hero-greeting'), 'type', 'Greeting');
+      addTarget(document.querySelector('.hero-name'), 'type', 'Heading');
+      addTarget(document.querySelector('.hero-description'), 'type', 'Bio');
+      addTarget(document.querySelector('.hero-location'), 'place', 'Location');
       document.querySelectorAll('.hero-links .hero-link').forEach((btn, idx) => {
-        addIfVisible(btn, 'box', `Button-${idx + 1}`);
+        addTarget(btn, 'box', `Button-${idx + 1}`);
       });
 
       // 3. Hero 右侧头像名片区域
-      addIfVisible(document.querySelector('.avatar-card'), 'box', 'Card');
-      addIfVisible(document.querySelector('.avatar-wrapper'), 'box', 'Avatar');
-      addIfVisible(document.querySelector('.avatar-name'), 'type', 'Title');
-      addIfVisible(document.querySelector('.avatar-role'), 'type', 'Role');
+      addTarget(document.querySelector('.avatar-card'), 'box', 'Card');
+      addTarget(document.querySelector('.avatar-wrapper'), 'box', 'Avatar');
+      addTarget(document.querySelector('.avatar-name'), 'type', 'Title');
+      addTarget(document.querySelector('.avatar-role'), 'type', 'Role');
       document.querySelectorAll('.avatar-stats .stat').forEach((stat, idx) => {
-        addIfVisible(stat, 'place', `Stat-${idx + 1}`);
+        addTarget(stat, 'place', `Stat-${idx + 1}`);
       });
 
-      // 4. 首屏下部露出的精选文章或最新文章标题与卡片
-      addIfVisible(document.querySelector('.featured-section .section-header'), 'type', 'Section');
+      // 4. 精选文章区域（全页收集，不强制滚屏）
+      addTarget(document.querySelector('.featured-section .section-header'), 'type', 'Section');
       document.querySelectorAll('.featured-card').forEach((card, idx) => {
-        addIfVisible(card, 'box', `Featured-${idx + 1}`);
+        addTarget(card, 'box', `Featured-${idx + 1}`);
       });
-      addIfVisible(document.querySelector('.posts-section .section-header'), 'type', 'Section');
+
+      // 5. 最新文章区域全部卡片与分页
+      addTarget(document.querySelector('.posts-section .section-header'), 'type', 'Section');
       document.querySelectorAll('#postsGrid .post-card').forEach((card, idx) => {
-        if (idx < 2) addIfVisible(card, 'box', `Post-${idx + 1}`);
+        addTarget(card, 'box', `Post-${idx + 1}`);
       });
+      addTarget(document.querySelector('.pagination'), 'place', 'Pagination');
+
+      // 6. 页脚 Footer 区域
+      addTarget(document.querySelector('.footer-info'), 'type', 'Footer');
+      addTarget(document.querySelector('.footer-friends'), 'box', 'Friends');
+      addTarget(document.querySelector('.footer-links'), 'place', 'Links');
+      addTarget(document.querySelector('.footer-stats'), 'place', 'Stats');
+      addTarget(document.querySelector('.footer-copyright'), 'place', 'Copyright');
 
       return tasks;
     },
@@ -2744,6 +2746,10 @@ try {
         postsGrid.style.display = 'grid';
         postsGrid.style.opacity = '1';
       }
+      // 消除 reveal 类的初始 translateY 偏移，确保所有卡片边界坐标 100% 处于最终位置
+      document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-stagger').forEach((el) => {
+        el.classList.add('revealed');
+      });
     },
 
     start(isReplay = false) {
@@ -2754,7 +2760,9 @@ try {
       this.speedMultiplier = 1;
       localStorage.setItem(this.STORAGE_KEY, '1');
 
-      // 确保骨架屏直接替换为真实文章网格以便测量首屏坐标
+      document.documentElement.classList.add('swarm-running');
+
+      // 确保骨架屏直接替换为真实文章网格且消除 reveal 偏移以便精准测量坐标
       this.prepareAllPostsGridImmediately();
 
       // 先移除 preparing 类以便测量真实 DOM 尺寸，紧接着给目标节点挂上受控隐藏类
@@ -2762,7 +2770,7 @@ try {
       tasks.forEach((task) => {
         if (task.type === 'type') {
           if (!task.el.dataset.swarmOrigText) {
-            task.el.dataset.swarmOrigText = task.el.textContent;
+            task.el.dataset.swarmOrigText = task.el.textContent.trim();
           }
           task.origText = task.el.dataset.swarmOrigText;
           // 保持原有高度占位，避免打字过程中布局跳动
@@ -2780,7 +2788,7 @@ try {
       // 创建全屏舞台与 HUD
       this.buildStage(tasks.length);
 
-      // 创建 24 个 Agent 实例
+      // 创建 12 个 Agent 实例
       this.createAgents();
 
       // 绑定 ESC 键跳过
@@ -2920,10 +2928,12 @@ try {
           prevX: startX,
           prevY: startY,
           angle,
-          orbitRadius: 42 + (index % 5) * 24,
-          orbitSpeed: (index % 2 === 0 ? 1 : -1) * (2.6 + (index % 4) * 0.45),
+          orbitRadius: 44 + (index % 4) * 22,
+          orbitSpeed: (index % 2 === 0 ? 1 : -1) * (2.5 + (index % 3) * 0.45),
+          speedFactor: 0.88 + (index % 4) * 0.1,
           tool: 'arrow',
-          busy: false
+          busy: false,
+          retired: false
         };
 
         this.setAgentPos(agent, startX, startY);
@@ -2932,6 +2942,7 @@ try {
     },
 
     setAgentPos(agent, x, y) {
+      if (agent.retired) return;
       // 更新残影坐标（滞后跟随）
       if (agent.ghosts && agent.ghosts.length) {
         for (let i = agent.ghosts.length - 1; i > 0; i--) {
@@ -2952,6 +2963,7 @@ try {
     },
 
     setAgentTool(agent, tool, metaText = '') {
+      if (agent.retired) return;
       if (agent.tool !== tool) {
         agent.tool = tool;
         const renderer = this.ICONS[tool] || this.ICONS.arrow;
@@ -2976,36 +2988,42 @@ try {
       setTimeout(() => r.remove(), 600);
     },
 
-    // 使用贝塞尔曲线平滑移动 Agent 到指定坐标
-    moveAgentTo(agent, targetX, targetY, durationMs, onUpdate) {
+    // 使用四次方缓动 (Quartic Easing) + 贝塞尔曲线平滑移动 Agent 到指定坐标
+    moveAgentTo(agent, targetX, targetY, durationMs, onUpdate, easingType = 'inOutQuart') {
       return new Promise((resolve) => {
+        if (agent.retired) return resolve();
         const startX = agent.x;
         const startY = agent.y;
-        // 构造自然的弧线控制点
         const dx = targetX - startX;
         const dy = targetY - startY;
-        const ctrlX = startX + dx * 0.45 - dy * 0.16;
-        const ctrlY = startY + dy * 0.45 + dx * 0.16;
+        const ctrlX = startX + dx * 0.46 - dy * 0.14;
+        const ctrlY = startY + dy * 0.46 + dx * 0.14;
 
         let elapsed = 0;
         let lastTime = performance.now();
+        const actualDuration = Math.max(20, durationMs / (agent.speedFactor || 1));
 
         const step = (now) => {
-          if (!this.isRunning) return resolve();
+          if (!this.isRunning || agent.retired) return resolve();
           const dt = (now - lastTime) * this.speedMultiplier;
           lastTime = now;
           elapsed += dt;
 
-          const t = Math.min(1, elapsed / Math.max(16, durationMs));
-          // easeOutCubic
-          const ease = 1 - Math.pow(1 - t, 3);
+          const t = Math.min(1, elapsed / actualDuration);
+          // 采用四次方缓动曲线
+          const ease =
+            easingType === 'linear'
+              ? t
+              : easingType === 'outQuart'
+              ? this.easeOutQuart(t)
+              : this.easeInOutQuart(t);
 
           const inv = 1 - ease;
           const curX = inv * inv * startX + 2 * inv * ease * ctrlX + ease * ease * targetX;
           const curY = inv * inv * startY + 2 * inv * ease * ctrlY + ease * ease * targetY;
 
           this.setAgentPos(agent, curX, curY);
-          if (onUpdate) onUpdate(ease, curX, curY);
+          if (onUpdate) onUpdate(ease, curX, curY, t);
 
           if (t < 1) {
             requestAnimationFrame(step);
@@ -3016,6 +3034,41 @@ try {
 
         requestAnimationFrame(step);
       });
+    },
+
+    // 单个 Agent 完成所有分配的任务后，独自飞向右下角移出屏幕并走消失流程
+    async retireAgent(agent) {
+      if (!this.isRunning || agent.retired) return;
+      this.setAgentTool(agent, 'arrow');
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      // 目标点在右下角屏幕外侧，每个 Agent 带一点扇形偏移避免重叠
+      const exitX = vw + 75 + (agent.id % 4) * 32;
+      const exitY = vh + 65 + Math.floor(agent.id / 4) * 28;
+      // 若当前 Agent 在视口很下方（因为构建了底部元素），先拉回视口底部附近再从右下角滑出，确保视觉可见
+      if (agent.y > vh + 120) {
+        agent.y = vh + 40;
+      }
+
+      await this.moveAgentTo(
+        agent,
+        exitX,
+        exitY,
+        620 + (agent.id % 3) * 80,
+        (ease) => {
+          const alpha = Math.max(0, 1 - Math.pow(ease, 2));
+          agent.el.style.opacity = alpha.toFixed(2);
+          agent.ghosts.forEach((g, idx) => {
+            g.el.style.opacity = (alpha * (0.35 - idx * 0.15)).toFixed(2);
+          });
+        },
+        'inOutQuart'
+      );
+
+      agent.retired = true;
+      if (agent.el) agent.el.remove();
+      if (agent.ghosts) agent.ghosts.forEach((g) => g.el.remove());
     },
 
     wait(ms) {
@@ -3046,7 +3099,7 @@ try {
       };
 
       // ==========================================
-      // 阶段 1：中心风暴螺旋集结 (0 ~ 950ms)
+      // 阶段 1：中心风暴螺旋集结 (0 ~ 950ms，采用四次缓动)
       // ==========================================
       const vw = window.innerWidth;
       const vh = window.innerHeight;
@@ -3064,9 +3117,9 @@ try {
           last = now;
           elapsed += dt;
           const progress = Math.min(1, elapsed / duration);
-          const ease = 1 - Math.pow(1 - progress, 3);
+          const ease = this.easeOutQuart(progress);
 
-          this.agents.forEach((agent, i) => {
+          this.agents.forEach((agent) => {
             const currentAngle = agent.angle + progress * agent.orbitSpeed * 2.4;
             const startR = Math.max(vw, vh) * 0.45;
             const r = startR * (1 - ease) + agent.orbitRadius * ease;
@@ -3076,7 +3129,7 @@ try {
           });
 
           if (this.hudBar) {
-            this.hudBar.style.width = `${Math.round(progress * 12)}%`;
+            this.hudBar.style.width = `${Math.round(progress * 10)}%`;
           }
 
           if (progress < 1) {
@@ -3091,26 +3144,36 @@ try {
       if (!this.isRunning) return;
 
       // ==========================================
-      // 阶段 2：中心徽章散开 + 主画板蓝图拉框与标尺切入 (950ms ~ 1450ms)
+      // 阶段 2：中心徽章散开 + 主画板蓝图拉框与标尺精准切入
       // ==========================================
       this.centerBadge.classList.remove('is-visible');
       this.centerBadge.classList.add('is-dispersing');
       this.backdrop.classList.add('is-fading');
       updateHudProgress();
 
-      // 激活贯穿全屏的红/蓝对齐标尺线（复刻视频第 3~5 帧）
-      const containerEl = document.querySelector('.hero .container') || document.body;
-      const containerRect = containerEl.getBoundingClientRect();
-      const leftEdge = Math.max(16, containerRect.left);
-      const topEdge = 56;
-      this.guideV.style.left = `${leftEdge}px`;
-      this.guideH1.style.top = `${topEdge}px`;
-      this.guideH2.style.top = `${Math.min(vh - 80, containerRect.bottom)}px`;
+      // 直接取真实内容网格 .hero-grid（不含 .container 的 24px 左右内边距），确保垂直红线与左列内容 100% 像素级对齐！
+      const contentGridEl =
+        document.querySelector('.hero-grid') ||
+        document.querySelector('.hero .container') ||
+        document.body;
+      const navbarEl = document.querySelector('.navbar');
+      const gridRect = contentGridEl.getBoundingClientRect();
+      const navBottom = navbarEl ? Math.round(navbarEl.getBoundingClientRect().bottom) : 56;
+
+      const abLeft = Math.round(gridRect.left);
+      const abTop = Math.round(gridRect.top);
+      const abWidth = Math.round(gridRect.width);
+      const abHeight = Math.round(gridRect.height);
+
+      // 红色垂直标尺线精准锁定内容区左边界，水平标尺线精准锁定导航栏底边与 Hero 底边
+      this.guideV.style.left = `${abLeft}px`;
+      this.guideH1.style.top = `${navBottom}px`;
+      this.guideH2.style.top = `${abTop + abHeight}px`;
       this.guideV.classList.add('is-active');
       this.guideH1.classList.add('is-active');
       this.guideH2.classList.add('is-active');
 
-      // 由 0 号 Agent（亲情）与 1 号 Agent（友情）拉出首屏主画板外框
+      // 主画板外框贴合 .hero-grid 真实边界
       const artboard = document.createElement('div');
       artboard.className = 'swarm-wireframe';
       artboard.style.setProperty('--wf-color', '#0c8ce9');
@@ -3122,29 +3185,27 @@ try {
       this.stage.appendChild(artboard);
       const artboardTag = artboard.querySelector('#artboardSizeTag');
 
-      const abLeft = Math.max(12, containerRect.left - 8);
-      const abTop = 58;
-      const abWidth = Math.min(vw - abLeft * 2, containerRect.width + 16);
-      const abHeight = Math.min(vh - abTop - 72, Math.max(360, containerRect.height));
-
       const leadAgent = this.agents[1]; // 友情 (#0c8ce9)
       leadAgent.busy = true;
       this.setAgentTool(leadAgent, 'crosshair', 'Artboard');
 
-      // 其余 Agent 同时散开预备
+      // 其余 11 个 Agent 散开预备
       this.agents.forEach((ag, idx) => {
         if (ag === leadAgent) return;
         const targetX = abLeft + ((idx * 137) % Math.max(200, abWidth));
         const targetY = abTop + ((idx * 89) % Math.max(180, abHeight));
-        this.moveAgentTo(ag, targetX, targetY, 460 + (idx % 5) * 60);
+        this.moveAgentTo(ag, targetX, targetY, 440 + (idx % 4) * 55);
       });
 
-      await this.moveAgentTo(leadAgent, abLeft, abTop, 220);
-      await this. moveAgentTo(leadAgent, abLeft + abWidth, abTop + abHeight, 360, (ease) => {
-        const curW = Math.max(20, Math.round(abWidth * ease));
-        const curH = Math.max(20, Math.round(abHeight * ease));
-        artboard.style.left = `${abLeft}px`;
-        artboard.style.top = `${abTop}px`;
+      await this.moveAgentTo(leadAgent, abLeft, abTop, 240);
+      await this.moveAgentTo(leadAgent, abLeft + abWidth, abTop + abHeight, 380, (ease) => {
+        const curRect = contentGridEl.getBoundingClientRect();
+        const curL = Math.round(curRect.left);
+        const curT = Math.round(curRect.top);
+        const curW = Math.max(20, Math.round(curRect.width * ease));
+        const curH = Math.max(20, Math.round(curRect.height * ease));
+        artboard.style.left = `${curL}px`;
+        artboard.style.top = `${curT}px`;
         artboard.style.width = `${curW}px`;
         artboard.style.height = `${curH}px`;
         if (artboardTag) artboardTag.textContent = `${curW} × ${curH}`;
@@ -3153,42 +3214,44 @@ try {
       leadAgent.busy = false;
       this.setAgentTool(leadAgent, 'arrow');
 
-      // 主画板框完成后淡化为浅辅助框
+      // 主画板框完成后淡化为浅辅助框，并在用户手动滚动时实时跟随 .hero-grid
       artboard.style.background = 'transparent';
       artboard.style.borderColor = 'rgba(12, 140, 233, 0.28)';
+      const syncArtboardOnScroll = () => {
+        if (!this.isRunning || !artboard.isConnected) return;
+        const r = contentGridEl.getBoundingClientRect();
+        artboard.style.left = `${Math.round(r.left)}px`;
+        artboard.style.top = `${Math.round(r.top)}px`;
+        artboard.style.width = `${Math.round(r.width)}px`;
+        artboard.style.height = `${Math.round(r.height)}px`;
+      };
+      window.addEventListener('scroll', syncArtboardOnScroll, { passive: true });
+      this.scrollSyncCleanup = () => window.removeEventListener('scroll', syncArtboardOnScroll);
 
       // ==========================================
-      // 阶段 3：24 个 Agent 多线程并发构建首屏所有图层 (1.4s ~ 5.6s)
+      // 阶段 3：12 个 Agent 异步工作池构建全页所有图层
+      // 每个 Agent 完成队列任务后各自前往右下角飞出屏幕消失
       // ==========================================
-      const buildLayer = async (task, index) => {
+      const executeTask = async (agent, task) => {
         if (!this.isRunning) return;
-        // 错峰启动，形成此起彼伏的丝滑并发感
-        await this.wait(index * 115);
-        if (!this.isRunning) return;
-
-        const agent = this.agents[index % this.agents.length];
         agent.busy = true;
 
-        const rect = task.el.getBoundingClientRect();
-        // 移动红色垂直对齐线和蓝色水平辅助线跟随当前活跃区块
-        if (index % 3 === 0 && this.guideV && this.guideH2) {
-          this.guideV.style.left = `${Math.round(rect.left)}px`;
-          this.guideH2.style.top = `${Math.round(rect.bottom)}px`;
+        const initRect = task.el.getBoundingClientRect();
+        // 当目标元素在当前视口内时，同步更新红/蓝对齐标尺线到该元素的真实边界（精确到像素）
+        if (initRect.top >= 0 && initRect.top <= window.innerHeight && this.guideV && this.guideH2) {
+          this.guideV.style.left = `${Math.round(initRect.left)}px`;
+          this.guideH2.style.top = `${Math.round(initRect.bottom)}px`;
         }
 
         if (task.type === 'box') {
-          // 【拉框生成模式】：飞到左上角 -> 切换十字准星 -> 拖拽到右下角拉出蓝框与实时像素尺寸 -> 元素缩放显现
+          // 【拉框生成模式】：采用 clip-path 揭开元素，不缩放元素盒子本身，保证选区框与真实边缘 100% 重合
           this.setAgentTool(agent, 'crosshair', task.metaLabel);
-          await this.moveAgentTo(agent, rect.left, rect.top, 280);
+          await this.moveAgentTo(agent, Math.round(initRect.left), Math.round(initRect.top), 320);
           if (!this.isRunning) return;
 
           const wf = document.createElement('div');
           wf.className = 'swarm-wireframe';
           wf.style.setProperty('--wf-color', agent.color);
-          wf.style.left = `${rect.left}px`;
-          wf.style.top = `${rect.top}px`;
-          wf.style.width = '4px';
-          wf.style.height = '4px';
           wf.innerHTML = `
             <span class="swarm-wf-handle-bl"></span>
             <span class="swarm-wf-handle-br"></span>
@@ -3199,77 +3262,108 @@ try {
 
           task.el.classList.add('swarm-target-building');
           task.el.classList.remove('swarm-target-hidden');
-          task.el.style.transformOrigin = 'top left';
 
-          await this.moveAgentTo(agent, rect.right, rect.bottom, 380, (ease) => {
-            const w = Math.max(8, Math.round(rect.width * ease));
-            const h = Math.max(8, Math.round(rect.height * ease));
-            wf.style.width = `${w}px`;
-            wf.style.height = `${h}px`;
-            sizeLabel.textContent = `${w} × ${h}`;
-            task.el.style.opacity = String(Math.min(1, ease * 1.15));
-            task.el.style.transform = `scale(${0.92 + 0.08 * ease})`;
-          });
+          const targetRect = task.el.getBoundingClientRect();
+          await this.moveAgentTo(
+            agent,
+            Math.round(targetRect.right),
+            Math.round(targetRect.bottom),
+            420,
+            (ease) => {
+              // 每帧实时读取最新位置（兼容用户手动滚动），与真实卡片边界零误差贴合
+              const curRect = task.el.getBoundingClientRect();
+              const l = Math.round(curRect.left);
+              const t = Math.round(curRect.top);
+              const w = Math.max(6, Math.round(curRect.width * ease));
+              const h = Math.max(6, Math.round(curRect.height * ease));
+              wf.style.left = `${l}px`;
+              wf.style.top = `${t}px`;
+              wf.style.width = `${w}px`;
+              wf.style.height = `${h}px`;
+              sizeLabel.textContent = `${w} × ${h}`;
 
+              const clipRight = Math.max(0, 100 - ease * 100).toFixed(1);
+              const clipBottom = Math.max(0, 100 - ease * 100).toFixed(1);
+              task.el.style.clipPath = `inset(0 ${clipRight}% ${clipBottom}% 0)`;
+              task.el.style.opacity = String(Math.min(1, ease * 1.2));
+
+              if (curRect.top >= 0 && curRect.top <= window.innerHeight && this.guideH2) {
+                this.guideV.style.left = `${l}px`;
+                this.guideH2.style.top = `${t + h}px`;
+              }
+            },
+            'inOutQuart'
+          );
+
+          task.el.style.clipPath = '';
           task.el.style.opacity = '';
-          task.el.style.transform = '';
-          task.el.style.transformOrigin = '';
-          this.spawnRipple(rect.right, rect.bottom, agent.color);
+          const endRect = task.el.getBoundingClientRect();
+          this.spawnRipple(Math.round(endRect.right), Math.round(endRect.bottom), agent.color);
 
           wf.style.opacity = '0';
-          setTimeout(() => wf.remove(), 260);
+          setTimeout(() => wf.remove(), 240);
         } else if (task.type === 'type') {
-          // 【打字机生成模式】：飞到文字起点 -> 切换 I 型文本光标 -> 蓝色选区高亮框 -> 逐字高速敲入并跟随光标
+          // 【打字机生成模式】：调慢打字速度，让人眼清晰看到逐字敲击与蓝色高亮选区
           this.setAgentTool(agent, 'ibeam', 'Typing');
-          await this.moveAgentTo(agent, rect.left + 4, rect.top + rect.height * 0.5, 260);
+          await this.moveAgentTo(
+            agent,
+            Math.round(initRect.left + 4),
+            Math.round(initRect.top + initRect.height * 0.5),
+            300
+          );
           if (!this.isRunning) return;
 
           task.el.classList.remove('swarm-target-hidden');
           task.el.classList.add('swarm-text-highlight');
           const fullText = task.origText || '';
           const len = fullText.length;
-          const typeDuration = Math.min(720, Math.max(260, len * 18));
+          // 调慢打字速度：单字 58ms，最短 520ms，最长 1850ms
+          const typeDuration = Math.min(1850, Math.max(520, len * 58));
 
+          const curRect = task.el.getBoundingClientRect();
           await this.moveAgentTo(
             agent,
-            rect.left + Math.min(rect.width, Math.max(40, len * 11)),
-            rect.top + rect.height * 0.5,
+            Math.round(curRect.left + Math.min(curRect.width, Math.max(48, len * 13))),
+            Math.round(curRect.top + curRect.height * 0.5),
             typeDuration,
-            (ease) => {
-              const charCount = Math.max(1, Math.round(len * ease));
+            (_ease, _cx, _cy, rawT) => {
+              // 打字过程使用线性进度 rawT，逐字敲击均匀清晰
+              const charCount = Math.max(1, Math.round(len * rawT));
               task.el.textContent = fullText.slice(0, charCount);
-            }
+            },
+            'outQuart'
           );
 
           task.el.textContent = fullText;
           task.el.style.minHeight = '';
           setTimeout(() => {
             task.el.classList.remove('swarm-text-highlight');
-          }, 220);
+          }, 260);
         } else {
-          // 【快速安放组件模式】：飞到组件中心 -> 抓手/箭头落点 + 蓝框闪烁 + 点击涟漪
+          // 【快速安放组件模式】
           this.setAgentTool(agent, 'hand', task.metaLabel);
-          const targetX = rect.left + rect.width * 0.5;
-          const targetY = rect.top + rect.height * 0.5;
-          await this.moveAgentTo(agent, targetX, targetY, 270);
+          const targetX = Math.round(initRect.left + initRect.width * 0.5);
+          const targetY = Math.round(initRect.top + initRect.height * 0.5);
+          await this.moveAgentTo(agent, targetX, targetY, 300);
           if (!this.isRunning) return;
 
+          const curRect = task.el.getBoundingClientRect();
           const wf = document.createElement('div');
           wf.className = 'swarm-wireframe';
           wf.style.setProperty('--wf-color', agent.color);
-          wf.style.left = `${rect.left - 2}px`;
-          wf.style.top = `${rect.top - 2}px`;
-          wf.style.width = `${rect.width + 4}px`;
-          wf.style.height = `${rect.height + 4}px`;
-          wf.innerHTML = `<span class="swarm-wf-size">${Math.round(rect.width)} × ${Math.round(rect.height)}</span>`;
+          wf.style.left = `${Math.round(curRect.left)}px`;
+          wf.style.top = `${Math.round(curRect.top)}px`;
+          wf.style.width = `${Math.round(curRect.width)}px`;
+          wf.style.height = `${Math.round(curRect.height)}px`;
+          wf.innerHTML = `<span class="swarm-wf-size">${Math.round(curRect.width)} × ${Math.round(curRect.height)}</span>`;
           this.stage.appendChild(wf);
 
           agent.el.classList.add('is-clicking');
-          this.spawnRipple(targetX, targetY, agent.color);
+          this.spawnRipple(Math.round(curRect.left + curRect.width * 0.5), Math.round(curRect.top + curRect.height * 0.5), agent.color);
           task.el.classList.add('swarm-target-building');
           task.el.classList.remove('swarm-target-hidden');
 
-          await this.wait(160);
+          await this.wait(170);
           agent.el.classList.remove('is-clicking');
           wf.style.opacity = '0';
           setTimeout(() => wf.remove(), 220);
@@ -3281,30 +3375,31 @@ try {
         updateHudProgress();
       };
 
-      // 让未分配具体任务的空闲 Agent 在首屏画布中协同巡航（营造热闹的 24 人协作氛围）
-      let buildingDone = false;
-      const roamPromise = (async () => {
-        while (this.isRunning && !buildingDone) {
-          this.agents.forEach((ag, idx) => {
-            if (!ag.busy && Math.random() < 0.35) {
-              const rx = abLeft + 24 + Math.random() * Math.max(120, abWidth - 48);
-              const ry = abTop + 16 + Math.random() * Math.max(120, abHeight - 32);
-              this.moveAgentTo(ag, rx, ry, 420 + (idx % 4) * 90);
-            }
-          });
-          await this.wait(320);
+      // 建立共享任务队列，12 个 Agent 各自异步领取任务，谁干完谁立刻独自从右下角退场！
+      const taskQueue = [...tasks];
+      const workerPromises = this.agents.map(async (agent, idx) => {
+        // 初始错峰出发
+        await this.wait(idx * 95);
+        while (this.isRunning && taskQueue.length > 0) {
+          const nextTask = taskQueue.shift();
+          if (!nextTask) break;
+          await executeTask(agent, nextTask);
         }
-      })();
+        // 该 Agent 已无新任务可领，立即独自飞向右下角移出屏幕并走消失流程
+        await this.retireAgent(agent);
+      });
 
-      await Promise.all(tasks.map((task, idx) => buildLayer(task, idx)));
-      buildingDone = true;
-      await roamPromise;
+      await Promise.all(workerPromises);
 
       if (!this.isRunning) return;
 
       // ==========================================
-      // 阶段 4：竣工致意与优雅退场 (Celebration & Complete)
+      // 阶段 4：全部 Agent 已陆续退场，收起辅助线并更新 HUD
       // ==========================================
+      if (this.scrollSyncCleanup) {
+        this.scrollSyncCleanup();
+        this.scrollSyncCleanup = null;
+      }
       artboard.style.opacity = '0';
       this.guideV.classList.remove('is-active');
       this.guideH1.classList.remove('is-active');
@@ -3324,24 +3419,14 @@ try {
         this.hudReplayBtn.style.display = 'inline-flex';
       }
 
-      // Agent 们向右下与四周轻快散开淡出（复刻视频最后一帧右下角光标簇退场）
-      this.agents.forEach((ag, i) => {
-        const exitAngle = (i / this.agents.length) * Math.PI * 2;
-        const exitX = ag.x + Math.cos(exitAngle) * 90;
-        const exitY = ag.y + Math.sin(exitAngle) * 70;
-        ag.el.style.opacity = '0';
-        ag.ghosts.forEach((g) => (g.el.style.opacity = '0'));
-        this.moveAgentTo(ag, exitX, exitY, 450);
-      });
-
-      await this.wait(500);
+      await this.wait(300);
       if (!this.isRunning) return;
 
-      // 移除舞台遮罩层，保留底部胶囊 HUD 3.8 秒供用户点击 Replay，之后自动收起
       if (this.stage) {
         this.stage.remove();
         this.stage = null;
       }
+      document.documentElement.classList.remove('swarm-running');
 
       this.autoHideTimer = setTimeout(() => {
         this.cleanup(false);
@@ -3354,6 +3439,10 @@ try {
 
     cleanup(immediate = true) {
       this.isRunning = false;
+      if (this.scrollSyncCleanup) {
+        this.scrollSyncCleanup();
+        this.scrollSyncCleanup = null;
+      }
       if (this.autoHideTimer) {
         clearTimeout(this.autoHideTimer);
         this.autoHideTimer = null;
@@ -3363,7 +3452,7 @@ try {
         this.escHandler = null;
       }
 
-      document.documentElement.classList.remove('swarm-intro-preparing');
+      document.documentElement.classList.remove('swarm-intro-preparing', 'swarm-running');
 
       // 立即恢复所有受控 DOM 元素的原始文本与可见性
       document.querySelectorAll('.swarm-target-hidden, .swarm-target-building, .swarm-text-highlight').forEach((el) => {
@@ -3371,6 +3460,7 @@ try {
         el.style.opacity = '';
         el.style.transform = '';
         el.style.transformOrigin = '';
+        el.style.clipPath = '';
         el.style.minHeight = '';
         if (el.dataset.swarmOrigText) {
           el.textContent = el.dataset.swarmOrigText;

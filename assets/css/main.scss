@@ -5887,17 +5887,24 @@ html.swarm-intro-preparing .posts-section {
   opacity: 0 !important;
 }
 
-/* 构建过程中受控的目标元素初始态 */
+/* 构建动效运行期间消除 reveal 类的初始 translateY 偏移，保证选区框与标尺线像素级对齐 */
+html.swarm-running .reveal,
+html.swarm-running .reveal-left,
+html.swarm-running .reveal-right,
+html.swarm-running .reveal-scale,
+html.swarm-running .reveal-stagger > * {
+  transform: none !important;
+  transition: none !important;
+}
+
+/* 构建过程中受控的目标元素初始态（不加 transform 偏移，确保 getBoundingClientRect 100% 精准对齐） */
 .swarm-target-hidden {
   opacity: 0 !important;
-  transform: scale(0.96) translateY(6px) !important;
   transition: none !important;
 }
 
 .swarm-target-building {
-  transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-              clip-path 0.32s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 /* 文本选中高亮态（模仿视频中三段蓝色高亮框选打字） */
