@@ -2678,62 +2678,55 @@ try {
 
     collectTargets() {
       const tasks = [];
+      const vh = window.innerHeight;
 
-      const addTarget = (el, type, metaLabel) => {
+      const addIfVisible = (el, type, metaLabel) => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
         if (rect.width < 4 || rect.height < 4) return;
+        // 仅收集首屏视口范围内可见的元素（不跑完整张页面、不自动滚屏）
+        if (rect.top > vh - 20 || rect.bottom < 0) return;
         tasks.push({ el, type, metaLabel });
       };
 
       // 1. 导航栏核心元素
-      addTarget(document.querySelector('.navbar .logo'), 'place', 'Logo');
+      addIfVisible(document.querySelector('.navbar .logo'), 'place', 'Logo');
       document.querySelectorAll('.navbar .nav-link').forEach((link, idx) => {
-        addTarget(link, 'place', `Nav-${idx + 1}`);
+        addIfVisible(link, 'place', `Nav-${idx + 1}`);
       });
-      addTarget(document.getElementById('swarmReplayBtn'), 'place', 'Action');
-      addTarget(document.getElementById('searchToggle'), 'place', 'Search');
-      addTarget(document.getElementById('themeToggle'), 'place', 'Theme');
-      addTarget(document.getElementById('menuToggle'), 'place', 'Menu');
+      addIfVisible(document.getElementById('swarmReplayBtn'), 'place', 'Action');
+      addIfVisible(document.getElementById('searchToggle'), 'place', 'Search');
+      addIfVisible(document.getElementById('themeToggle'), 'place', 'Theme');
+      addIfVisible(document.getElementById('menuToggle'), 'place', 'Menu');
 
       // 2. Hero 左侧个人介绍区域
-      addTarget(document.querySelector('.hero-badge'), 'box', 'Badge');
-      addTarget(document.querySelector('.hero-greeting'), 'type', 'Greeting');
-      addTarget(document.querySelector('.hero-name'), 'type', 'Heading');
-      addTarget(document.querySelector('.hero-description'), 'type', 'Bio');
-      addTarget(document.querySelector('.hero-location'), 'place', 'Location');
+      addIfVisible(document.querySelector('.hero-badge'), 'box', 'Badge');
+      addIfVisible(document.querySelector('.hero-greeting'), 'type', 'Greeting');
+      addIfVisible(document.querySelector('.hero-name'), 'type', 'Heading');
+      addIfVisible(document.querySelector('.hero-description'), 'type', 'Bio');
+      addIfVisible(document.querySelector('.hero-location'), 'place', 'Location');
       document.querySelectorAll('.hero-links .hero-link').forEach((btn, idx) => {
-        addTarget(btn, 'box', `Button-${idx + 1}`);
+        addIfVisible(btn, 'box', `Button-${idx + 1}`);
       });
 
       // 3. Hero 右侧头像名片区域
-      addTarget(document.querySelector('.avatar-card'), 'box', 'Card');
-      addTarget(document.querySelector('.avatar-wrapper'), 'box', 'Avatar');
-      addTarget(document.querySelector('.avatar-name'), 'type', 'Title');
-      addTarget(document.querySelector('.avatar-role'), 'type', 'Role');
+      addIfVisible(document.querySelector('.avatar-card'), 'box', 'Card');
+      addIfVisible(document.querySelector('.avatar-wrapper'), 'box', 'Avatar');
+      addIfVisible(document.querySelector('.avatar-name'), 'type', 'Title');
+      addIfVisible(document.querySelector('.avatar-role'), 'type', 'Role');
       document.querySelectorAll('.avatar-stats .stat').forEach((stat, idx) => {
-        addTarget(stat, 'place', `Stat-${idx + 1}`);
+        addIfVisible(stat, 'place', `Stat-${idx + 1}`);
       });
 
-      // 4. 精选文章区域（全页收集，不强制滚屏）
-      addTarget(document.querySelector('.featured-section .section-header'), 'type', 'Section');
+      // 4. 首屏下部露出的精选文章或最新文章标题与卡片
+      addIfVisible(document.querySelector('.featured-section .section-header'), 'type', 'Section');
       document.querySelectorAll('.featured-card').forEach((card, idx) => {
-        addTarget(card, 'box', `Featured-${idx + 1}`);
+        addIfVisible(card, 'box', `Featured-${idx + 1}`);
       });
-
-      // 5. 最新文章区域全部卡片与分页
-      addTarget(document.querySelector('.posts-section .section-header'), 'type', 'Section');
+      addIfVisible(document.querySelector('.posts-section .section-header'), 'type', 'Section');
       document.querySelectorAll('#postsGrid .post-card').forEach((card, idx) => {
-        addTarget(card, 'box', `Post-${idx + 1}`);
+        if (idx < 2) addIfVisible(card, 'box', `Post-${idx + 1}`);
       });
-      addTarget(document.querySelector('.pagination'), 'place', 'Pagination');
-
-      // 6. 页脚 Footer 区域
-      addTarget(document.querySelector('.footer-info'), 'type', 'Footer');
-      addTarget(document.querySelector('.footer-friends'), 'box', 'Friends');
-      addTarget(document.querySelector('.footer-links'), 'place', 'Links');
-      addTarget(document.querySelector('.footer-stats'), 'place', 'Stats');
-      addTarget(document.querySelector('.footer-copyright'), 'place', 'Copyright');
 
       return tasks;
     },
@@ -2989,7 +2982,7 @@ try {
     },
 
     // 使用四次方缓动 (Quartic Easing) + 贝塞尔曲线平滑移动 Agent 到指定坐标
-    moveAgentTo(agent, targetX, targetY, durationMs, onUpdate, easingType = 'inOutQuart') {
+    moveAgentTo(agent, targetX, targetY, durationMs, onUpdate, easingType = 'outQuart') {
       return new Promise((resolve) => {
         if (agent.retired) return resolve();
         const startX = agent.x;
@@ -3010,13 +3003,13 @@ try {
           elapsed += dt;
 
           const t = Math.min(1, elapsed / actualDuration);
-          // 采用四次方缓动曲线
+          // 采用四次方缓动曲线（默认 outQuart，初速度充沛零停滞，落点细腻减速）
           const ease =
             easingType === 'linear'
               ? t
-              : easingType === 'outQuart'
-              ? this.easeOutQuart(t)
-              : this.easeInOutQuart(t);
+              : easingType === 'inOutQuart'
+              ? this.easeInOutQuart(t)
+              : this.easeOutQuart(t);
 
           const inv = 1 - ease;
           const curX = inv * inv * startX + 2 * inv * ease * ctrlX + ease * ease * targetX;
@@ -3046,7 +3039,6 @@ try {
       // 目标点在右下角屏幕外侧，每个 Agent 带一点扇形偏移避免重叠
       const exitX = vw + 75 + (agent.id % 4) * 32;
       const exitY = vh + 65 + Math.floor(agent.id / 4) * 28;
-      // 若当前 Agent 在视口很下方（因为构建了底部元素），先拉回视口底部附近再从右下角滑出，确保视觉可见
       if (agent.y > vh + 120) {
         agent.y = vh + 40;
       }
@@ -3055,7 +3047,7 @@ try {
         agent,
         exitX,
         exitY,
-        620 + (agent.id % 3) * 80,
+        560 + (agent.id % 3) * 70,
         (ease) => {
           const alpha = Math.max(0, 1 - Math.pow(ease, 2));
           agent.el.style.opacity = alpha.toFixed(2);
@@ -3063,7 +3055,7 @@ try {
             g.el.style.opacity = (alpha * (0.35 - idx * 0.15)).toFixed(2);
           });
         },
-        'inOutQuart'
+        'outQuart'
       );
 
       agent.retired = true;
@@ -3099,7 +3091,7 @@ try {
       };
 
       // ==========================================
-      // 阶段 1：中心风暴螺旋集结 (0 ~ 950ms，采用四次缓动)
+      // 阶段 1：中心风暴螺旋集结 (0 ~ 680ms，紧凑旋入不减速停滞)
       // ==========================================
       const vw = window.innerWidth;
       const vh = window.innerHeight;
@@ -3109,7 +3101,7 @@ try {
       await new Promise((resolve) => {
         let elapsed = 0;
         let last = performance.now();
-        const duration = 950;
+        const duration = 680;
 
         const vortexStep = (now) => {
           if (!this.isRunning) return resolve();
@@ -3120,8 +3112,8 @@ try {
           const ease = this.easeOutQuart(progress);
 
           this.agents.forEach((agent) => {
-            const currentAngle = agent.angle + progress * agent.orbitSpeed * 2.4;
-            const startR = Math.max(vw, vh) * 0.45;
+            const currentAngle = agent.angle + progress * agent.orbitSpeed * 2.1;
+            const startR = Math.max(vw, vh) * 0.44;
             const r = startR * (1 - ease) + agent.orbitRadius * ease;
             const x = cx + Math.cos(currentAngle) * r;
             const y = cy + Math.sin(currentAngle) * r * 0.78;
@@ -3144,7 +3136,7 @@ try {
       if (!this.isRunning) return;
 
       // ==========================================
-      // 阶段 2：中心徽章散开 + 主画板蓝图拉框与标尺精准切入
+      // 阶段 2 & 3 无缝并发：中心徽章散开瞬间，12 个鼠标 0 停顿同时冲向各自首个任务！
       // ==========================================
       this.centerBadge.classList.remove('is-visible');
       this.centerBadge.classList.add('is-dispersing');
@@ -3185,38 +3177,6 @@ try {
       this.stage.appendChild(artboard);
       const artboardTag = artboard.querySelector('#artboardSizeTag');
 
-      const leadAgent = this.agents[1]; // 友情 (#0c8ce9)
-      leadAgent.busy = true;
-      this.setAgentTool(leadAgent, 'crosshair', 'Artboard');
-
-      // 其余 11 个 Agent 散开预备
-      this.agents.forEach((ag, idx) => {
-        if (ag === leadAgent) return;
-        const targetX = abLeft + ((idx * 137) % Math.max(200, abWidth));
-        const targetY = abTop + ((idx * 89) % Math.max(180, abHeight));
-        this.moveAgentTo(ag, targetX, targetY, 440 + (idx % 4) * 55);
-      });
-
-      await this.moveAgentTo(leadAgent, abLeft, abTop, 240);
-      await this.moveAgentTo(leadAgent, abLeft + abWidth, abTop + abHeight, 380, (ease) => {
-        const curRect = contentGridEl.getBoundingClientRect();
-        const curL = Math.round(curRect.left);
-        const curT = Math.round(curRect.top);
-        const curW = Math.max(20, Math.round(curRect.width * ease));
-        const curH = Math.max(20, Math.round(curRect.height * ease));
-        artboard.style.left = `${curL}px`;
-        artboard.style.top = `${curT}px`;
-        artboard.style.width = `${curW}px`;
-        artboard.style.height = `${curH}px`;
-        if (artboardTag) artboardTag.textContent = `${curW} × ${curH}`;
-      });
-      this.spawnRipple(abLeft + abWidth, abTop + abHeight, leadAgent.color);
-      leadAgent.busy = false;
-      this.setAgentTool(leadAgent, 'arrow');
-
-      // 主画板框完成后淡化为浅辅助框，并在用户手动滚动时实时跟随 .hero-grid
-      artboard.style.background = 'transparent';
-      artboard.style.borderColor = 'rgba(12, 140, 233, 0.28)';
       const syncArtboardOnScroll = () => {
         if (!this.isRunning || !artboard.isConnected) return;
         const r = contentGridEl.getBoundingClientRect();
@@ -3225,19 +3185,42 @@ try {
         artboard.style.width = `${Math.round(r.width)}px`;
         artboard.style.height = `${Math.round(r.height)}px`;
       };
-      window.addEventListener('scroll', syncArtboardOnScroll, { passive: true });
-      this.scrollSyncCleanup = () => window.removeEventListener('scroll', syncArtboardOnScroll);
 
-      // ==========================================
-      // 阶段 3：12 个 Agent 异步工作池构建全页所有图层
-      // 每个 Agent 完成队列任务后各自前往右下角飞出屏幕消失
-      // ==========================================
-      const executeTask = async (agent, task) => {
+      // 1 号 Agent (友情) 负责拉主画板框的任务函数（与其他 11 个 Agent 并发执行，绝不阻塞全员！）
+      const buildArtboardTask = async (leadAgent) => {
+        leadAgent.busy = true;
+        this.setAgentTool(leadAgent, 'crosshair', 'Artboard');
+        await this.moveAgentTo(leadAgent, abLeft, abTop, 240);
+        if (!this.isRunning) return;
+        await this.moveAgentTo(leadAgent, abLeft + abWidth, abTop + abHeight, 360, (ease) => {
+          const curRect = contentGridEl.getBoundingClientRect();
+          const curL = Math.round(curRect.left);
+          const curT = Math.round(curRect.top);
+          const curW = Math.max(20, Math.round(curRect.width * ease));
+          const curH = Math.max(20, Math.round(curRect.height * ease));
+          artboard.style.left = `${curL}px`;
+          artboard.style.top = `${curT}px`;
+          artboard.style.width = `${curW}px`;
+          artboard.style.height = `${curH}px`;
+          if (artboardTag) artboardTag.textContent = `${curW} × ${curH}`;
+        });
+        this.spawnRipple(abLeft + abWidth, abTop + abHeight, leadAgent.color);
+        leadAgent.busy = false;
+        this.setAgentTool(leadAgent, 'arrow');
+        artboard.style.background = 'transparent';
+        artboard.style.borderColor = 'rgba(12, 140, 233, 0.28)';
+        window.addEventListener('scroll', syncArtboardOnScroll, { passive: true });
+        this.scrollSyncCleanup = () => window.removeEventListener('scroll', syncArtboardOnScroll);
+      };
+
+      const executeTask = async (agent, task, isFirstTask = false) => {
         if (!this.isRunning) return;
         agent.busy = true;
 
+        // 首个任务直接在空中通过不同的飞行时长形成错落感，不在原地停顿等待！
+        const extraFlight = isFirstTask ? (agent.id % 6) * 42 : 0;
+
         const initRect = task.el.getBoundingClientRect();
-        // 当目标元素在当前视口内时，同步更新红/蓝对齐标尺线到该元素的真实边界（精确到像素）
         if (initRect.top >= 0 && initRect.top <= window.innerHeight && this.guideV && this.guideH2) {
           this.guideV.style.left = `${Math.round(initRect.left)}px`;
           this.guideH2.style.top = `${Math.round(initRect.bottom)}px`;
@@ -3246,7 +3229,7 @@ try {
         if (task.type === 'box') {
           // 【拉框生成模式】：采用 clip-path 揭开元素，不缩放元素盒子本身，保证选区框与真实边缘 100% 重合
           this.setAgentTool(agent, 'crosshair', task.metaLabel);
-          await this.moveAgentTo(agent, Math.round(initRect.left), Math.round(initRect.top), 320);
+          await this.moveAgentTo(agent, Math.round(initRect.left), Math.round(initRect.top), 290 + extraFlight);
           if (!this.isRunning) return;
 
           const wf = document.createElement('div');
@@ -3268,7 +3251,7 @@ try {
             agent,
             Math.round(targetRect.right),
             Math.round(targetRect.bottom),
-            420,
+            400,
             (ease) => {
               // 每帧实时读取最新位置（兼容用户手动滚动），与真实卡片边界零误差贴合
               const curRect = task.el.getBoundingClientRect();
@@ -3292,7 +3275,7 @@ try {
                 this.guideH2.style.top = `${t + h}px`;
               }
             },
-            'inOutQuart'
+            'outQuart'
           );
 
           task.el.style.clipPath = '';
@@ -3309,7 +3292,7 @@ try {
             agent,
             Math.round(initRect.left + 4),
             Math.round(initRect.top + initRect.height * 0.5),
-            300
+            280 + extraFlight
           );
           if (!this.isRunning) return;
 
@@ -3327,7 +3310,6 @@ try {
             Math.round(curRect.top + curRect.height * 0.5),
             typeDuration,
             (_ease, _cx, _cy, rawT) => {
-              // 打字过程使用线性进度 rawT，逐字敲击均匀清晰
               const charCount = Math.max(1, Math.round(len * rawT));
               task.el.textContent = fullText.slice(0, charCount);
             },
@@ -3344,7 +3326,7 @@ try {
           this.setAgentTool(agent, 'hand', task.metaLabel);
           const targetX = Math.round(initRect.left + initRect.width * 0.5);
           const targetY = Math.round(initRect.top + initRect.height * 0.5);
-          await this.moveAgentTo(agent, targetX, targetY, 300);
+          await this.moveAgentTo(agent, targetX, targetY, 270 + extraFlight);
           if (!this.isRunning) return;
 
           const curRect = task.el.getBoundingClientRect();
@@ -3363,7 +3345,7 @@ try {
           task.el.classList.add('swarm-target-building');
           task.el.classList.remove('swarm-target-hidden');
 
-          await this.wait(170);
+          await this.wait(150);
           agent.el.classList.remove('is-clicking');
           wf.style.opacity = '0';
           setTimeout(() => wf.remove(), 220);
@@ -3375,15 +3357,20 @@ try {
         updateHudProgress();
       };
 
-      // 建立共享任务队列，12 个 Agent 各自异步领取任务，谁干完谁立刻独自从右下角退场！
+      // 建立共享任务队列：旋涡散开的同一毫秒，12 个 Agent 0 等待同时出发，谁干完谁独自从右下角退场！
       const taskQueue = [...tasks];
       const workerPromises = this.agents.map(async (agent, idx) => {
-        // 初始错峰出发
-        await this.wait(idx * 95);
+        let isFirst = true;
+        if (idx === 1) {
+          // 1号 Agent 先并发拉开主画板外框，拉完无缝继续从队列取任务
+          await buildArtboardTask(agent);
+          isFirst = false;
+        }
         while (this.isRunning && taskQueue.length > 0) {
           const nextTask = taskQueue.shift();
           if (!nextTask) break;
-          await executeTask(agent, nextTask);
+          await executeTask(agent, nextTask, isFirst);
+          isFirst = false;
         }
         // 该 Agent 已无新任务可领，立即独自飞向右下角移出屏幕并走消失流程
         await this.retireAgent(agent);
