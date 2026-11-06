@@ -3491,7 +3491,7 @@ try {
       }, 3800);
     },
 
-    // 结尾演出：「爱」小鼠在画面中心衔着重播图标登场，精准放入顶栏槽位（歪着），
+    // 结尾演出：「爱」小鼠从屏幕右侧衔着重播图标登场，精准放入顶栏槽位（歪着），
     // 曲线退开一小段后从右侧冲刺撞击，把图标撞正、自己弹开，停顿几毫秒后撤离
     async playFinale(run) {
       const replayBtn = document.getElementById('swarmReplayBtn');
@@ -3500,8 +3500,9 @@ try {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const color = '#f43f5e';
-      const cx = vw * 0.5;
-      const cy = vh * 0.46;
+      // 从屏幕右侧外飞入
+      const startX = vw + 90;
+      const startY = vh * 0.62;
 
       const el = document.createElement('div');
       el.className = 'swarm-cursor';
@@ -3520,10 +3521,10 @@ try {
         el,
         iconEl: el.querySelector('.swarm-cursor-icon'),
         metaEl: el.querySelector('.swarm-cursor-tag-meta'),
-        x: cx,
-        y: cy,
-        prevX: cx,
-        prevY: cy,
+        x: startX,
+        y: startY,
+        prevX: startX,
+        prevY: startY,
         angle: 0,
         orbitRadius: 0,
         orbitSpeed: 0,
@@ -3549,18 +3550,18 @@ try {
       const btnCx = btnRect.left + btnRect.width * 0.5;
       const btnCy = btnRect.top + btnRect.height * 0.5;
 
-      // 0) 在画面中心衔着图标淡入
+      // 0) 从屏幕右侧衔着图标登场
       requestAnimationFrame(() => {
         if (el.isConnected) el.style.opacity = '1';
       });
-      await this.wait(260);
+      await this.wait(90);
       if (!this.isAlive(run)) {
         carry.remove();
         el.remove();
         return;
       }
 
-      // 1) 曲线平滑飞向顶栏，把图标对准放入槽位（先歪着）
+      // 1) 曲线平滑飞到顶栏，把图标对准放入槽位（先歪着）
       await this.moveAgentTo(
         agent,
         Math.round(btnCx + 46),
