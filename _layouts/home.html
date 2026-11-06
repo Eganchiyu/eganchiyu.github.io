@@ -2,36 +2,41 @@
 layout: default
 ---
 
-<!-- Hero Section -->
-<section class="hero">
-  <div class="container">
-    <!-- 装饰元素 -->
+<!-- Hero Section: Full-Viewport Bento Grid Dashboard -->
+<section class="hero hero-bento-screen" id="heroSection">
+  <div class="container hero-bento-container">
+    <!-- 背景柔和光晕装饰（严格限制在容器内，不漏出） -->
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
-    
-    <div class="hero-grid">
-      <!-- 左侧内容 -->
-      <div class="hero-content">
-        <div class="hero-badge">
-          <span class="hero-badge-dot"></span>
-          <span>正在学习中...</span>
+
+    <div class="bento-grid" id="heroBentoGrid">
+      <!-- 1. 主介绍卡 (Row 1, Col 1-7) -->
+      <div class="bento-card bento-intro">
+        <div class="bento-intro-top">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            <span>正在学习中 · 智能无人系统</span>
+          </div>
+          <div class="hero-location">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>{{ site.author.location | default: "西安" }} · NWPU</span>
+          </div>
         </div>
-        
-        <span class="hero-greeting">你好，我是</span>
-        <h1 class="hero-name">{{ site.author.name }}</h1>
-        
-        <p class="hero-description">
-          {{ site.description }}
-        </p>
-        
-        <div class="hero-location">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-          <span>{{ site.author.location }}</span>
+
+        <div class="bento-intro-body">
+          <span class="hero-greeting">你好，我是</span>
+          <div class="hero-title-row">
+            <h1 class="hero-name">{{ site.author.name }}</h1>
+            <span class="hero-subtitle-pill">{{ site.subtitle | default: "学习 · 记录 · 随想" }}</span>
+          </div>
+          <p class="hero-description">
+            {{ site.description }}
+          </p>
         </div>
-        
+
         <div class="hero-links">
           <a href="https://github.com/Eganchiyu" target="_blank" rel="noopener" class="hero-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -44,38 +49,150 @@ layout: default
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
               <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
-            邮箱
+            邮箱联系
+          </a>
+          <a href="#contentStart" class="hero-link hero-link-ghost">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            阅读文章
           </a>
         </div>
       </div>
-      
-      <!-- 右侧头像卡片 -->
-      <div class="hero-avatar">
-        <div class="avatar-card">
+
+      <!-- 2. 右侧个人名片与统计卡 (Row 1, Col 8-12) -->
+      <div class="bento-card bento-profile avatar-card">
+        <div class="profile-card-main">
           <div class="avatar-wrapper">
-            <img src="{{ '/assets/images/avatar.png' | relative_url }}" alt="{{ site.author.name }}" loading="lazy">
+            <img src="{{ '/assets/images/avatar.png' | relative_url }}" alt="{{ site.author.name }}" loading="eager">
           </div>
-          <div class="avatar-name">{{ site.author.name }}</div>
-          <div class="avatar-role">NWPU · 智能无人系统</div>
-          <div class="avatar-stats">
-            <div class="stat">
-              <span class="stat-number">{{ site.posts.size }}</span>
-              <span class="stat-label">文章</span>
+          <div class="profile-card-info">
+            <div class="avatar-name">{{ site.author.name }}</div>
+            <div class="avatar-role">NWPU · 智能无人系统</div>
+            <div class="avatar-tags">
+              <span class="avatar-mini-tag">Embedded</span>
+              <span class="avatar-mini-tag">OR-Tools</span>
+              <span class="avatar-mini-tag">Linux</span>
             </div>
-            <div class="stat">
-              <span class="stat-number">{{ site.categories.size }}</span>
-              <span class="stat-label">分类</span>
+          </div>
+        </div>
+        <div class="avatar-stats">
+          <a href="#postsSection" class="stat">
+            <span class="stat-number">{{ site.posts.size }}</span>
+            <span class="stat-label">文章</span>
+          </a>
+          <a href="{{ '/categories/' | relative_url }}" class="stat">
+            <span class="stat-number">{{ site.categories.size }}</span>
+            <span class="stat-label">分类</span>
+          </a>
+          <a href="{{ '/tags/' | relative_url }}" class="stat">
+            <span class="stat-number">{{ site.tags.size }}</span>
+            <span class="stat-label">标签</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. 技术栈矩阵卡 (Row 2, Col 1-4) -->
+      <div class="bento-card bento-tech">
+        <div class="bento-card-header">
+          <span class="bento-card-icon">🛠️</span>
+          <h2 class="bento-card-title">技术栈与工具</h2>
+          <span class="bento-card-badge">Stack</span>
+        </div>
+        <div class="bento-tech-groups">
+          <div class="bento-tech-row">
+            <span class="tech-group-label">语言</span>
+            <div class="tech-pills">
+              <span class="tech-pill tech-pill-blue">C / C++</span>
+              <span class="tech-pill tech-pill-blue">Python</span>
+              <span class="tech-pill tech-pill-blue">JS</span>
             </div>
-            <div class="stat">
-              <span class="stat-number">{{ site.tags.size }}</span>
-              <span class="stat-label">标签</span>
+          </div>
+          <div class="bento-tech-row">
+            <span class="tech-group-label">硬件</span>
+            <div class="tech-pills">
+              <span class="tech-pill tech-pill-teal">ESP32</span>
+              <span class="tech-pill tech-pill-teal">树莓派</span>
+              <span class="tech-pill tech-pill-teal">Embedded Linux</span>
+            </div>
+          </div>
+          <div class="bento-tech-row">
+            <span class="tech-group-label">工程</span>
+            <div class="tech-pills">
+              <span class="tech-pill tech-pill-purple">OR-Tools</span>
+              <span class="tech-pill tech-pill-purple">ROS</span>
+              <span class="tech-pill tech-pill-purple">Git</span>
+              <span class="tech-pill tech-pill-purple">Jekyll</span>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- 4. 研究与探索方向卡 (Row 2, Col 5-8) -->
+      <div class="bento-card bento-focus">
+        <div class="bento-card-header">
+          <span class="bento-card-icon">🧭</span>
+          <h2 class="bento-card-title">探索与实践领域</h2>
+          <span class="bento-card-badge">Focus</span>
+        </div>
+        <ul class="bento-focus-list">
+          <li class="bento-focus-item">
+            <span class="focus-index">01</span>
+            <div class="focus-detail">
+              <div class="focus-name">嵌入式与硬件系统</div>
+              <div class="focus-desc">ESP32 物联网、传感器协议与 Linux 交叉编译</div>
+            </div>
+          </li>
+          <li class="bento-focus-item">
+            <span class="focus-index">02</span>
+            <div class="focus-detail">
+              <div class="focus-name">运筹优化与算法建模</div>
+              <div class="focus-desc">CSP 约束满足问题、CP-SAT 大规模题库组卷</div>
+            </div>
+          </li>
+          <li class="bento-focus-item">
+            <span class="focus-index">03</span>
+            <div class="focus-detail">
+              <div class="focus-name">AI 部署与系统工程</div>
+              <div class="focus-desc">DeepSeek LoRA 微调、SSH 通信与开发工具链</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 5. 近期更新速览卡 (Row 2, Col 9-12) -->
+      <div class="bento-card bento-latest">
+        <div class="bento-card-header">
+          <span class="bento-card-icon">📡</span>
+          <h2 class="bento-card-title">近期文章速览</h2>
+          <a href="{{ '/year-archive/' | relative_url }}" class="bento-card-more">归档 →</a>
+        </div>
+        <div class="bento-latest-list">
+          {% for post in site.posts limit:3 %}
+          <a href="{{ post.url | relative_url }}" class="bento-latest-item">
+            <span class="latest-item-date">{{ post.date | date: "%m-%d" }}</span>
+            <span class="latest-item-title">{{ post.title }}</span>
+            {% if post.categories.size > 0 %}
+            <span class="latest-item-cat">{{ post.categories | first }}</span>
+            {% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
     </div>
+
+    <!-- 首屏底部向下滚动提示 -->
+    <a href="#contentStart" class="hero-scroll-hint" aria-label="向下滚动查看文章">
+      <span class="scroll-mouse">
+        <span class="scroll-wheel"></span>
+      </span>
+      <span class="scroll-text">向下滚动探索文章</span>
+    </a>
   </div>
 </section>
+
+<div id="contentStart"></div>
 
 <!-- Featured Posts Section -->
 {% assign featured_posts = site.posts | where: "featured", true %}
@@ -91,6 +208,14 @@ layout: default
         {% if post.cover_image %}
         <div class="featured-cover">
           <img src="{{ post.cover_image | relative_url }}" alt="{{ post.title }}" loading="lazy">
+        </div>
+        {% else %}
+        <div class="featured-cover featured-cover-placeholder">
+          <div class="placeholder-pattern"></div>
+          <div class="placeholder-content">
+            <span class="placeholder-badge">{{ post.categories | first | default: "Featured" }}</span>
+            <span class="placeholder-icon">✦</span>
+          </div>
         </div>
         {% endif %}
         <div class="featured-content">
@@ -122,7 +247,7 @@ layout: default
 {% endif %}
 
 <!-- Posts Section -->
-<section class="posts-section">
+<section class="posts-section" id="postsSection">
   <div class="container">
     <div class="section-header reveal">
       <h2 class="section-title">最新文章</h2>

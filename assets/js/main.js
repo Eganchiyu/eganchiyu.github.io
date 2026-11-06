@@ -2677,58 +2677,109 @@ try {
     },
 
     collectTargets() {
-      const tasks = [];
+      const structuralTasks = [];
+      const detailTasks = [];
       const vh = window.innerHeight;
 
-      const addIfVisible = (el, type, metaLabel) => {
-        if (!el) return;
+      const createTask = (el, type, metaLabel, parentTask = null) => {
+        if (!el) return null;
         const rect = el.getBoundingClientRect();
-        if (rect.width < 4 || rect.height < 4) return;
-        // 仅收集首屏视口范围内可见的元素（不跑完整张页面、不自动滚屏）
-        if (rect.top > vh - 20 || rect.bottom < 0) return;
-        tasks.push({ el, type, metaLabel });
+        if (rect.width < 4 || rect.height < 4) return null;
+        // 仅收集首屏视口范围内可见的元素
+        if (rect.top > vh - 10 || rect.bottom < 0) return null;
+        let resolveDone;
+        const donePromise = new Promise((res) => {
+          resolveDone = res;
+        });
+        return {
+          el,
+          type,
+          metaLabel,
+          cachedRect: {
+            left: rect.left,
+            top: rect.top,
+            right: rect.right,
+            bottom: rect.bottom,
+            width: rect.width,
+            height: rect.height
+          },
+          parentPromise: parentTask ? parentTask.donePromise : null,
+          donePromise,
+          markDone: resolveDone
+        };
       };
 
-      // 1. 导航栏核心元素
-      addIfVisible(document.querySelector('.navbar .logo'), 'place', 'Logo');
+      const pushStructural = (el, type, metaLabel) => {
+        const t = createTask(el, type, metaLabel, null);
+        if (t) structuralTasks.push(t);
+        return t;
+      };
+
+      const pushDetail = (el, type, metaLabel, parentTask = null) => {
+        const t = createTask(el, type, metaLabel, parentTask);
+        if (t) detailTasks.push(t);
+        return t;
+      };
+
+      // 第一波（容器与顶栏层）：5 张 Bento Card 外框 + 导航栏元素，保证 12 个 Agent 散开瞬间并发拉框且内部元素绝不提前漏出框外
+      const introCardTask = pushStructural(document.querySelector('.bento-intro'), 'box', 'Intro-Card');
+      const profileCardTask = pushStructural(document.querySelector('.bento-profile'), 'box', 'Profile-Card');
+      const techCardTask = pushStructural(document.querySelector('.bento-tech'), 'box', 'Stack-Card');
+      const focusCardTask = pushStructural(document.querySelector('.bento-focus'), 'box', 'Focus-Card');
+      const latestCardTask = pushStructural(document.querySelector('.bento-latest'), 'box', 'Recent-Card');
+
+      pushStructural(document.querySelector('.navbar .logo'), 'place', 'Logo');
       document.querySelectorAll('.navbar .nav-link').forEach((link, idx) => {
-        addIfVisible(link, 'place', `Nav-${idx + 1}`);
+        pushStructural(link, 'place', `Nav-${idx + 1}`);
       });
-      addIfVisible(document.getElementById('swarmReplayBtn'), 'place', 'Action');
-      addIfVisible(document.getElementById('searchToggle'), 'place', 'Search');
-      addIfVisible(document.getElementById('themeToggle'), 'place', 'Theme');
-      addIfVisible(document.getElementById('menuToggle'), 'place', 'Menu');
+      pushStructural(document.getElementById('swarmReplayBtn'), 'place', 'Replay');
+      pushStructural(document.getElementById('searchToggle'), 'place', 'Search');
+      pushStructural(document.getElementById('themeToggle'), 'place', 'Theme');
+      pushStructural(document.getElementById('menuToggle'), 'place', 'Menu');
 
-      // 2. Hero 左侧个人介绍区域
-      addIfVisible(document.querySelector('.hero-badge'), 'box', 'Badge');
-      addIfVisible(document.querySelector('.hero-greeting'), 'type', 'Greeting');
-      addIfVisible(document.querySelector('.hero-name'), 'type', 'Heading');
-      addIfVisible(document.querySelector('.hero-description'), 'type', 'Bio');
-      addIfVisible(document.querySelector('.hero-location'), 'place', 'Location');
-      document.querySelectorAll('.hero-links .hero-link').forEach((btn, idx) => {
-        addIfVisible(btn, 'box', `Button-${idx + 1}`);
-      });
-
-      // 3. Hero 右侧头像名片区域
-      addIfVisible(document.querySelector('.avatar-card'), 'box', 'Card');
-      addIfVisible(document.querySelector('.avatar-wrapper'), 'box', 'Avatar');
-      addIfVisible(document.querySelector('.avatar-name'), 'type', 'Title');
-      addIfVisible(document.querySelector('.avatar-role'), 'type', 'Role');
-      document.querySelectorAll('.avatar-stats .stat').forEach((stat, idx) => {
-        addIfVisible(stat, 'place', `Stat-${idx + 1}`);
+      // 第二波（卡片内精细组件层）：在所属 Bento Card 外框拉好后立即入场构建内部内容
+      // 1. 主介绍卡内部
+      pushDetail(document.querySelector('.bento-intro .hero-badge'), 'place', 'Badge', introCardTask);
+      pushDetail(document.querySelector('.bento-intro .hero-location'), 'place', 'Location', introCardTask);
+      pushDetail(document.querySelector('.bento-intro .hero-greeting'), 'type', 'Greeting', introCardTask);
+      pushDetail(document.querySelector('.bento-intro .hero-name'), 'type', 'Heading', introCardTask);
+      pushDetail(document.querySelector('.bento-intro .hero-subtitle-pill'), 'place', 'Tagline', introCardTask);
+      pushDetail(document.querySelector('.bento-intro .hero-description'), 'type', 'Bio', introCardTask);
+      document.querySelectorAll('.bento-intro .hero-links .hero-link').forEach((btn, idx) => {
+        pushDetail(btn, 'place', `CTA-${idx + 1}`, introCardTask);
       });
 
-      // 4. 首屏下部露出的精选文章或最新文章标题与卡片
-      addIfVisible(document.querySelector('.featured-section .section-header'), 'type', 'Section');
-      document.querySelectorAll('.featured-card').forEach((card, idx) => {
-        addIfVisible(card, 'box', `Featured-${idx + 1}`);
-      });
-      addIfVisible(document.querySelector('.posts-section .section-header'), 'type', 'Section');
-      document.querySelectorAll('#postsGrid .post-card').forEach((card, idx) => {
-        if (idx < 2) addIfVisible(card, 'box', `Post-${idx + 1}`);
+      // 2. 个人名片卡内部
+      pushDetail(document.querySelector('.bento-profile .avatar-wrapper'), 'box', 'Avatar', profileCardTask);
+      pushDetail(document.querySelector('.bento-profile .avatar-name'), 'type', 'Name', profileCardTask);
+      pushDetail(document.querySelector('.bento-profile .avatar-role'), 'type', 'Role', profileCardTask);
+      pushDetail(document.querySelector('.bento-profile .avatar-tags'), 'place', 'Skills', profileCardTask);
+      document.querySelectorAll('.bento-profile .avatar-stats .stat').forEach((stat, idx) => {
+        pushDetail(stat, 'place', `Stat-${idx + 1}`, profileCardTask);
       });
 
-      return tasks;
+      // 3. 技术栈卡内部
+      pushDetail(document.querySelector('.bento-tech .bento-card-header'), 'place', 'Header', techCardTask);
+      document.querySelectorAll('.bento-tech .bento-tech-row').forEach((row, idx) => {
+        pushDetail(row, 'place', `Tech-${idx + 1}`, techCardTask);
+      });
+
+      // 4. 探索方向卡内部
+      pushDetail(document.querySelector('.bento-focus .bento-card-header'), 'place', 'Header', focusCardTask);
+      document.querySelectorAll('.bento-focus .bento-focus-item').forEach((item, idx) => {
+        pushDetail(item, 'place', `Focus-${idx + 1}`, focusCardTask);
+      });
+
+      // 5. 近期更新卡内部
+      pushDetail(document.querySelector('.bento-latest .bento-card-header'), 'place', 'Header', latestCardTask);
+      document.querySelectorAll('.bento-latest .bento-latest-item').forEach((item, idx) => {
+        pushDetail(item, 'place', `Post-${idx + 1}`, latestCardTask);
+      });
+
+      // 6. 首屏底部滚动引导条
+      pushDetail(document.querySelector('.hero-scroll-hint'), 'place', 'Scroll-Hint', null);
+
+      return [...structuralTasks, ...detailTasks];
     },
 
     prepareAllPostsGridImmediately() {
@@ -2758,7 +2809,7 @@ try {
       // 确保骨架屏直接替换为真实文章网格且消除 reveal 偏移以便精准测量坐标
       this.prepareAllPostsGridImmediately();
 
-      // 先移除 preparing 类以便测量真实 DOM 尺寸，紧接着给目标节点挂上受控隐藏类
+      // 在清空任何文本前先一次性采集所有目标的真实几何尺寸，防止宽度/高度塌陷
       const tasks = this.collectTargets();
       tasks.forEach((task) => {
         if (task.type === 'type') {
@@ -2766,9 +2817,9 @@ try {
             task.el.dataset.swarmOrigText = task.el.textContent.trim();
           }
           task.origText = task.el.dataset.swarmOrigText;
-          // 保持原有高度占位，避免打字过程中布局跳动
-          const rect = task.el.getBoundingClientRect();
-          task.el.style.minHeight = `${Math.round(rect.height)}px`;
+          // 保持原有宽高占位，避免打字过程中布局跳动或文字溢出
+          task.el.style.minHeight = `${Math.round(task.cachedRect.height)}px`;
+          task.el.style.minWidth = `${Math.round(task.cachedRect.width)}px`;
           task.el.textContent = '';
           task.el.classList.add('swarm-target-hidden');
         } else {
@@ -3116,8 +3167,9 @@ try {
       this.backdrop.classList.add('is-fading');
       updateHudProgress();
 
-      // 直接取真实内容网格 .hero-grid（不含 .container 的 24px 左右内边距），确保垂直红线与左列内容 100% 像素级对齐！
+      // 直接取真实内容网格 .bento-grid（不含 .container 的左右内边距），确保垂直红线与左列内容 100% 像素级对齐！
       const contentGridEl =
+        document.querySelector('.bento-grid') ||
         document.querySelector('.hero-grid') ||
         document.querySelector('.hero .container') ||
         document.body;
@@ -3187,13 +3239,17 @@ try {
       };
 
       const executeTask = async (agent, task, isFirstTask = false) => {
-        if (!this.isRunning) return;
+        if (!this.isRunning) {
+          if (task.markDone) task.markDone();
+          return;
+        }
         agent.busy = true;
 
         // 首个任务直接在空中通过不同的飞行时长形成错落感，不在原地停顿等待！
         const extraFlight = isFirstTask ? (agent.id % 6) * 42 : 0;
 
-        const initRect = task.el.getBoundingClientRect();
+        const liveRect = task.el.getBoundingClientRect();
+        const initRect = liveRect.width >= 4 ? liveRect : (task.cachedRect || liveRect);
         if (initRect.top >= 0 && initRect.top <= window.innerHeight && this.guideV && this.guideH2) {
           this.guideV.style.left = `${Math.round(initRect.left)}px`;
           this.guideH2.style.top = `${Math.round(initRect.bottom)}px`;
@@ -3203,7 +3259,11 @@ try {
           // 【拉框生成模式】：采用 clip-path 揭开元素，不缩放元素盒子本身，保证选区框与真实边缘 100% 重合
           this.setAgentTool(agent, 'crosshair', task.metaLabel);
           await this.moveAgentTo(agent, Math.round(initRect.left), Math.round(initRect.top), 290 + extraFlight);
-          if (!this.isRunning) return;
+          if (task.parentPromise) await task.parentPromise;
+          if (!this.isRunning) {
+            if (task.markDone) task.markDone();
+            return;
+          }
 
           const wf = document.createElement('div');
           wf.className = 'swarm-wireframe';
@@ -3224,7 +3284,7 @@ try {
             agent,
             Math.round(targetRect.right),
             Math.round(targetRect.bottom),
-            400,
+            380,
             (ease) => {
               // 每帧实时读取最新位置（兼容用户手动滚动），与真实卡片边界零误差贴合
               const curRect = task.el.getBoundingClientRect();
@@ -3259,27 +3319,31 @@ try {
           wf.style.opacity = '0';
           setTimeout(() => wf.remove(), 240);
         } else if (task.type === 'type') {
-          // 【打字机生成模式】：调慢打字速度，让人眼清晰看到逐字敲击与蓝色高亮选区
+          // 【打字机生成模式】：逐字敲击与蓝色高亮选区，严格在所属卡片完成后执行
           this.setAgentTool(agent, 'ibeam', 'Typing');
           await this.moveAgentTo(
             agent,
             Math.round(initRect.left + 4),
             Math.round(initRect.top + initRect.height * 0.5),
-            280 + extraFlight
+            270 + extraFlight
           );
-          if (!this.isRunning) return;
+          if (task.parentPromise) await task.parentPromise;
+          if (!this.isRunning) {
+            if (task.markDone) task.markDone();
+            return;
+          }
 
           task.el.classList.remove('swarm-target-hidden');
           task.el.classList.add('swarm-text-highlight');
           const fullText = task.origText || '';
           const len = fullText.length;
-          // 调慢打字速度：单字 58ms，最短 520ms，最长 1850ms
-          const typeDuration = Math.min(1850, Math.max(520, len * 58));
+          const typeDuration = Math.min(1650, Math.max(480, len * 52));
 
           const curRect = task.el.getBoundingClientRect();
+          const spanWidth = Math.max(curRect.width, task.cachedRect ? task.cachedRect.width : 48);
           await this.moveAgentTo(
             agent,
-            Math.round(curRect.left + Math.min(curRect.width, Math.max(48, len * 13))),
+            Math.round(curRect.left + Math.min(spanWidth, Math.max(48, len * 13))),
             Math.round(curRect.top + curRect.height * 0.5),
             typeDuration,
             (_ease, _cx, _cy, rawT) => {
@@ -3291,6 +3355,7 @@ try {
 
           task.el.textContent = fullText;
           task.el.style.minHeight = '';
+          task.el.style.minWidth = '';
           setTimeout(() => {
             task.el.classList.remove('swarm-text-highlight');
           }, 260);
@@ -3299,8 +3364,12 @@ try {
           this.setAgentTool(agent, 'hand', task.metaLabel);
           const targetX = Math.round(initRect.left + initRect.width * 0.5);
           const targetY = Math.round(initRect.top + initRect.height * 0.5);
-          await this.moveAgentTo(agent, targetX, targetY, 270 + extraFlight);
-          if (!this.isRunning) return;
+          await this.moveAgentTo(agent, targetX, targetY, 260 + extraFlight);
+          if (task.parentPromise) await task.parentPromise;
+          if (!this.isRunning) {
+            if (task.markDone) task.markDone();
+            return;
+          }
 
           const curRect = task.el.getBoundingClientRect();
           const wf = document.createElement('div');
@@ -3318,12 +3387,13 @@ try {
           task.el.classList.add('swarm-target-building');
           task.el.classList.remove('swarm-target-hidden');
 
-          await this.wait(150);
+          await this.wait(140);
           agent.el.classList.remove('is-clicking');
           wf.style.opacity = '0';
           setTimeout(() => wf.remove(), 220);
         }
 
+        if (task.markDone) task.markDone();
         this.setAgentTool(agent, 'arrow');
         agent.busy = false;
         completedLayers++;
@@ -3422,6 +3492,7 @@ try {
         el.style.transformOrigin = '';
         el.style.clipPath = '';
         el.style.minHeight = '';
+        el.style.minWidth = '';
         if (el.dataset.swarmOrigText) {
           el.textContent = el.dataset.swarmOrigText;
         }

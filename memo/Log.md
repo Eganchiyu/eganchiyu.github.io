@@ -17,6 +17,11 @@
   1. 恢复为仅收集和构建首屏视口可见区域（不跑完整张页面）。
   2. 彻底消除开场与第一轮任务之间的停顿等待感：阶段 1 旋涡汇聚缩短至 680ms，散开瞬间 12 个鼠标 0ms 等待同时直奔各自的首个任务（1 号鼠标拉主画板框与其余 11 个鼠标构建元素完全并发，移除预备点停靠与 `wait(idx * 95)` 原地等待，改为在飞行时长中自然形成空中错落感），默认缓动设为初速度饱满的 `easeOutQuart`。
   3. 移除鼠标残影拖尾（`.swarm-cursor-ghost`），画面更干净利落。
+- **首页 Bento Grid 美化与防漏出优化**：
+  1. `_layouts/home.html`：将首屏 `.hero` 升级为独立占满一屏（`min-height: calc(100vh - 3.5rem)`）的 12 列 Bento Grid 现代仪表盘（包含主介绍卡、个人名片与统计卡、技术栈与工具矩阵卡、探索与实践领域卡、近期文章速览卡及底部滚动引导条），并为无封面精选文章增加几何渐变占位头图。
+  2. `assets/css/main.scss`：新增 Bento Grid 全套响应式样式与玻璃拟态卡片防溢出约束；修复 `.posts-grid` 因 JS `display: grid` 覆盖 `columns: 2` 导致的单列拉宽问题，改为双列等高 CSS Grid；在 `swarm-intro-preparing` 与 `swarm-running` 期间锁定首屏外内容不漏出，修复 `.swarm-text-highlight` 对渐变文字的兼容性。
+  3. `assets/js/main.js`：`SwarmIntroManager` 适配 Bento Grid，采用“先拉 5 张 Bento 卡片外框 + 顶栏、待父卡片完成后再填充卡片内组件”的两级同步任务队列，并预先锁定打字元素的宽高占位，彻底杜绝内容漏出画板或卡片框外。
+
 
 
 
