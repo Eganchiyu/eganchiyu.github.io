@@ -28,3 +28,9 @@
 ## 2026-xx 开屏打字速度微调
 - assets/js/main.js：SwarmIntroManager 打字机任务时长 `len*52` → `len*42`，上下限 1650/480 → 1350/400，开屏鼠标打字约快 20%。
 - 已提交 75e3d86。
+
+## 开屏动效结尾演出 + 中途重播修复
+- 顶栏 ✨ 重播按钮不再作为构建任务：动画全程 `swarm-replay-pending`（透明 + 不可点），由结尾第 13 只光标「爱」衔着图标从画面左下飞入顶栏，歪着放下（`is-tilted`），模拟点击涟漪后 `is-springing` Q 弹回正，再退场。
+- 结束同时进度条 `is-collapsed` 平滑收起，HUD 文案显示耗时。
+- 新增 `runId` 实例守卫（`isAlive(run)`），`moveAgentTo`/`wait`/`runTimeline` 全部校验，中途重播不再出现白屏与新旧任务打架。
+- 用 /tmp 静态桩页 + Chrome CDP 实测：无 JS 报错，结尾环节按序发生，结束后可正常再次重播。
