@@ -3337,7 +3337,7 @@ try {
           task.el.classList.add('swarm-text-highlight');
           const fullText = task.origText || '';
           const len = fullText.length;
-          const typeDuration = Math.min(1650, Math.max(480, len * 52));
+          const typeDuration = Math.min(1350, Math.max(400, len * 42));
 
           const curRect = task.el.getBoundingClientRect();
           const spanWidth = Math.max(curRect.width, task.cachedRect ? task.cachedRect.width : 48);
