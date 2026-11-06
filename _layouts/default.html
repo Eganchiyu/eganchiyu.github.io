@@ -18,6 +18,19 @@
       if (saved === 'dark' || (!saved && prefersDark)) {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
+      // 首页启动构建动效预备状态（防闪烁）
+      try {
+        const isHome = window.location.pathname === '/' || window.location.pathname === '/index.html';
+        const forceIntro = new URLSearchParams(window.location.search).get('intro') === '1';
+        const seenIntro = localStorage.getItem('cyber_swarm_intro_seen_v1');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (isHome && !reducedMotion && (!seenIntro || forceIntro)) {
+          document.documentElement.classList.add('swarm-intro-preparing');
+          setTimeout(function() {
+            document.documentElement.classList.remove('swarm-intro-preparing');
+          }, 3500);
+        }
+      } catch (e) {}
     })();
   </script>
   

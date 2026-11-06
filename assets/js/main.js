@@ -2582,6 +2582,822 @@ try {
     }
   };
 
+  // ========== Cyber Swarm Intro 多智能体/人生记忆协同构建启动动效 ==========
+  const SwarmIntroManager = {
+    STORAGE_KEY: 'cyber_swarm_intro_seen_v1',
+    isRunning: false,
+    speedMultiplier: 1,
+    rafId: null,
+    timers: [],
+    activeCleanups: [],
+
+    // 24 个抽象人生羁绊与精神世界 Agent 词库
+    AGENTS_DATA: [
+      { name: '亲情', color: '#f43f5e' },
+      { name: '友情', color: '#0c8ce9' },
+      { name: '同学', color: '#10b981' },
+      { name: '网络', color: '#8b5cf6' },
+      { name: '热爱', color: '#f59e0b' },
+      { name: '理想', color: '#06b6d4' },
+      { name: '好奇心', color: '#ec4899' },
+      { name: '初心', color: '#3b82f6' },
+      { name: '青春', color: '#14b8a6' },
+      { name: '灵感', color: '#a855f7' },
+      { name: '深夜', color: '#6366f1' },
+      { name: '远方', color: '#0ea5e9' },
+      { name: '代码', color: '#22c55e' },
+      { name: '回忆', color: '#fb7185' },
+      { name: '星光', color: '#eab308' },
+      { name: '微风', color: '#2dd4bf' },
+      { name: '勇气', color: '#f97316' },
+      { name: '自由', color: '#38bdf8' },
+      { name: '少年感', color: '#c084fc' },
+      { name: '山海', color: '#34d399' },
+      { name: '花火', color: '#f472b6' },
+      { name: '知己', color: '#60a5fa' },
+      { name: '顿悟', color: '#fbbf24' },
+      { name: '未来', color: '#818cf8' }
+    ],
+
+    // 4 种 Figma 协作光标工具 SVG
+    ICONS: {
+      arrow: (color) => `
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+          <path d="M4.5 3.5L11.5 20L14.2 13.8L20.5 11.2L4.5 3.5Z" fill="${color}" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>`,
+      crosshair: (color) => `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <path d="M12 3V21M3 12H21" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M12 3V21M3 12H21" stroke="${color}" stroke-width="1.6" stroke-linecap="round"/>
+          <rect x="9.5" y="9.5" width="5" height="5" fill="none" stroke="${color}" stroke-width="1.5"/>
+        </svg>`,
+      ibeam: (color) => `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <path d="M8 4H16M8 20H16M12 4V20" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M8 4H16M8 20H16M12 4V20" stroke="${color}" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>`,
+      hand: (color) => `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+          <path d="M9 11V6a1.5 1.5 0 0 1 3 0v4m0-3a1.5 1.5 0 0 1 3 0v3m0-2a1.5 1.5 0 0 1 3 0v5a6 6 0 0 1-6 6h-2a6 6 0 0 1-5-2.7L4.2 13.8a1.5 1.5 0 0 1 2.3-1.9L9 14V11Z" fill="${color}" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>`
+    },
+
+    init() {
+      const replayBtn = document.getElementById('swarmReplayBtn');
+      const isHome = document.querySelector('.hero') !== null;
+
+      if (replayBtn) {
+        replayBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (!isHome) {
+            window.location.href = '/?intro=1';
+            return;
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          this.start(true);
+        });
+      }
+
+      if (!isHome) {
+        document.documentElement.classList.remove('swarm-intro-preparing');
+        return;
+      }
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceIntro = urlParams.get('intro') === '1';
+      const seen = localStorage.getItem(this.STORAGE_KEY);
+
+      if (!prefersReducedMotion && (!seen || forceIntro)) {
+        if (forceIntro && window.history.replaceState) {
+          urlParams.delete('intro');
+          const newSearch = urlParams.toString();
+          window.history.replaceState({}, '', window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash);
+        }
+        this.start(false);
+      } else {
+        document.documentElement.classList.remove('swarm-intro-preparing');
+      }
+    },
+
+    collectTargets() {
+      const tasks = [];
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const addIfVisible = (el, type, metaLabel) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 4 || rect.height < 4) return;
+        // 仅收集首屏视口范围内可见的元素（不自动滚屏）
+        if (rect.top > vh - 20 || rect.bottom < 0) return;
+        tasks.push({ el, type, metaLabel });
+      };
+
+      // 1. 导航栏核心元素
+      addIfVisible(document.querySelector('.navbar .logo'), 'place', 'Logo');
+      document.querySelectorAll('.navbar .nav-link').forEach((link, idx) => {
+        addIfVisible(link, 'place', `Nav-${idx + 1}`);
+      });
+      addIfVisible(document.getElementById('swarmReplayBtn'), 'place', 'Action');
+      addIfVisible(document.getElementById('searchToggle'), 'place', 'Search');
+      addIfVisible(document.getElementById('themeToggle'), 'place', 'Theme');
+      addIfVisible(document.getElementById('menuToggle'), 'place', 'Menu');
+
+      // 2. Hero 左侧个人介绍区域
+      addIfVisible(document.querySelector('.hero-badge'), 'box', 'Badge');
+      addIfVisible(document.querySelector('.hero-greeting'), 'type', 'Greeting');
+      addIfVisible(document.querySelector('.hero-name'), 'type', 'Heading');
+      addIfVisible(document.querySelector('.hero-description'), 'type', 'Bio');
+      addIfVisible(document.querySelector('.hero-location'), 'place', 'Location');
+      document.querySelectorAll('.hero-links .hero-link').forEach((btn, idx) => {
+        addIfVisible(btn, 'box', `Button-${idx + 1}`);
+      });
+
+      // 3. Hero 右侧头像名片区域
+      addIfVisible(document.querySelector('.avatar-card'), 'box', 'Card');
+      addIfVisible(document.querySelector('.avatar-wrapper'), 'box', 'Avatar');
+      addIfVisible(document.querySelector('.avatar-name'), 'type', 'Title');
+      addIfVisible(document.querySelector('.avatar-role'), 'type', 'Role');
+      document.querySelectorAll('.avatar-stats .stat').forEach((stat, idx) => {
+        addIfVisible(stat, 'place', `Stat-${idx + 1}`);
+      });
+
+      // 4. 首屏下部露出的精选文章或最新文章标题与卡片
+      addIfVisible(document.querySelector('.featured-section .section-header'), 'type', 'Section');
+      document.querySelectorAll('.featured-card').forEach((card, idx) => {
+        addIfVisible(card, 'box', `Featured-${idx + 1}`);
+      });
+      addIfVisible(document.querySelector('.posts-section .section-header'), 'type', 'Section');
+      document.querySelectorAll('#postsGrid .post-card').forEach((card, idx) => {
+        if (idx < 2) addIfVisible(card, 'box', `Post-${idx + 1}`);
+      });
+
+      return tasks;
+    },
+
+    prepareAllPostsGridImmediately() {
+      const skeletonGrid = document.getElementById('skeletonGrid');
+      const postsGrid = document.getElementById('postsGrid');
+      if (skeletonGrid && postsGrid) {
+        skeletonGrid.style.display = 'none';
+        postsGrid.style.display = 'grid';
+        postsGrid.style.opacity = '1';
+      }
+    },
+
+    start(isReplay = false) {
+      if (this.isRunning) {
+        this.cleanup(true);
+      }
+      this.isRunning = true;
+      this.speedMultiplier = 1;
+      localStorage.setItem(this.STORAGE_KEY, '1');
+
+      // 确保骨架屏直接替换为真实文章网格以便测量首屏坐标
+      this.prepareAllPostsGridImmediately();
+
+      // 先移除 preparing 类以便测量真实 DOM 尺寸，紧接着给目标节点挂上受控隐藏类
+      const tasks = this.collectTargets();
+      tasks.forEach((task) => {
+        if (task.type === 'type') {
+          if (!task.el.dataset.swarmOrigText) {
+            task.el.dataset.swarmOrigText = task.el.textContent;
+          }
+          task.origText = task.el.dataset.swarmOrigText;
+          // 保持原有高度占位，避免打字过程中布局跳动
+          const rect = task.el.getBoundingClientRect();
+          task.el.style.minHeight = `${Math.round(rect.height)}px`;
+          task.el.textContent = '';
+          task.el.classList.add('swarm-target-hidden');
+        } else {
+          task.el.classList.add('swarm-target-hidden');
+        }
+      });
+
+      document.documentElement.classList.remove('swarm-intro-preparing');
+
+      // 创建全屏舞台与 HUD
+      this.buildStage(tasks.length);
+
+      // 创建 24 个 Agent 实例
+      this.createAgents();
+
+      // 绑定 ESC 键跳过
+      this.escHandler = (e) => {
+        if (e.key === 'Escape') {
+          this.skip();
+        }
+      };
+      window.addEventListener('keydown', this.escHandler);
+
+      // 启动主编排时间线
+      this.runTimeline(tasks);
+    },
+
+    buildStage(totalLayers) {
+      this.stage = document.createElement('div');
+      this.stage.className = 'swarm-stage';
+
+      // 深邃网格背景（阶段1展示，阶段2渐隐）
+      this.backdrop = document.createElement('div');
+      this.backdrop.className = 'swarm-backdrop';
+      this.stage.appendChild(this.backdrop);
+
+      // 阶段1中心小头像徽章
+      this.centerBadge = document.createElement('div');
+      this.centerBadge.className = 'swarm-center-badge';
+      const avatarImg = document.querySelector('.avatar-wrapper img');
+      const avatarSrc = avatarImg ? avatarImg.src : '/assets/images/avatar.png';
+      this.centerBadge.innerHTML = `<img src="${avatarSrc}" alt="Center Avatar">`;
+      this.stage.appendChild(this.centerBadge);
+
+      // 贯穿全屏的对齐辅助标尺线（1条红竖线 + 2条青蓝横线）
+      this.guideV = document.createElement('div');
+      this.guideV.className = 'swarm-guide-line guide-v';
+      this.guideH1 = document.createElement('div');
+      this.guideH1.className = 'swarm-guide-line guide-h';
+      this.guideH2 = document.createElement('div');
+      this.guideH2.className = 'swarm-guide-line guide-h';
+      this.stage.appendChild(this.guideV);
+      this.stage.appendChild(this.guideH1);
+      this.stage.appendChild(this.guideH2);
+
+      document.body.appendChild(this.stage);
+
+      // 底部悬浮胶囊 HUD（复刻视频底部控制栏）
+      this.hud = document.createElement('div');
+      this.hud.className = 'swarm-hud';
+      const dotColors = ['#38bdf8', '#34d399', '#fbbf24', '#f43f5e', '#a855f7'];
+      const dotsHtml = dotColors
+        .map((c) => `<span class="swarm-hud-dot" style="background:${c}"></span>`)
+        .join('');
+
+      this.hud.innerHTML = `
+        <div class="swarm-hud-dots">${dotsHtml}</div>
+        <div class="swarm-hud-status" id="swarmHudStatus">Scanning memories...</div>
+        <div class="swarm-hud-progress" id="swarmHudProgressWrap">
+          <div class="swarm-hud-progress-bar" id="swarmHudBar"></div>
+        </div>
+        <div class="swarm-hud-actions">
+          <button type="button" class="swarm-hud-btn" id="swarmSpeedBtn" title="切换构建倍速">1x</button>
+          <button type="button" class="swarm-hud-btn is-primary" id="swarmHudReplayBtn" style="display:none;">↻ Replay</button>
+          <button type="button" class="swarm-hud-btn btn-close" id="swarmSkipBtn" title="跳过动画 (Esc)">✕</button>
+        </div>
+      `;
+      document.body.appendChild(this.hud);
+
+      this.hudStatus = this.hud.querySelector('#swarmHudStatus');
+      this.hudBar = this.hud.querySelector('#swarmHudBar');
+      this.hudProgressWrap = this.hud.querySelector('#swarmHudProgressWrap');
+      this.speedBtn = this.hud.querySelector('#swarmSpeedBtn');
+      this.hudReplayBtn = this.hud.querySelector('#swarmHudReplayBtn');
+      this.skipBtn = this.hud.querySelector('#swarmSkipBtn');
+
+      this.speedBtn.addEventListener('click', () => {
+        this.speedMultiplier = this.speedMultiplier === 1 ? 2 : 1;
+        this.speedBtn.textContent = `${this.speedMultiplier}x`;
+      });
+
+      this.hudReplayBtn.addEventListener('click', () => {
+        this.start(true);
+      });
+
+      this.skipBtn.addEventListener('click', () => {
+        this.skip();
+      });
+
+      requestAnimationFrame(() => {
+        if (this.hud) this.hud.classList.add('is-visible');
+        if (this.centerBadge) this.centerBadge.classList.add('is-visible');
+      });
+    },
+
+    createAgents() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const cx = vw * 0.5;
+      const cy = vh * 0.46;
+
+      this.agents = this.AGENTS_DATA.map((item, index) => {
+        const angle = (index / this.AGENTS_DATA.length) * Math.PI * 2;
+        const startDist = Math.max(vw, vh) * (0.42 + (index % 3) * 0.12);
+        const startX = cx + Math.cos(angle) * startDist;
+        const startY = cy + Math.sin(angle) * startDist;
+
+        // 创建 2 个半透明残影节点（复刻视频第1帧环绕幻影）
+        const ghosts = [0.38, 0.18].map((alpha, gIdx) => {
+          const g = document.createElement('div');
+          g.className = 'swarm-cursor-ghost';
+          g.style.opacity = String(alpha);
+          g.innerHTML = `<div class="swarm-cursor-icon" style="transform:scale(${0.92 - gIdx * 0.08})">${this.ICONS.arrow(item.color)}</div>`;
+          this.stage.appendChild(g);
+          return { el: g, x: startX, y: startY };
+        });
+
+        const el = document.createElement('div');
+        el.className = 'swarm-cursor';
+        el.style.setProperty('--agent-color', item.color);
+        el.innerHTML = `
+          <div class="swarm-cursor-icon">${this.ICONS.arrow(item.color)}</div>
+          <div class="swarm-cursor-tag">
+            <span>${item.name}</span>
+            <span class="swarm-cursor-tag-meta" style="display:none;"></span>
+          </div>
+        `;
+        this.stage.appendChild(el);
+
+        const agent = {
+          id: index,
+          name: item.name,
+          color: item.color,
+          el,
+          iconEl: el.querySelector('.swarm-cursor-icon'),
+          metaEl: el.querySelector('.swarm-cursor-tag-meta'),
+          ghosts,
+          x: startX,
+          y: startY,
+          prevX: startX,
+          prevY: startY,
+          angle,
+          orbitRadius: 42 + (index % 5) * 24,
+          orbitSpeed: (index % 2 === 0 ? 1 : -1) * (2.6 + (index % 4) * 0.45),
+          tool: 'arrow',
+          busy: false
+        };
+
+        this.setAgentPos(agent, startX, startY);
+        return agent;
+      });
+    },
+
+    setAgentPos(agent, x, y) {
+      // 更新残影坐标（滞后跟随）
+      if (agent.ghosts && agent.ghosts.length) {
+        for (let i = agent.ghosts.length - 1; i > 0; i--) {
+          agent.ghosts[i].x += (agent.ghosts[i - 1].x - agent.ghosts[i].x) * 0.42;
+          agent.ghosts[i].y += (agent.ghosts[i - 1].y - agent.ghosts[i].y) * 0.42;
+          agent.ghosts[i].el.style.transform = `translate3d(${agent.ghosts[i].x.toFixed(1)}px, ${agent.ghosts[i].y.toFixed(1)}px, 0)`;
+        }
+        agent.ghosts[0].x += (agent.x - agent.ghosts[0].x) * 0.48;
+        agent.ghosts[0].y += (agent.y - agent.ghosts[0].y) * 0.48;
+        agent.ghosts[0].el.style.transform = `translate3d(${agent.ghosts[0].x.toFixed(1)}px, ${agent.ghosts[0].y.toFixed(1)}px, 0)`;
+      }
+
+      agent.prevX = agent.x;
+      agent.prevY = agent.y;
+      agent.x = x;
+      agent.y = y;
+      agent.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+    },
+
+    setAgentTool(agent, tool, metaText = '') {
+      if (agent.tool !== tool) {
+        agent.tool = tool;
+        const renderer = this.ICONS[tool] || this.ICONS.arrow;
+        agent.iconEl.innerHTML = renderer(agent.color);
+      }
+      if (metaText) {
+        agent.metaEl.textContent = metaText;
+        agent.metaEl.style.display = 'inline';
+      } else {
+        agent.metaEl.style.display = 'none';
+      }
+    },
+
+    spawnRipple(x, y, color) {
+      if (!this.stage) return;
+      const r = document.createElement('div');
+      r.className = 'swarm-ripple';
+      r.style.left = `${x}px`;
+      r.style.top = `${y}px`;
+      r.style.setProperty('--ripple-color', color);
+      this.stage.appendChild(r);
+      setTimeout(() => r.remove(), 600);
+    },
+
+    // 使用贝塞尔曲线平滑移动 Agent 到指定坐标
+    moveAgentTo(agent, targetX, targetY, durationMs, onUpdate) {
+      return new Promise((resolve) => {
+        const startX = agent.x;
+        const startY = agent.y;
+        // 构造自然的弧线控制点
+        const dx = targetX - startX;
+        const dy = targetY - startY;
+        const ctrlX = startX + dx * 0.45 - dy * 0.16;
+        const ctrlY = startY + dy * 0.45 + dx * 0.16;
+
+        let elapsed = 0;
+        let lastTime = performance.now();
+
+        const step = (now) => {
+          if (!this.isRunning) return resolve();
+          const dt = (now - lastTime) * this.speedMultiplier;
+          lastTime = now;
+          elapsed += dt;
+
+          const t = Math.min(1, elapsed / Math.max(16, durationMs));
+          // easeOutCubic
+          const ease = 1 - Math.pow(1 - t, 3);
+
+          const inv = 1 - ease;
+          const curX = inv * inv * startX + 2 * inv * ease * ctrlX + ease * ease * targetX;
+          const curY = inv * inv * startY + 2 * inv * ease * ctrlY + ease * ease * targetY;
+
+          this.setAgentPos(agent, curX, curY);
+          if (onUpdate) onUpdate(ease, curX, curY);
+
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else {
+            resolve();
+          }
+        };
+
+        requestAnimationFrame(step);
+      });
+    },
+
+    wait(ms) {
+      return new Promise((resolve) => {
+        let elapsed = 0;
+        let last = performance.now();
+        const tick = (now) => {
+          if (!this.isRunning) return resolve();
+          elapsed += (now - last) * this.speedMultiplier;
+          last = now;
+          if (elapsed >= ms) return resolve();
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    },
+
+    async runTimeline(tasks) {
+      const startTime = performance.now();
+      const totalLayers = Math.max(1, tasks.length);
+      let completedLayers = 0;
+
+      const updateHudProgress = () => {
+        if (!this.hudStatus || !this.hudBar) return;
+        const pct = Math.min(100, Math.round((completedLayers / totalLayers) * 100));
+        this.hudStatus.innerHTML = `<strong>${this.agents.length} 羁绊</strong> · ${completedLayers} / ${totalLayers} layers`;
+        this.hudBar.style.width = `${pct}%`;
+      };
+
+      // ==========================================
+      // 阶段 1：中心风暴螺旋集结 (0 ~ 950ms)
+      // ==========================================
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const cx = vw * 0.5;
+      const cy = vh * 0.46;
+
+      await new Promise((resolve) => {
+        let elapsed = 0;
+        let last = performance.now();
+        const duration = 950;
+
+        const vortexStep = (now) => {
+          if (!this.isRunning) return resolve();
+          const dt = (now - last) * this.speedMultiplier;
+          last = now;
+          elapsed += dt;
+          const progress = Math.min(1, elapsed / duration);
+          const ease = 1 - Math.pow(1 - progress, 3);
+
+          this.agents.forEach((agent, i) => {
+            const currentAngle = agent.angle + progress * agent.orbitSpeed * 2.4;
+            const startR = Math.max(vw, vh) * 0.45;
+            const r = startR * (1 - ease) + agent.orbitRadius * ease;
+            const x = cx + Math.cos(currentAngle) * r;
+            const y = cy + Math.sin(currentAngle) * r * 0.78;
+            this.setAgentPos(agent, x, y);
+          });
+
+          if (this.hudBar) {
+            this.hudBar.style.width = `${Math.round(progress * 12)}%`;
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(vortexStep);
+          } else {
+            resolve();
+          }
+        };
+        requestAnimationFrame(vortexStep);
+      });
+
+      if (!this.isRunning) return;
+
+      // ==========================================
+      // 阶段 2：中心徽章散开 + 主画板蓝图拉框与标尺切入 (950ms ~ 1450ms)
+      // ==========================================
+      this.centerBadge.classList.remove('is-visible');
+      this.centerBadge.classList.add('is-dispersing');
+      this.backdrop.classList.add('is-fading');
+      updateHudProgress();
+
+      // 激活贯穿全屏的红/蓝对齐标尺线（复刻视频第 3~5 帧）
+      const containerEl = document.querySelector('.hero .container') || document.body;
+      const containerRect = containerEl.getBoundingClientRect();
+      const leftEdge = Math.max(16, containerRect.left);
+      const topEdge = 56;
+      this.guideV.style.left = `${leftEdge}px`;
+      this.guideH1.style.top = `${topEdge}px`;
+      this.guideH2.style.top = `${Math.min(vh - 80, containerRect.bottom)}px`;
+      this.guideV.classList.add('is-active');
+      this.guideH1.classList.add('is-active');
+      this.guideH2.classList.add('is-active');
+
+      // 由 0 号 Agent（亲情）与 1 号 Agent（友情）拉出首屏主画板外框
+      const artboard = document.createElement('div');
+      artboard.className = 'swarm-wireframe';
+      artboard.style.setProperty('--wf-color', '#0c8ce9');
+      artboard.innerHTML = `
+        <span class="swarm-wf-handle-bl"></span>
+        <span class="swarm-wf-handle-br"></span>
+        <span class="swarm-wf-size" id="artboardSizeTag">0 × 0</span>
+      `;
+      this.stage.appendChild(artboard);
+      const artboardTag = artboard.querySelector('#artboardSizeTag');
+
+      const abLeft = Math.max(12, containerRect.left - 8);
+      const abTop = 58;
+      const abWidth = Math.min(vw - abLeft * 2, containerRect.width + 16);
+      const abHeight = Math.min(vh - abTop - 72, Math.max(360, containerRect.height));
+
+      const leadAgent = this.agents[1]; // 友情 (#0c8ce9)
+      leadAgent.busy = true;
+      this.setAgentTool(leadAgent, 'crosshair', 'Artboard');
+
+      // 其余 Agent 同时散开预备
+      this.agents.forEach((ag, idx) => {
+        if (ag === leadAgent) return;
+        const targetX = abLeft + ((idx * 137) % Math.max(200, abWidth));
+        const targetY = abTop + ((idx * 89) % Math.max(180, abHeight));
+        this.moveAgentTo(ag, targetX, targetY, 460 + (idx % 5) * 60);
+      });
+
+      await this.moveAgentTo(leadAgent, abLeft, abTop, 220);
+      await this. moveAgentTo(leadAgent, abLeft + abWidth, abTop + abHeight, 360, (ease) => {
+        const curW = Math.max(20, Math.round(abWidth * ease));
+        const curH = Math.max(20, Math.round(abHeight * ease));
+        artboard.style.left = `${abLeft}px`;
+        artboard.style.top = `${abTop}px`;
+        artboard.style.width = `${curW}px`;
+        artboard.style.height = `${curH}px`;
+        if (artboardTag) artboardTag.textContent = `${curW} × ${curH}`;
+      });
+      this.spawnRipple(abLeft + abWidth, abTop + abHeight, leadAgent.color);
+      leadAgent.busy = false;
+      this.setAgentTool(leadAgent, 'arrow');
+
+      // 主画板框完成后淡化为浅辅助框
+      artboard.style.background = 'transparent';
+      artboard.style.borderColor = 'rgba(12, 140, 233, 0.28)';
+
+      // ==========================================
+      // 阶段 3：24 个 Agent 多线程并发构建首屏所有图层 (1.4s ~ 5.6s)
+      // ==========================================
+      const buildLayer = async (task, index) => {
+        if (!this.isRunning) return;
+        // 错峰启动，形成此起彼伏的丝滑并发感
+        await this.wait(index * 115);
+        if (!this.isRunning) return;
+
+        const agent = this.agents[index % this.agents.length];
+        agent.busy = true;
+
+        const rect = task.el.getBoundingClientRect();
+        // 移动红色垂直对齐线和蓝色水平辅助线跟随当前活跃区块
+        if (index % 3 === 0 && this.guideV && this.guideH2) {
+          this.guideV.style.left = `${Math.round(rect.left)}px`;
+          this.guideH2.style.top = `${Math.round(rect.bottom)}px`;
+        }
+
+        if (task.type === 'box') {
+          // 【拉框生成模式】：飞到左上角 -> 切换十字准星 -> 拖拽到右下角拉出蓝框与实时像素尺寸 -> 元素缩放显现
+          this.setAgentTool(agent, 'crosshair', task.metaLabel);
+          await this.moveAgentTo(agent, rect.left, rect.top, 280);
+          if (!this.isRunning) return;
+
+          const wf = document.createElement('div');
+          wf.className = 'swarm-wireframe';
+          wf.style.setProperty('--wf-color', agent.color);
+          wf.style.left = `${rect.left}px`;
+          wf.style.top = `${rect.top}px`;
+          wf.style.width = '4px';
+          wf.style.height = '4px';
+          wf.innerHTML = `
+            <span class="swarm-wf-handle-bl"></span>
+            <span class="swarm-wf-handle-br"></span>
+            <span class="swarm-wf-size">0 × 0</span>
+          `;
+          this.stage.appendChild(wf);
+          const sizeLabel = wf.querySelector('.swarm-wf-size');
+
+          task.el.classList.add('swarm-target-building');
+          task.el.classList.remove('swarm-target-hidden');
+          task.el.style.transformOrigin = 'top left';
+
+          await this.moveAgentTo(agent, rect.right, rect.bottom, 380, (ease) => {
+            const w = Math.max(8, Math.round(rect.width * ease));
+            const h = Math.max(8, Math.round(rect.height * ease));
+            wf.style.width = `${w}px`;
+            wf.style.height = `${h}px`;
+            sizeLabel.textContent = `${w} × ${h}`;
+            task.el.style.opacity = String(Math.min(1, ease * 1.15));
+            task.el.style.transform = `scale(${0.92 + 0.08 * ease})`;
+          });
+
+          task.el.style.opacity = '';
+          task.el.style.transform = '';
+          task.el.style.transformOrigin = '';
+          this.spawnRipple(rect.right, rect.bottom, agent.color);
+
+          wf.style.opacity = '0';
+          setTimeout(() => wf.remove(), 260);
+        } else if (task.type === 'type') {
+          // 【打字机生成模式】：飞到文字起点 -> 切换 I 型文本光标 -> 蓝色选区高亮框 -> 逐字高速敲入并跟随光标
+          this.setAgentTool(agent, 'ibeam', 'Typing');
+          await this.moveAgentTo(agent, rect.left + 4, rect.top + rect.height * 0.5, 260);
+          if (!this.isRunning) return;
+
+          task.el.classList.remove('swarm-target-hidden');
+          task.el.classList.add('swarm-text-highlight');
+          const fullText = task.origText || '';
+          const len = fullText.length;
+          const typeDuration = Math.min(720, Math.max(260, len * 18));
+
+          await this.moveAgentTo(
+            agent,
+            rect.left + Math.min(rect.width, Math.max(40, len * 11)),
+            rect.top + rect.height * 0.5,
+            typeDuration,
+            (ease) => {
+              const charCount = Math.max(1, Math.round(len * ease));
+              task.el.textContent = fullText.slice(0, charCount);
+            }
+          );
+
+          task.el.textContent = fullText;
+          task.el.style.minHeight = '';
+          setTimeout(() => {
+            task.el.classList.remove('swarm-text-highlight');
+          }, 220);
+        } else {
+          // 【快速安放组件模式】：飞到组件中心 -> 抓手/箭头落点 + 蓝框闪烁 + 点击涟漪
+          this.setAgentTool(agent, 'hand', task.metaLabel);
+          const targetX = rect.left + rect.width * 0.5;
+          const targetY = rect.top + rect.height * 0.5;
+          await this.moveAgentTo(agent, targetX, targetY, 270);
+          if (!this.isRunning) return;
+
+          const wf = document.createElement('div');
+          wf.className = 'swarm-wireframe';
+          wf.style.setProperty('--wf-color', agent.color);
+          wf.style.left = `${rect.left - 2}px`;
+          wf.style.top = `${rect.top - 2}px`;
+          wf.style.width = `${rect.width + 4}px`;
+          wf.style.height = `${rect.height + 4}px`;
+          wf.innerHTML = `<span class="swarm-wf-size">${Math.round(rect.width)} × ${Math.round(rect.height)}</span>`;
+          this.stage.appendChild(wf);
+
+          agent.el.classList.add('is-clicking');
+          this.spawnRipple(targetX, targetY, agent.color);
+          task.el.classList.add('swarm-target-building');
+          task.el.classList.remove('swarm-target-hidden');
+
+          await this.wait(160);
+          agent.el.classList.remove('is-clicking');
+          wf.style.opacity = '0';
+          setTimeout(() => wf.remove(), 220);
+        }
+
+        this.setAgentTool(agent, 'arrow');
+        agent.busy = false;
+        completedLayers++;
+        updateHudProgress();
+      };
+
+      // 让未分配具体任务的空闲 Agent 在首屏画布中协同巡航（营造热闹的 24 人协作氛围）
+      let buildingDone = false;
+      const roamPromise = (async () => {
+        while (this.isRunning && !buildingDone) {
+          this.agents.forEach((ag, idx) => {
+            if (!ag.busy && Math.random() < 0.35) {
+              const rx = abLeft + 24 + Math.random() * Math.max(120, abWidth - 48);
+              const ry = abTop + 16 + Math.random() * Math.max(120, abHeight - 32);
+              this.moveAgentTo(ag, rx, ry, 420 + (idx % 4) * 90);
+            }
+          });
+          await this.wait(320);
+        }
+      })();
+
+      await Promise.all(tasks.map((task, idx) => buildLayer(task, idx)));
+      buildingDone = true;
+      await roamPromise;
+
+      if (!this.isRunning) return;
+
+      // ==========================================
+      // 阶段 4：竣工致意与优雅退场 (Celebration & Complete)
+      // ==========================================
+      artboard.style.opacity = '0';
+      this.guideV.classList.remove('is-active');
+      this.guideH1.classList.remove('is-active');
+      this.guideH2.classList.remove('is-active');
+
+      const totalSeconds = ((performance.now() - startTime) / 1000).toFixed(1);
+      if (this.hudStatus) {
+        this.hudStatus.innerHTML = `Built by <strong>${this.agents.length} 羁绊</strong> in ${totalSeconds}s`;
+      }
+      if (this.hudProgressWrap) {
+        this.hudProgressWrap.style.display = 'none';
+      }
+      if (this.speedBtn) {
+        this.speedBtn.style.display = 'none';
+      }
+      if (this.hudReplayBtn) {
+        this.hudReplayBtn.style.display = 'inline-flex';
+      }
+
+      // Agent 们向右下与四周轻快散开淡出（复刻视频最后一帧右下角光标簇退场）
+      this.agents.forEach((ag, i) => {
+        const exitAngle = (i / this.agents.length) * Math.PI * 2;
+        const exitX = ag.x + Math.cos(exitAngle) * 90;
+        const exitY = ag.y + Math.sin(exitAngle) * 70;
+        ag.el.style.opacity = '0';
+        ag.ghosts.forEach((g) => (g.el.style.opacity = '0'));
+        this.moveAgentTo(ag, exitX, exitY, 450);
+      });
+
+      await this.wait(500);
+      if (!this.isRunning) return;
+
+      // 移除舞台遮罩层，保留底部胶囊 HUD 3.8 秒供用户点击 Replay，之后自动收起
+      if (this.stage) {
+        this.stage.remove();
+        this.stage = null;
+      }
+
+      this.autoHideTimer = setTimeout(() => {
+        this.cleanup(false);
+      }, 3800);
+    },
+
+    skip() {
+      this.cleanup(true);
+    },
+
+    cleanup(immediate = true) {
+      this.isRunning = false;
+      if (this.autoHideTimer) {
+        clearTimeout(this.autoHideTimer);
+        this.autoHideTimer = null;
+      }
+      if (this.escHandler) {
+        window.removeEventListener('keydown', this.escHandler);
+        this.escHandler = null;
+      }
+
+      document.documentElement.classList.remove('swarm-intro-preparing');
+
+      // 立即恢复所有受控 DOM 元素的原始文本与可见性
+      document.querySelectorAll('.swarm-target-hidden, .swarm-target-building, .swarm-text-highlight').forEach((el) => {
+        el.classList.remove('swarm-target-hidden', 'swarm-target-building', 'swarm-text-highlight');
+        el.style.opacity = '';
+        el.style.transform = '';
+        el.style.transformOrigin = '';
+        el.style.minHeight = '';
+        if (el.dataset.swarmOrigText) {
+          el.textContent = el.dataset.swarmOrigText;
+        }
+      });
+
+      this.prepareAllPostsGridImmediately();
+
+      if (this.stage) {
+        this.stage.remove();
+        this.stage = null;
+      }
+
+      if (this.hud) {
+        if (immediate) {
+          this.hud.remove();
+          this.hud = null;
+        } else {
+          const hudRef = this.hud;
+          this.hud = null;
+          hudRef.classList.remove('is-visible');
+          setTimeout(() => hudRef.remove(), 380);
+        }
+      }
+    }
+  };
+
   // ========== 初始化 ==========
   document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -2609,6 +3425,7 @@ try {
     TypewriterManager.init();
     Card3DManager.init();
     StatsManager.init();
+    SwarmIntroManager.init();
   });
 
 })();
