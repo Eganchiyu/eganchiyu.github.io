@@ -5,6 +5,8 @@
 - 核心模板：`_layouts/default.html`、`_layouts/home.html`、`_includes/navigation.html`。
 - 核心样式与脚本：`assets/css/main.scss`、`assets/js/main.js`。
 
-## 首页启动构建动效 (SwarmIntroManager)
-- 首次访问首页自动触发（记录于 `localStorage` 的 `cyber_swarm_intro_seen_v1`），可通过导航栏右侧 `✨` 按钮（`#swarmReplayBtn`）或 URL 参数 `/?intro=1` 随时手动重播。
-- 采用 12 个抽象人生羁绊/精神词汇（亲情、友情、同学、网络、热爱、理想、好奇心、初心、青春、灵感、代码、回忆）作为协同 Agent，使用四次方缓动（`easeOutQuart`）仅针对首屏核心可见区域构建，旋涡散开瞬间 0 停顿并发直奔各自首个任务，每个 Agent 完成自身最后任务后各自异步向右下角移出屏幕淡出消失。
+## 首页布局与启动构建动效 (Bento Grid + SwarmIntroManager)
+- 首页首屏（`.hero.hero-bento-screen`）采用独立占满一屏（`min-height: calc(100vh - 3.5rem)`）的 12 列 Bento Grid 现代仪表盘（主介绍卡 `.bento-intro`、个人名片卡 `.bento-profile`、技术栈卡 `.bento-tech`、探索方向卡 `.bento-focus`、近期文章卡 `.bento-latest`）。
+- 精选文章（`.featured-grid`）与最新文章（`.posts-grid`）均采用双列等高 CSS Grid（`grid-template-columns: repeat(2, minmax(0, 1fr))`）。
+- 首次访问首页自动触发 `SwarmIntroManager`（记录于 `localStorage` 的 `cyber_swarm_intro_seen_v1`），可通过导航栏右侧 `✨` 按钮（`#swarmReplayBtn`）或 URL 参数 `/?intro=1` 手动重播。
+- 12 个羁绊 Agent 采用两级同步队列：先并发拉开主画板与 5 张 Bento 卡片外框及导航栏，父卡片完成后再构建卡片内部组件，确保无内容漏出框外。
