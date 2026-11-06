@@ -2732,7 +2732,7 @@ try {
       document.querySelectorAll('.navbar .nav-link').forEach((link, idx) => {
         pushStructural(link, 'place', `Nav-${idx + 1}`);
       });
-      pushStructural(document.getElementById('swarmReplayBtn'), 'place', 'Replay');
+      // 顶栏重播按钮不参与构建：动画期间完全隐藏，由结尾「爱」小鼠衔入顶栏
       pushStructural(document.getElementById('searchToggle'), 'place', 'Search');
       pushStructural(document.getElementById('themeToggle'), 'place', 'Theme');
       pushStructural(document.getElementById('menuToggle'), 'place', 'Menu');
@@ -2796,11 +2796,25 @@ try {
       });
     },
 
+    // 每次播放递增的实例编号：旧时间线的异步循环据此立即失效，避免中途重播时新旧任务互相打架
+    isAlive(run) {
+      return this.isRunning && this.runId === run;
+    },
+
     start(isReplay = false) {
       if (this.isRunning) {
         this.cleanup(true);
       }
+      this.runId = (this.runId || 0) + 1;
+      const run = this.runId;
       this.isRunning = true;
+
+      // 顶栏重播按钮：动画期间完全隐藏且不可点，等结尾由「爱」衔回
+      const replayBtn = document.getElementById('swarmReplayBtn');
+      if (replayBtn) {
+        replayBtn.classList.remove('is-tilted', 'is-springing');
+        replayBtn.classList.add('swarm-replay-pending');
+      }
       this.speedMultiplier = 1;
       localStorage.setItem(this.STORAGE_KEY, '1');
 
@@ -2844,7 +2858,7 @@ try {
       window.addEventListener('keydown', this.escHandler);
 
       // 启动主编排时间线
-      this.runTimeline(tasks);
+      this.runTimeline(tasks, run);
     },
 
     buildStage(totalLayers) {
@@ -3011,6 +3025,7 @@ try {
 
     // 使用四次方缓动 (Quartic Easing) + 贝塞尔曲线平滑移动 Agent 到指定坐标
     moveAgentTo(agent, targetX, targetY, durationMs, onUpdate, easingType = 'outQuart') {
+      const run = this.runId;
       return new Promise((resolve) => {
         if (agent.retired) return resolve();
         const startX = agent.x;
@@ -3025,7 +3040,7 @@ try {
         const actualDuration = Math.max(20, durationMs / (agent.speedFactor || 1));
 
         const step = (now) => {
-          if (!this.isRunning || agent.retired) return resolve();
+          if (!this.isAlive(run) || agent.retired) return resolve();
           const dt = (now - lastTime) * this.speedMultiplier;
           lastTime = now;
           elapsed += dt;
@@ -3088,11 +3103,12 @@ try {
     },
 
     wait(ms) {
+      const run = this.runId;
       return new Promise((resolve) => {
         let elapsed = 0;
         let last = performance.now();
         const tick = (now) => {
-          if (!this.isRunning) return resolve();
+          if (!this.isAlive(run)) return resolve();
           elapsed += (now - last) * this.speedMultiplier;
           last = now;
           if (elapsed >= ms) return resolve();
@@ -3102,7 +3118,8 @@ try {
       });
     },
 
-    async runTimeline(tasks) {
+    async runTimeline(tasks, run) {
+      const agents = this.agents;
       const startTime = performance.now();
       const totalLayers = Math.max(1, tasks.length);
       let completedLayers = 0;
@@ -3110,7 +3127,7 @@ try {
       const updateHudProgress = () => {
         if (!this.hudStatus || !this.hudBar) return;
         const pct = Math.min(100, Math.round((completedLayers / totalLayers) * 100));
-        this.hudStatus.innerHTML = `<strong>${this.agents.length} 羁绊</strong> · ${completedLayers} / ${totalLayers} layers`;
+        this.hudStatus.innerHTML = `<strong>${agents.length} 羁绊</strong> · ${completedLayers} / ${totalLayers} layers`;
         this.hudBar.style.width = `${pct}%`;
       };
 
@@ -3128,14 +3145,14 @@ try {
         const duration = 680;
 
         const vortexStep = (now) => {
-          if (!this.isRunning) return resolve();
+          if (!this.isAlive(run)) return resolve();
           const dt = (now - last) * this.speedMultiplier;
           last = now;
           elapsed += dt;
           const progress = Math.min(1, elapsed / duration);
           const ease = this.easeOutQuart(progress);
 
-          this.agents.forEach((agent) => {
+          agents.forEach((agent) => {
             const currentAngle = agent.angle + progress * agent.orbitSpeed * 2.1;
             const startR = Math.max(vw, vh) * 0.44;
             const r = startR * (1 - ease) + agent.orbitRadius * ease;
@@ -3157,7 +3174,7 @@ try {
         requestAnimationFrame(vortexStep);
       });
 
-      if (!this.isRunning) return;
+      if (!this.isAlive(run)) return;
 
       // ==========================================
       // 阶段 2 & 3 无缝并发：中心徽章散开瞬间，12 个鼠标 0 停顿同时冲向各自首个任务！
@@ -3203,7 +3220,7 @@ try {
       const artboardTag = artboard.querySelector('#artboardSizeTag');
 
       const syncArtboardOnScroll = () => {
-        if (!this.isRunning || !artboard.isConnected) return;
+        if (!this.isAlive(run) || !artboard.isConnected) return;
         const r = contentGridEl.getBoundingClientRect();
         artboard.style.left = `${Math.round(r.left)}px`;
         artboard.style.top = `${Math.round(r.top)}px`;
@@ -3216,7 +3233,7 @@ try {
         leadAgent.busy = true;
         this.setAgentTool(leadAgent, 'crosshair', 'Artboard');
         await this.moveAgentTo(leadAgent, abLeft, abTop, 240);
-        if (!this.isRunning) return;
+        if (!this.isAlive(run)) return;
         await this.moveAgentTo(leadAgent, abLeft + abWidth, abTop + abHeight, 360, (ease) => {
           const curRect = contentGridEl.getBoundingClientRect();
           const curL = Math.round(curRect.left);
@@ -3239,7 +3256,7 @@ try {
       };
 
       const executeTask = async (agent, task, isFirstTask = false) => {
-        if (!this.isRunning) {
+        if (!this.isAlive(run)) {
           if (task.markDone) task.markDone();
           return;
         }
@@ -3260,7 +3277,7 @@ try {
           this.setAgentTool(agent, 'crosshair', task.metaLabel);
           await this.moveAgentTo(agent, Math.round(initRect.left), Math.round(initRect.top), 290 + extraFlight);
           if (task.parentPromise) await task.parentPromise;
-          if (!this.isRunning) {
+          if (!this.isAlive(run)) {
             if (task.markDone) task.markDone();
             return;
           }
@@ -3328,7 +3345,7 @@ try {
             270 + extraFlight
           );
           if (task.parentPromise) await task.parentPromise;
-          if (!this.isRunning) {
+          if (!this.isAlive(run)) {
             if (task.markDone) task.markDone();
             return;
           }
@@ -3366,7 +3383,7 @@ try {
           const targetY = Math.round(initRect.top + initRect.height * 0.5);
           await this.moveAgentTo(agent, targetX, targetY, 260 + extraFlight);
           if (task.parentPromise) await task.parentPromise;
-          if (!this.isRunning) {
+          if (!this.isAlive(run)) {
             if (task.markDone) task.markDone();
             return;
           }
@@ -3402,14 +3419,14 @@ try {
 
       // 建立共享任务队列：旋涡散开的同一毫秒，12 个 Agent 0 等待同时出发，谁干完谁独自从右下角退场！
       const taskQueue = [...tasks];
-      const workerPromises = this.agents.map(async (agent, idx) => {
+      const workerPromises = agents.map(async (agent, idx) => {
         let isFirst = true;
         if (idx === 1) {
           // 1号 Agent 先并发拉开主画板外框，拉完无缝继续从队列取任务
           await buildArtboardTask(agent);
           isFirst = false;
         }
-        while (this.isRunning && taskQueue.length > 0) {
+        while (this.isAlive(run) && taskQueue.length > 0) {
           const nextTask = taskQueue.shift();
           if (!nextTask) break;
           await executeTask(agent, nextTask, isFirst);
@@ -3421,10 +3438,10 @@ try {
 
       await Promise.all(workerPromises);
 
-      if (!this.isRunning) return;
+      if (!this.isAlive(run)) return;
 
       // ==========================================
-      // 阶段 4：全部 Agent 已陆续退场，收起辅助线并更新 HUD
+      // 阶段 4：全部 Agent 已陆续退场，收起辅助线
       // ==========================================
       if (this.scrollSyncCleanup) {
         this.scrollSyncCleanup();
@@ -3435,12 +3452,23 @@ try {
       this.guideH1.classList.remove('is-active');
       this.guideH2.classList.remove('is-active');
 
+      // ==========================================
+      // 阶段 5：结尾演出——「爱」小鼠把重播图标衔入顶栏，点一下 Q 弹回正后退场
+      // ==========================================
+      await this.playFinale(run);
+      if (!this.isAlive(run)) return;
+
       const totalSeconds = ((performance.now() - startTime) / 1000).toFixed(1);
       if (this.hudStatus) {
-        this.hudStatus.innerHTML = `Built by <strong>${this.agents.length} 羁绊</strong> in ${totalSeconds}s`;
+        this.hudStatus.innerHTML = `Built by <strong>${agents.length} 羁绊</strong> in ${totalSeconds}s`;
       }
+      // 进度栏平滑收起
       if (this.hudProgressWrap) {
-        this.hudProgressWrap.style.display = 'none';
+        const bar = this.hudProgressWrap;
+        bar.classList.add('is-collapsed');
+        setTimeout(() => {
+          bar.style.display = 'none';
+        }, 340);
       }
       if (this.speedBtn) {
         this.speedBtn.style.display = 'none';
@@ -3450,7 +3478,7 @@ try {
       }
 
       await this.wait(300);
-      if (!this.isRunning) return;
+      if (!this.isAlive(run)) return;
 
       if (this.stage) {
         this.stage.remove();
@@ -3461,6 +3489,140 @@ try {
       this.autoHideTimer = setTimeout(() => {
         this.cleanup(false);
       }, 3800);
+    },
+
+    // 结尾演出：「爱」小鼠衔着重播图标飞入顶栏，把图标歪着放下，模拟点击后 Q 弹回正，然后退场
+    async playFinale(run) {
+      const replayBtn = document.getElementById('swarmReplayBtn');
+      if (!this.stage) return;
+      if (!replayBtn) return;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const color = '#f43f5e';
+
+      const el = document.createElement('div');
+      el.className = 'swarm-cursor';
+      el.style.setProperty('--agent-color', color);
+      el.innerHTML = `
+        <div class="swarm-cursor-icon">${this.ICONS.arrow(color)}</div>
+        <div class="swarm-cursor-tag"><span>爱</span><span class="swarm-cursor-tag-meta" style="display:none;"></span></div>
+      `;
+      el.style.opacity = '0';
+      this.stage.appendChild(el);
+
+      const agent = {
+        id: 12,
+        name: '爱',
+        color,
+        el,
+        iconEl: el.querySelector('.swarm-cursor-icon'),
+        metaEl: el.querySelector('.swarm-cursor-tag-meta'),
+        x: -70,
+        y: vh + 50,
+        prevX: -70,
+        prevY: vh + 50,
+        angle: 0,
+        orbitRadius: 0,
+        orbitSpeed: 0,
+        speedFactor: 1.06,
+        tool: 'arrow',
+        busy: false,
+        retired: false
+      };
+      this.setAgentPos(agent, agent.x, agent.y);
+      requestAnimationFrame(() => {
+        if (el.isConnected) el.style.opacity = '1';
+      });
+
+      // 衔在嘴前的重播图标（克隆顶栏按钮的图标，最后交接给真实按钮）
+      const carry = document.createElement('div');
+      carry.className = 'swarm-carry-icon';
+      carry.innerHTML = replayBtn.innerHTML;
+      this.stage.appendChild(carry);
+      const placeCarry = (cx, cy, rot, scale, alpha = 1) => {
+        carry.style.transform = `translate3d(${Math.round(cx)}px, ${Math.round(cy)}px, 0) rotate(${rot}deg) scale(${scale})`;
+        carry.style.opacity = String(alpha);
+      };
+      placeCarry(agent.x + 16, agent.y + 6, -16, 1.05);
+
+      const btnRect = replayBtn.getBoundingClientRect();
+      const btnCx = btnRect.left + btnRect.width * 0.5;
+      const btnCy = btnRect.top + btnRect.height * 0.5;
+
+      // 1) 从左下角飞向顶栏重播按钮
+      await this.moveAgentTo(
+        agent,
+        Math.round(btnCx - 30),
+        Math.round(btnCy + 26),
+        720,
+        (ease, cx, cy) => placeCarry(cx + 16, cy + 6, -16 - ease * 10, 1.05),
+        'outQuart'
+      );
+      if (!this.isAlive(run)) {
+        carry.remove();
+        el.remove();
+        return;
+      }
+
+      // 2) 交棒：图标落入按钮槽位，真实按钮以「歪着」的姿态现身
+      const fromX = agent.x + 16;
+      const fromY = agent.y + 6;
+      await new Promise((resolve) => {
+        const duration = 260;
+        const t0 = performance.now();
+        const step = (now) => {
+          if (!this.isAlive(run)) return resolve();
+          const t = Math.min(1, (now - t0) / duration);
+          const ease = this.easeOutQuart(t);
+          placeCarry(
+            fromX + (btnCx - fromX) * ease,
+            fromY + (btnCy - fromY) * ease,
+            -26,
+            1.05 - 0.35 * ease,
+            1 - ease
+          );
+          if (t < 1) requestAnimationFrame(step);
+          else resolve();
+        };
+        requestAnimationFrame(step);
+      });
+      carry.remove();
+      if (!this.isAlive(run)) return;
+
+      replayBtn.classList.remove('swarm-replay-pending');
+      replayBtn.classList.add('is-tilted');
+
+      // 3) 小鼠凑上去模拟点击，图标 Q 弹回正
+      await this.moveAgentTo(agent, Math.round(btnCx + 2), Math.round(btnCy + 4), 220);
+      if (!this.isAlive(run)) return;
+      el.classList.add('is-clicking');
+      this.spawnRipple(Math.round(btnCx), Math.round(btnCy), color);
+      await this.wait(110);
+      if (!this.isAlive(run)) return;
+
+      replayBtn.classList.add('is-springing');
+      replayBtn.classList.remove('is-tilted');
+      el.classList.remove('is-clicking');
+
+      await this.wait(420);
+      if (!this.isAlive(run)) return;
+      setTimeout(() => replayBtn.classList.remove('is-springing'), 420);
+
+      // 4) 小鼠收工退场
+      this.setAgentTool(agent, 'arrow');
+      await this.moveAgentTo(
+        agent,
+        vw + 80,
+        vh + 80,
+        560,
+        (ease) => {
+          el.style.opacity = Math.max(0, 1 - Math.pow(ease, 2)).toFixed(2);
+        },
+        'outQuart'
+      );
+      agent.retired = true;
+      el.remove();
     },
 
     skip() {
@@ -3483,6 +3645,12 @@ try {
       }
 
       document.documentElement.classList.remove('swarm-intro-preparing', 'swarm-running');
+
+      // 顶栏重播按钮恢复常态
+      const replayBtn = document.getElementById('swarmReplayBtn');
+      if (replayBtn) {
+        replayBtn.classList.remove('swarm-replay-pending', 'is-tilted', 'is-springing');
+      }
 
       // 立即恢复所有受控 DOM 元素的原始文本与可见性
       document.querySelectorAll('.swarm-target-hidden, .swarm-target-building, .swarm-text-highlight').forEach((el) => {

@@ -6444,6 +6444,41 @@ button:focus-visible {
   transform: rotate(18deg) scale(1.1);
 }
 
+/* 开屏动效期间：顶栏重播按钮完全不参与构建，隐藏且不可点 */
+.swarm-replay-toggle.swarm-replay-pending {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 结尾演出：「爱」小鼠把图标歪着放进顶栏 */
+.swarm-replay-toggle.is-tilted {
+  opacity: 1 !important;
+  pointer-events: none !important;
+  transform: rotate(-26deg) scale(0.86);
+  transition: transform 0.16s ease !important;
+}
+
+/* 被点一下后 Q 弹回正 */
+.swarm-replay-toggle.is-springing {
+  transition: transform 0.72s cubic-bezier(0.2, 1.85, 0.32, 1) !important;
+}
+
+.swarm-replay-toggle.is-springing svg {
+  animation: swarm-replay-pop 0.72s ease;
+}
+
+@keyframes swarm-replay-pop {
+  0% {
+    transform: rotate(-14deg) scale(0.9);
+  }
+  55% {
+    transform: rotate(10deg) scale(1.12);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
 /* 预备态防闪烁：在 JS 启动前隐藏首屏核心节点与下方区域，防止任何内容提前漏出 */
 html.swarm-intro-preparing .navbar,
 html.swarm-intro-preparing .hero,
@@ -6683,6 +6718,27 @@ html.swarm-running .reveal-stagger > * {
   transform: scale(0.84);
 }
 
+/* 结尾「爱」小鼠衔着的重播图标 */
+.swarm-carry-icon {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9996;
+  width: 20px;
+  height: 20px;
+  color: #0c8ce9;
+  pointer-events: none;
+  transform-origin: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 2px 6px rgba(12, 140, 233, 0.45));
+}
+
+.swarm-carry-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
 /* 鼠标右下角名字胶囊（亲情、友情、同学、网络等） */
 .swarm-cursor-tag {
   position: absolute;
@@ -6816,6 +6872,14 @@ html.swarm-running .reveal-stagger > * {
   background: rgba(255, 255, 255, 0.16);
   overflow: hidden;
   flex-shrink: 0;
+  transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease, background-color 0.32s ease;
+}
+
+/* 结尾收起进度栏 */
+.swarm-hud-progress.is-collapsed {
+  width: 0;
+  opacity: 0;
+  background-color: transparent;
 }
 
 .swarm-hud-progress-bar {
