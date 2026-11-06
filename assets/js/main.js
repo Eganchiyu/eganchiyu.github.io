@@ -3491,15 +3491,17 @@ try {
       }, 3800);
     },
 
-    // 结尾演出：「爱」小鼠衔着重播图标飞入顶栏，把图标歪着放下，模拟点击后 Q 弹回正，然后退场
+    // 结尾演出：「爱」小鼠在画面中心衔着重播图标登场，精准放入顶栏槽位（歪着），
+    // 曲线退开一小段后从右侧冲刺撞击，把图标撞正、自己弹开，停顿几毫秒后撤离
     async playFinale(run) {
       const replayBtn = document.getElementById('swarmReplayBtn');
-      if (!this.stage) return;
-      if (!replayBtn) return;
+      if (!this.stage || !replayBtn) return;
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const color = '#f43f5e';
+      const cx = vw * 0.5;
+      const cy = vh * 0.46;
 
       const el = document.createElement('div');
       el.className = 'swarm-cursor';
@@ -3518,10 +3520,10 @@ try {
         el,
         iconEl: el.querySelector('.swarm-cursor-icon'),
         metaEl: el.querySelector('.swarm-cursor-tag-meta'),
-        x: -70,
-        y: vh + 50,
-        prevX: -70,
-        prevY: vh + 50,
+        x: cx,
+        y: cy,
+        prevX: cx,
+        prevY: cy,
         angle: 0,
         orbitRadius: 0,
         orbitSpeed: 0,
@@ -3531,33 +3533,41 @@ try {
         retired: false
       };
       this.setAgentPos(agent, agent.x, agent.y);
-      requestAnimationFrame(() => {
-        if (el.isConnected) el.style.opacity = '1';
-      });
 
       // 衔在嘴前的重播图标（克隆顶栏按钮的图标，最后交接给真实按钮）
       const carry = document.createElement('div');
       carry.className = 'swarm-carry-icon';
       carry.innerHTML = replayBtn.innerHTML;
       this.stage.appendChild(carry);
-      const placeCarry = (cx, cy, rot, scale, alpha = 1) => {
-        carry.style.transform = `translate3d(${Math.round(cx)}px, ${Math.round(cy)}px, 0) rotate(${rot}deg) scale(${scale})`;
+      const placeCarry = (x, y, rot, scale, alpha = 1) => {
+        carry.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0) rotate(${rot}deg) scale(${scale})`;
         carry.style.opacity = String(alpha);
       };
-      placeCarry(agent.x + 16, agent.y + 6, -16, 1.05);
+      placeCarry(agent.x + 16, agent.y + 6, 22, 1.05);
 
       const btnRect = replayBtn.getBoundingClientRect();
       const btnCx = btnRect.left + btnRect.width * 0.5;
       const btnCy = btnRect.top + btnRect.height * 0.5;
 
-      // 1) 从左下角飞向顶栏重播按钮
+      // 0) 在画面中心衔着图标淡入
+      requestAnimationFrame(() => {
+        if (el.isConnected) el.style.opacity = '1';
+      });
+      await this.wait(260);
+      if (!this.isAlive(run)) {
+        carry.remove();
+        el.remove();
+        return;
+      }
+
+      // 1) 曲线平滑飞向顶栏，把图标对准放入槽位（先歪着）
       await this.moveAgentTo(
         agent,
-        Math.round(btnCx - 30),
-        Math.round(btnCy + 26),
-        720,
-        (ease, cx, cy) => placeCarry(cx + 16, cy + 6, -16 - ease * 10, 1.05),
-        'outQuart'
+        Math.round(btnCx + 46),
+        Math.round(btnCy + 12),
+        640,
+        (ease, x, y) => placeCarry(x + 16, y + 6, 22, 1.05),
+        'inOutQuart'
       );
       if (!this.isAlive(run)) {
         carry.remove();
@@ -3565,11 +3575,10 @@ try {
         return;
       }
 
-      // 2) 交棒：图标落入按钮槽位，真实按钮以「歪着」的姿态现身
       const fromX = agent.x + 16;
       const fromY = agent.y + 6;
       await new Promise((resolve) => {
-        const duration = 260;
+        const duration = 230;
         const t0 = performance.now();
         const step = (now) => {
           if (!this.isAlive(run)) return resolve();
@@ -3578,7 +3587,7 @@ try {
           placeCarry(
             fromX + (btnCx - fromX) * ease,
             fromY + (btnCy - fromY) * ease,
-            -26,
+            22,
             1.05 - 0.35 * ease,
             1 - ease
           );
@@ -3593,29 +3602,43 @@ try {
       replayBtn.classList.remove('swarm-replay-pending');
       replayBtn.classList.add('is-tilted');
 
-      // 3) 小鼠凑上去模拟点击，图标 Q 弹回正
-      await this.moveAgentTo(agent, Math.round(btnCx + 2), Math.round(btnCy + 4), 220);
+      // 2) 平滑曲线退开一小段（向右下绕出去）
+      await this.moveAgentTo(
+        agent,
+        Math.round(btnCx + 150),
+        Math.round(btnCy + 66),
+        430,
+        null,
+        'inOutQuart'
+      );
+      if (!this.isAlive(run)) return;
+      await this.wait(120);
+      if (!this.isAlive(run)) return;
+
+      // 3) 从右侧冲刺撞击图标，把它撞正
+      await this.moveAgentTo(agent, Math.round(btnCx + 13), Math.round(btnCy + 2), 190, null, 'inOutQuart');
       if (!this.isAlive(run)) return;
       el.classList.add('is-clicking');
       this.spawnRipple(Math.round(btnCx), Math.round(btnCy), color);
-      await this.wait(110);
-      if (!this.isAlive(run)) return;
-
       replayBtn.classList.add('is-springing');
       replayBtn.classList.remove('is-tilted');
-      el.classList.remove('is-clicking');
 
-      await this.wait(420);
+      // 4) 自己被撞得往斜下弹开
+      await this.moveAgentTo(agent, Math.round(btnCx + 112), Math.round(btnCy + 96), 240, null, 'outQuart');
+      el.classList.remove('is-clicking');
       if (!this.isAlive(run)) return;
       setTimeout(() => replayBtn.classList.remove('is-springing'), 420);
 
-      // 4) 小鼠收工退场
+      // 5) 停顿几毫秒，撤离现场
+      await this.wait(340);
+      if (!this.isAlive(run)) return;
+
       this.setAgentTool(agent, 'arrow');
       await this.moveAgentTo(
         agent,
         vw + 80,
         vh + 80,
-        560,
+        520,
         (ease) => {
           el.style.opacity = Math.max(0, 1 - Math.pow(ease, 2)).toFixed(2);
         },

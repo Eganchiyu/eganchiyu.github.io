@@ -6450,11 +6450,11 @@ button:focus-visible {
   pointer-events: none !important;
 }
 
-/* 结尾演出：「爱」小鼠把图标歪着放进顶栏 */
+/* 结尾演出：「爱」小鼠把图标歪着放进顶栏（右倾，等着被从右侧撞正） */
 .swarm-replay-toggle.is-tilted {
   opacity: 1 !important;
   pointer-events: none !important;
-  transform: rotate(-26deg) scale(0.86);
+  transform: rotate(22deg) scale(0.88);
   transition: transform 0.16s ease !important;
 }
 
@@ -6469,10 +6469,10 @@ button:focus-visible {
 
 @keyframes swarm-replay-pop {
   0% {
-    transform: rotate(-14deg) scale(0.9);
+    transform: rotate(16deg) scale(0.9);
   }
   55% {
-    transform: rotate(10deg) scale(1.12);
+    transform: rotate(-8deg) scale(1.12);
   }
   100% {
     transform: rotate(0deg) scale(1);
