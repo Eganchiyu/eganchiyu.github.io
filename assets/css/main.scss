@@ -6098,16 +6098,6 @@ html.swarm-running .reveal-stagger > * {
   transition: opacity 0.3s ease;
 }
 
-/* 鼠标高速移动残影拖尾（复刻视频第1帧炫酷幻影簇） */
-.swarm-cursor-ghost {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9993;
-  pointer-events: none;
-  will-change: transform, opacity;
-}
-
 .swarm-cursor-icon {
   position: relative;
   width: 22px;

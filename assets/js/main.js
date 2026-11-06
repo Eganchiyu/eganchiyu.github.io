@@ -2886,16 +2886,6 @@ try {
         const startX = cx + Math.cos(angle) * startDist;
         const startY = cy + Math.sin(angle) * startDist;
 
-        // 创建 2 个半透明残影节点（复刻视频第1帧环绕幻影）
-        const ghosts = [0.38, 0.18].map((alpha, gIdx) => {
-          const g = document.createElement('div');
-          g.className = 'swarm-cursor-ghost';
-          g.style.opacity = String(alpha);
-          g.innerHTML = `<div class="swarm-cursor-icon" style="transform:scale(${0.92 - gIdx * 0.08})">${this.ICONS.arrow(item.color)}</div>`;
-          this.stage.appendChild(g);
-          return { el: g, x: startX, y: startY };
-        });
-
         const el = document.createElement('div');
         el.className = 'swarm-cursor';
         el.style.setProperty('--agent-color', item.color);
@@ -2915,7 +2905,6 @@ try {
           el,
           iconEl: el.querySelector('.swarm-cursor-icon'),
           metaEl: el.querySelector('.swarm-cursor-tag-meta'),
-          ghosts,
           x: startX,
           y: startY,
           prevX: startX,
@@ -2936,18 +2925,6 @@ try {
 
     setAgentPos(agent, x, y) {
       if (agent.retired) return;
-      // 更新残影坐标（滞后跟随）
-      if (agent.ghosts && agent.ghosts.length) {
-        for (let i = agent.ghosts.length - 1; i > 0; i--) {
-          agent.ghosts[i].x += (agent.ghosts[i - 1].x - agent.ghosts[i].x) * 0.42;
-          agent.ghosts[i].y += (agent.ghosts[i - 1].y - agent.ghosts[i].y) * 0.42;
-          agent.ghosts[i].el.style.transform = `translate3d(${agent.ghosts[i].x.toFixed(1)}px, ${agent.ghosts[i].y.toFixed(1)}px, 0)`;
-        }
-        agent.ghosts[0].x += (agent.x - agent.ghosts[0].x) * 0.48;
-        agent.ghosts[0].y += (agent.y - agent.ghosts[0].y) * 0.48;
-        agent.ghosts[0].el.style.transform = `translate3d(${agent.ghosts[0].x.toFixed(1)}px, ${agent.ghosts[0].y.toFixed(1)}px, 0)`;
-      }
-
       agent.prevX = agent.x;
       agent.prevY = agent.y;
       agent.x = x;
@@ -3051,16 +3028,12 @@ try {
         (ease) => {
           const alpha = Math.max(0, 1 - Math.pow(ease, 2));
           agent.el.style.opacity = alpha.toFixed(2);
-          agent.ghosts.forEach((g, idx) => {
-            g.el.style.opacity = (alpha * (0.35 - idx * 0.15)).toFixed(2);
-          });
         },
         'outQuart'
       );
 
       agent.retired = true;
       if (agent.el) agent.el.remove();
-      if (agent.ghosts) agent.ghosts.forEach((g) => g.el.remove());
     },
 
     wait(ms) {
